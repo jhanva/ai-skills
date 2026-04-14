@@ -29,6 +29,7 @@ Skills de desarrollo propias, escritas desde cero. Imponen flujos de trabajo dis
   image-algo/SKILL.md              — Diseno de algoritmos de imagen
   ml-ondevice/SKILL.md             — Integracion de ML on-device Android
   image-pipeline/SKILL.md          — Diseno de pipelines de imagen
+  humanize/SKILL.md                — Humanizar texto generado por IA
 ```
 
 ## Skills disponibles
@@ -51,6 +52,7 @@ Skills de desarrollo propias, escritas desde cero. Imponen flujos de trabajo dis
 | `/image-algo` | Solo usuario | Diseno de algoritmos de imagen (hashing, similarity, clustering) |
 | `/ml-ondevice` | Solo usuario | Integracion de modelos ML on-device en Android |
 | `/image-pipeline` | Solo usuario | Diseno de pipelines de procesamiento de imagen multi-paso |
+| `/humanize` | Solo usuario | Humanizar texto de IA: diagnostico y reescritura (review/rewrite) |
 
 "Siempre activa" = `user-invocable: false` (Claude la carga automaticamente, no aparece en menu `/`)
 "Solo usuario" = `disable-model-invocation: true` (se invoca manualmente con `/nombre`)
@@ -80,6 +82,12 @@ Skills de desarrollo propias, escritas desde cero. Imponen flujos de trabajo dis
 /bitmap-safety   (memory, threading, error handling de imagen)
 /room-audit      (migraciones, schema, data safety)
 /secure          (seguridad general: secrets, vulnerabilidades)
+```
+
+### Texto
+```
+/humanize review [archivo]    (diagnostico sin modificar)
+/humanize rewrite [archivo]   (reescritura completa)
 ```
 
 Para debugging: `/debug` (aplica `/tdd` para el fix y `/verify` para confirmar)
