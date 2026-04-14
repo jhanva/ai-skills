@@ -7,7 +7,6 @@ Skills de desarrollo propias, escritas desde cero. Imponen flujos de trabajo dis
 ```
 .claude/skills/
   optimize/SKILL.md                — Optimizacion de tokens (siempre activa)
-  optimize/scripts/filter-output.sh — Filtrado de output para comandos
   brainstorm/SKILL.md              — Diseno antes de implementar
   plan/SKILL.md                    — Spec -> plan de implementacion
   tdd/SKILL.md                     — Test-driven development estricto
@@ -24,13 +23,16 @@ Skills de desarrollo propias, escritas desde cero. Imponen flujos de trabajo dis
   secure/references/code-patterns.md     — Patrones de seguridad en codigo
   secure/references/infra-patterns.md    — Patrones de seguridad en infra
   secure/scripts/scan-secrets.py         — Scanner de secrets (Python, zero deps)
+  android-arch/SKILL.md            — Validacion de Clean Architecture Android
+  bitmap-safety/SKILL.md           — Auditoria de pipelines de imagen
+  room-audit/SKILL.md              — Auditoria de seguridad de datos Room
 ```
 
 ## Skills disponibles
 
 | Skill | Invocacion | Proposito |
 |---|---|---|
-| `optimize` | Siempre activa | Optimizacion de tokens, effort, filtrado, delegacion |
+| `optimize` | Siempre activa | Lecturas precisas, delegacion con umbral, filtrado, modelo por tarea |
 | `/brainstorm` | Solo usuario | Diseno antes de implementar |
 | `/plan` | Solo usuario | Spec -> plan con tareas de 2-5 min |
 | `/tdd` | Auto + usuario | TDD estricto RED-GREEN-REFACTOR |
@@ -40,6 +42,9 @@ Skills de desarrollo propias, escritas desde cero. Imponen flujos de trabajo dis
 | `/review` | Solo usuario | Code review con severidades |
 | `/parallel` | Solo usuario | Despachar agentes para problemas independientes |
 | `/secure` | Solo usuario | Analisis de seguridad (quick: diff only, full: proyecto completo) |
+| `/android-arch` | Solo usuario | Validacion de boundaries de Clean Architecture Android |
+| `/bitmap-safety` | Solo usuario | Auditoria de pipelines de procesamiento de imagen |
+| `/room-audit` | Solo usuario | Auditoria de seguridad de datos con Room |
 
 "Siempre activa" = `user-invocable: false` (Claude la carga automaticamente, no aparece en menu `/`)
 "Solo usuario" = `disable-model-invocation: true` (se invoca manualmente con `/nombre`)
@@ -69,10 +74,8 @@ Para seguridad: `/secure quick` (archivos cambiados) o `/secure full` (proyecto 
 
 La skill `optimize` se carga automaticamente y aplica estas reglas en toda interaccion:
 
-- Leer archivos con precision (Grep antes de Read, offset/limit)
-- Ajustar effort level por complejidad de tarea (low/medium/high/max)
-- Delegar operaciones verbosas a subagentes (tests, logs, exploracion)
-- Filtrar output de comandos antes de que entre al contexto
-- Compaction con foco (`/compact focus on X`)
+- Lecturas precisas (offset/limit, Grep con output_mode ajustado)
+- Tool calls paralelos para herramientas independientes
+- Delegar a subagentes solo cuando output esperado > 50 lineas
+- Filtrar output de comandos con pipes antes de que entre al contexto
 - Seleccion de modelo para subagentes (haiku/sonnet/opus)
-- Prompts especificos para minimizar lecturas innecesarias

@@ -2,126 +2,64 @@
 name: optimize
 description: >
   Reglas de optimizacion de tokens y contexto que se aplican SIEMPRE.
-  Gestiona effort level, delegacion a subagentes, lecturas de archivos eficientes,
-  filtrado de output, compaction con foco, y seleccion de modelo.
+  Lecturas precisas, delegacion a subagentes, filtrado de output, y seleccion de modelo.
 when_to_use: >
-  Siempre. Esta skill aplica a toda interaccion: codear, debuggear, revisar,
-  planificar, investigar, o cualquier tarea. Es conocimiento de fondo que
-  guia como trabajar de forma eficiente.
+  Siempre. Esta skill aplica a toda interaccion.
 user-invocable: false
 ---
 
 # Optimize — Reglas de eficiencia de tokens
 
-Estas reglas aplican SIEMPRE, en cada accion que tomes. No son sugerencias, son restricciones operativas.
+Restricciones operativas accionables por el modelo. Aplican en cada accion.
 
-## 1. Leer archivos con precision
+## 1. Lecturas precisas
 
-Las lecturas de archivos son el mayor consumidor de tokens (1,000-3,000 por archivo). Minimizalas:
+- **Read con offset/limit** — si necesitas una funcion, lee solo esas lineas: `Read(file, offset=120, limit=30)`
+- **No releas archivos** que ya estan en el contexto de esta sesion
+- **Grep con output_mode ajustado** — usa `files_with_matches` (default) para localizar, `content` solo cuando necesites ver el codigo, `count` para dimensionar. Ajusta `head_limit` para controlar cuanto entra al contexto
 
-- **Nunca leas archivos "por si acaso"** — solo lee lo que necesitas para la tarea actual
-- **Usa Grep antes de Read** — busca el patron exacto en vez de leer archivos completos para encontrar algo
-- **Usa Glob para encontrar archivos** — no leas directorios completos con `ls -R`
-- **Lee con offset y limit** — si solo necesitas una funcion, lee esas lineas, no el archivo entero: `Read(file, offset=120, limit=30)`
-- **No releas archivos que ya leiste** — recuerda el contenido de esta sesion
+## 2. Tool calls paralelos
 
-## 2. Effort level por complejidad de tarea
+Cuando necesites ejecutar herramientas independientes (ej: 3 Reads, Grep + Glob, Read + Bash), lanzalas todas en un solo mensaje. Reduce latencia sin costo extra de tokens.
 
-El extended thinking consume 10,000-50,000+ tokens de OUTPUT (los mas caros). Ajusta el esfuerzo:
+## 3. Delegar a subagentes (con umbral)
 
-| Tarea | Effort recomendado |
-|---|---|
-| Rename, fix typo, agregar import, formateo | low |
-| Implementar funcion simple, agregar test, fix acotado | medium |
-| Debugging multi-archivo, diseno, refactor complejo | high |
-| Arquitectura, decisiones criticas, problemas muy dificiles | max (solo opus) |
+Delega operaciones cuyo output se espera > 50 lineas:
 
-No uses high/max para tareas que se resuelven en 2 pasos. No uses low para decisiones que requieren razonamiento profundo.
+- Suites de tests completas
+- Exploracion de codebase multi-archivo
+- Logs largos, WebFetch
 
-## 3. Delegar operaciones verbosas a subagentes
+**No delegues si el output esperado es corto** (< 50 lineas). El overhead de un subagente (system prompt + CLAUDE.md + skills) supera el ahorro en esos casos.
 
-El output de estas operaciones inunda el contexto principal. SIEMPRE delega a un subagente:
-
-- **Correr suites de tests completas** — el output puede ser miles de tokens. Delega y recibe solo el resumen
-- **Investigar/explorar codebase** — usar subagente tipo Explore que lee multiples archivos sin inflar tu contexto
-- **Leer logs largos** — un subagente puede procesar y resumir
-- **Buscar en documentacion externa** — WebFetch retorna contenido masivo, mejor en subagente
-
-Cuando delegues, especifica exactamente que necesitas de vuelta:
+Cuando delegues, especifica que necesitas de vuelta:
 
 ```
 BIEN: "Corre npm test y reporta: cuantos pasan, cuantos fallan, y los nombres de los que fallan"
-MAL:  "Corre npm test"  (retorna todo el output raw)
+MAL:  "Corre npm test"
 ```
 
 ## 4. Filtrar output de comandos
 
-Cuando ejecutes comandos que producen output largo, filtra ANTES de que entre al contexto:
+Cuando ejecutes comandos con output largo, filtra con pipes antes de que entre al contexto:
 
 ```bash
-# MAL — todo el output entra al contexto
-npm test
-
-# BIEN — solo fallos
+# Tests — solo fallos
 npm test 2>&1 | grep -A 5 -E '(FAIL|ERROR|error:)' | head -100
 
-# MAL — todo el log
-cat app.log
-
-# BIEN — solo errores recientes
-tail -100 app.log | grep -i error
-
-# MAL — todo el build output
-npm run build
-
-# BIEN — solo errores
+# Build — solo errores
 npm run build 2>&1 | grep -i -E '(error|failed)' | head -50
+
+# Logs — solo errores recientes
+tail -100 app.log | grep -i error
 ```
 
-Usa el script `${CLAUDE_SKILL_DIR}/scripts/filter-output.sh` como referencia para patrones de filtrado.
+## 5. Seleccion de modelo para subagentes
 
-## 5. Compaction inteligente
+Usa el modelo mas barato que pueda completar la tarea:
 
-Cuando el contexto crece y necesitas compactar:
-
-- **Usa `/compact` con foco**: `/compact focus on the auth changes and test results` — esto le dice al compresor que preservar
-- **Usa `/clear` entre tareas no relacionadas** — contexto de tarea anterior es desperdicio puro
-- **Antes de `/clear`, usa `/rename`** — para encontrar la sesion despues con `/resume`
-
-## 6. Seleccion de modelo para subagentes
-
-Cuando despachas subagentes, elige el modelo mas barato que pueda hacer el trabajo:
-
-```
-model: haiku    → leer/buscar archivos, tareas de 1-2 archivos, investigacion simple
-model: sonnet   → implementacion, integracion, logica de negocio
-model: opus     → arquitectura, review de calidad, debugging complejo
-```
-
-Configura en el frontmatter del subagente o pasa como parametro al Agent tool.
-
-## 7. Prompts especificos
-
-Cada palabra vaga genera lecturas innecesarias:
-
-```
-MAL:  "mejora este codigo"          → Claude lee todo el proyecto buscando que mejorar
-BIEN: "agrega validacion de email en src/auth/login.ts linea 45"  → Claude lee 1 archivo, 1 seccion
-```
-
-## 8. CLAUDE.md limpio
-
-- Mantener bajo 200 lineas (se carga SIEMPRE, ~9 tokens por linea)
-- Mover instrucciones especificas de workflow a skills (se cargan on-demand)
-- No repetir lo que esta en el codigo o git history
-
-## Resumen de impacto
-
-| Tecnica | Tokens ahorrados por uso |
+| Modelo | Usar para |
 |---|---|
-| Read con offset/limit vs archivo completo | 500-2,500 |
-| Effort low vs high en tarea simple | 10,000-40,000 |
-| Subagente para tests vs inline | 1,000-5,000 en contexto principal |
-| Filtrar output de comando | 500-3,000 |
-| `/clear` entre tareas | todo el contexto acumulado |
-| Modelo haiku vs opus en subagente mecanico | ~60% menos costo |
+| haiku | Buscar archivos, leer/extraer info, tareas mecanicas |
+| sonnet | Implementar, integrar, logica de negocio |
+| opus | Arquitectura, review, debugging complejo |
