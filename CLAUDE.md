@@ -26,6 +26,9 @@ Skills de desarrollo propias, escritas desde cero. Imponen flujos de trabajo dis
   android-arch/SKILL.md            — Validacion de Clean Architecture Android
   bitmap-safety/SKILL.md           — Auditoria de pipelines de imagen
   room-audit/SKILL.md              — Auditoria de seguridad de datos Room
+  image-algo/SKILL.md              — Diseno de algoritmos de imagen
+  ml-ondevice/SKILL.md             — Integracion de ML on-device Android
+  image-pipeline/SKILL.md          — Diseno de pipelines de imagen
 ```
 
 ## Skills disponibles
@@ -45,6 +48,9 @@ Skills de desarrollo propias, escritas desde cero. Imponen flujos de trabajo dis
 | `/android-arch` | Solo usuario | Validacion de boundaries de Clean Architecture Android |
 | `/bitmap-safety` | Solo usuario | Auditoria de pipelines de procesamiento de imagen |
 | `/room-audit` | Solo usuario | Auditoria de seguridad de datos con Room |
+| `/image-algo` | Solo usuario | Diseno de algoritmos de imagen (hashing, similarity, clustering) |
+| `/ml-ondevice` | Solo usuario | Integracion de modelos ML on-device en Android |
+| `/image-pipeline` | Solo usuario | Diseno de pipelines de procesamiento de imagen multi-paso |
 
 "Siempre activa" = `user-invocable: false` (Claude la carga automaticamente, no aparece en menu `/`)
 "Solo usuario" = `disable-model-invocation: true` (se invoca manualmente con `/nombre`)
@@ -52,15 +58,31 @@ Skills de desarrollo propias, escritas desde cero. Imponen flujos de trabajo dis
 
 ## Flujo recomendado
 
+### General
 ```
 /brainstorm  -->  /plan  -->  /execute (usa /tdd internamente)
                                   |
                               /review  -->  /verify  -->  merge
 ```
 
-Para debugging: `/debug` (aplica `/tdd` para el fix y `/verify` para confirmar)
+### Features de imagen
+```
+/image-algo     -->  /image-pipeline  -->  /plan  -->  /execute
+  (algoritmo)       (arquitectura)       (tareas)    (implementar)
 
-Para seguridad: `/secure quick` (archivos cambiados) o `/secure full` (proyecto completo)
+/ml-ondevice    -->  /image-pipeline  -->  /plan  -->  /execute
+  (modelo ML)       (arquitectura)       (tareas)    (implementar)
+```
+
+### Auditorias
+```
+/android-arch    (boundaries de Clean Architecture)
+/bitmap-safety   (memory, threading, error handling de imagen)
+/room-audit      (migraciones, schema, data safety)
+/secure          (seguridad general: secrets, vulnerabilidades)
+```
+
+Para debugging: `/debug` (aplica `/tdd` para el fix y `/verify` para confirmar)
 
 ## Principios
 
