@@ -19,6 +19,7 @@ Estas skills nacieron de revisar [obra/superpowers](https://github.com/obra/supe
 | `/execute` | Manual | Ejecucion de plan con subagentes frescos y revision de 2 etapas (spec + calidad) |
 | `/review` | Manual | Code review estructurado con severidades. Solicitar y recibir review |
 | `/parallel` | Manual | Despachar agentes paralelos para problemas independientes |
+| `/secure` | Manual | Analisis de seguridad: secrets, injection, auth, crypto, infra. Modo quick (diff) o full (proyecto) |
 
 **Siempre activa** = `user-invocable: false`, Claude la carga automaticamente como conocimiento de fondo
 **Manual** = solo se invoca con `/nombre` (no se activa automaticamente)
@@ -42,6 +43,13 @@ Para multiples problemas independientes:
 
 ```
 /parallel  -->  /verify
+```
+
+Para seguridad:
+
+```
+/secure quick    (solo archivos cambiados, antes de commit/PR)
+/secure full     (proyecto completo, antes de deploy/release)
 ```
 
 ## Estructura
@@ -70,6 +78,14 @@ Para multiples problemas independientes:
     SKILL.md
   parallel/
     SKILL.md
+  secure/
+    SKILL.md                       # analisis de seguridad (quick/full)
+    references/
+      secrets-patterns.md          # 30+ regex patterns para detectar secrets
+      code-patterns.md             # injection, auth, crypto, error handling
+      infra-patterns.md            # Docker, CI/CD, supply chain
+    scripts/
+      scan-secrets.py              # scanner de secrets (Python, zero deps)
 ```
 
 Cada skill es un directorio con `SKILL.md` como punto de entrada (frontmatter YAML + instrucciones) y archivos de soporte opcionales que se cargan on-demand.

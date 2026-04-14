@@ -19,6 +19,11 @@ Skills de desarrollo propias, escritas desde cero. Imponen flujos de trabajo dis
   execute/model-selection.md       — Guia de seleccion de modelo (referencia)
   review/SKILL.md                  — Code review estructurado
   parallel/SKILL.md                — Agentes paralelos independientes
+  secure/SKILL.md                  — Analisis de seguridad (quick/full)
+  secure/references/secrets-patterns.md  — Patrones de deteccion de secrets
+  secure/references/code-patterns.md     — Patrones de seguridad en codigo
+  secure/references/infra-patterns.md    — Patrones de seguridad en infra
+  secure/scripts/scan-secrets.py         — Scanner de secrets (Python, zero deps)
 ```
 
 ## Skills disponibles
@@ -34,6 +39,7 @@ Skills de desarrollo propias, escritas desde cero. Imponen flujos de trabajo dis
 | `/execute` | Solo usuario | Ejecucion de plan con subagentes |
 | `/review` | Solo usuario | Code review con severidades |
 | `/parallel` | Solo usuario | Despachar agentes para problemas independientes |
+| `/secure` | Solo usuario | Analisis de seguridad (quick: diff only, full: proyecto completo) |
 
 "Siempre activa" = `user-invocable: false` (Claude la carga automaticamente, no aparece en menu `/`)
 "Solo usuario" = `disable-model-invocation: true` (se invoca manualmente con `/nombre`)
@@ -48,6 +54,8 @@ Skills de desarrollo propias, escritas desde cero. Imponen flujos de trabajo dis
 ```
 
 Para debugging: `/debug` (aplica `/tdd` para el fix y `/verify` para confirmar)
+
+Para seguridad: `/secure quick` (archivos cambiados) o `/secure full` (proyecto completo)
 
 ## Principios
 
