@@ -30,6 +30,9 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
   ml-ondevice/SKILL.md             — Integracion de ML on-device Android
   image-pipeline/SKILL.md          — Diseno de pipelines de imagen
   humanize/SKILL.md                — Humanizar texto generado por IA
+  rpg-design/SKILL.md              — Diseno de sistemas RPG (stats, combate, balance)
+  game-arch/SKILL.md               — Arquitectura de juegos 2D (game loop, FSM, commands)
+  pixel-pipeline/SKILL.md          — Pipeline de assets pixel art (sprites, tiles, atlas)
 
 .claude/agents/
   prompt-artist.md                 — Agent: prompts para generacion de imagen
@@ -60,6 +63,9 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
 | `/ml-ondevice` | Solo usuario | Integracion de modelos ML on-device en Android |
 | `/image-pipeline` | Solo usuario | Diseno de pipelines de procesamiento de imagen multi-paso |
 | `/humanize` | Solo usuario | Humanizar texto de IA: diagnostico y reescritura (review/rewrite) |
+| `/rpg-design` | Solo usuario | Diseno de sistemas RPG (stats, formulas, turnos, balance, enemy AI) |
+| `/game-arch` | Solo usuario | Arquitectura de juegos 2D (game loop, FSM, commands, save system) |
+| `/pixel-pipeline` | Solo usuario | Pipeline de assets pixel art (sprites, tiles, atlas, palette swap) |
 
 "Siempre activa" = `user-invocable: false` (Claude la carga automaticamente, no aparece en menu `/`)
 "Solo usuario" = `disable-model-invocation: true` (se invoca manualmente con `/nombre`)
@@ -95,6 +101,18 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
 ```
 /humanize review [archivo]    (diagnostico sin modificar)
 /humanize rewrite [archivo]   (reescritura completa)
+```
+
+### Game development
+```
+/rpg-design       -->  /plan  -->  /execute
+  (sistemas RPG)      (tareas)    (implementar con /tdd)
+
+/game-arch        -->  /plan  -->  /execute
+  (arquitectura)      (tareas)    (implementar)
+
+/pixel-pipeline   -->  assets listos para integracion
+  (sprites, tiles, atlas)
 ```
 
 ### Agentes especializados
