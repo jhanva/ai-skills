@@ -1,6 +1,6 @@
-# AI Skills — Custom Development Skills para Claude Code
+# AI Skills — Custom Skills & Agents para Claude Code
 
-Skills de desarrollo propias, escritas desde cero. Imponen flujos de trabajo disciplinados: TDD, debugging sistematico, diseno antes de implementacion, y verificacion con evidencia.
+Skills de desarrollo y agentes especializados propios, escritos desde cero. Imponen flujos de trabajo disciplinados: TDD, debugging sistematico, diseno antes de implementacion, y verificacion con evidencia.
 
 ## Estructura
 
@@ -30,6 +30,13 @@ Skills de desarrollo propias, escritas desde cero. Imponen flujos de trabajo dis
   ml-ondevice/SKILL.md             — Integracion de ML on-device Android
   image-pipeline/SKILL.md          — Diseno de pipelines de imagen
   humanize/SKILL.md                — Humanizar texto generado por IA
+
+.claude/agents/
+  prompt-artist.md                 — Agent: prompts para generacion de imagen
+  prompt-artist/domains.md         — 9 perfiles de dominio con pesos
+  prompt-artist/techniques.md      — Catalogo de tecnicas visuales
+  prompt-artist/platforms.md       — Adaptacion Gemini/MJ/DALL-E/SD
+  prompt-artist/text-safety.md     — Texto en imagenes y safety filters
 ```
 
 ## Skills disponibles
@@ -88,6 +95,12 @@ Skills de desarrollo propias, escritas desde cero. Imponen flujos de trabajo dis
 ```
 /humanize review [archivo]    (diagnostico sin modificar)
 /humanize rewrite [archivo]   (reescritura completa)
+```
+
+### Agentes especializados
+```
+@prompt-artist    Transforma ideas en prompts optimizados para imagen
+                  (Gemini, DALL-E, Midjourney, Stable Diffusion)
 ```
 
 Para debugging: `/debug` (aplica `/tdd` para el fix y `/verify` para confirmar)
