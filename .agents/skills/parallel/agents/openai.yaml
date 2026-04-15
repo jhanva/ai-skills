@@ -1,0 +1,7 @@
+interface:
+  display_name: "Parallel"
+  short_description: "Coordina trabajo paralelo"
+  default_prompt: "Usa $parallel para dividir investigación o fixes independientes en paralelo."
+
+policy:
+  allow_implicit_invocation: false

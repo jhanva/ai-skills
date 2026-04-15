@@ -1,0 +1,7 @@
+interface:
+  display_name: "Bitmap Safety"
+  short_description: "Audita pipelines de imagen"
+  default_prompt: "Usa $bitmap-safety para revisar seguridad de memoria y threading en bitmaps Android."
+
+policy:
+  allow_implicit_invocation: false

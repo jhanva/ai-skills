@@ -1,0 +1,7 @@
+interface:
+  display_name: "Execute"
+  short_description: "Ejecuta un plan aprobado"
+  default_prompt: "Usa $execute para implementar un plan existente tarea por tarea con verificación."
+
+policy:
+  allow_implicit_invocation: false

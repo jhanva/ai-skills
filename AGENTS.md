@@ -1,5 +1,30 @@
 # Reglas para agentes
 
+## Codex
+
+### Adaptacion del repositorio
+
+- Este repositorio tiene dos capas en paralelo:
+  - `.claude/` conserva la implementacion original pensada para Claude Code
+  - `.agents/skills/`, `.codex/agents/` y `.codex/config.toml` contienen la adaptacion nativa para Codex
+- No modifiques `.claude/` salvo que el usuario lo pida de forma explicita. Para trabajo orientado a Codex, edita solo la capa nueva.
+- En Codex, la invocacion explicita de skills es con `$skill`, no con `/skill`.
+
+### Traduccion de herramientas heredadas
+
+- Si una instruccion heredada menciona herramientas de Claude, traducela asi:
+  - `Read` / `Grep` / `Glob` / `Bash` -> `rg`, `rg --files`, `find`, `sed -n`, shell puntual
+  - `Agent` -> agentes built-in (`worker`, `explorer`) o agentes custom en `.codex/agents/`
+  - `Edit` / `Write` -> la herramienta nativa de patch del entorno de Codex (por ejemplo `apply_patch` cuando exista)
+  - `WebFetch` / `WebSearch` -> browsing web segun la politica del entorno
+
+### Reglas globales para Codex
+
+- Haz lecturas minimas y puntuales antes de abrir archivos completos
+- Usa `multi_tool_use.parallel` cuando varias lecturas o inspecciones sean independientes
+- Filtra output ruidoso de comandos antes de traerlo a contexto
+- No declares exito sin una verificacion fresca con comandos reales
+
 ## Commits
 
 Todos los commits deben seguir [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/).

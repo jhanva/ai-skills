@@ -1,0 +1,7 @@
+interface:
+  display_name: "Image Pipeline"
+  short_description: "Arquitectura de pipelines"
+  default_prompt: "Usa $image-pipeline para estructurar un pipeline de procesamiento de imágenes."
+
+policy:
+  allow_implicit_invocation: false

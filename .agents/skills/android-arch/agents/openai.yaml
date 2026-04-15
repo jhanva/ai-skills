@@ -1,0 +1,7 @@
+interface:
+  display_name: "Android Arch"
+  short_description: "Audita boundaries Android"
+  default_prompt: "Usa $android-arch para revisar boundaries y dependencias en un proyecto Android."
+
+policy:
+  allow_implicit_invocation: false

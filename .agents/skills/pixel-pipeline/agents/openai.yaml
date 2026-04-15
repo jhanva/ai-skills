@@ -1,0 +1,7 @@
+interface:
+  display_name: "Pixel Pipeline"
+  short_description: "Pipeline de pixel art"
+  default_prompt: "Usa $pixel-pipeline para diseñar un pipeline de sprites, tiles o atlas pixel art."
+
+policy:
+  allow_implicit_invocation: false

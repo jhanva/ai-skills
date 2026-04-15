@@ -1,0 +1,7 @@
+interface:
+  display_name: "RPG Design"
+  short_description: "Diseña sistemas RPG"
+  default_prompt: "Usa $rpg-design para diseñar stats, combate, turnos y balance de un RPG."
+
+policy:
+  allow_implicit_invocation: false

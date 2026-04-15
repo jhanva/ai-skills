@@ -1,0 +1,7 @@
+interface:
+  display_name: "Humanize"
+  short_description: "Texto con voz natural"
+  default_prompt: "Usa $humanize para revisar o reescribir texto que suena demasiado artificial."
+
+policy:
+  allow_implicit_invocation: false

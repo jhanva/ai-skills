@@ -1,0 +1,7 @@
+interface:
+  display_name: "Plan"
+  short_description: "Convierte spec en tareas"
+  default_prompt: "Usa $plan para convertir una spec aprobada en tareas pequeñas y ejecutables."
+
+policy:
+  allow_implicit_invocation: false

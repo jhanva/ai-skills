@@ -1,0 +1,7 @@
+interface:
+  display_name: "Image Algo"
+  short_description: "Diseña algoritmos de imagen"
+  default_prompt: "Usa $image-algo para diseñar hashing, similarity o clustering de imágenes."
+
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,7 @@
+interface:
+  display_name: "ML On-Device"
+  short_description: "ML local en Android"
+  default_prompt: "Usa $ml-ondevice para diseñar integración de modelos ML on-device en Android."
+
+policy:
+  allow_implicit_invocation: false

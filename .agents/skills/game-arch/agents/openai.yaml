@@ -1,0 +1,7 @@
+interface:
+  display_name: "Game Arch"
+  short_description: "Arquitectura para juegos 2D"
+  default_prompt: "Usa $game-arch para diseñar o revisar arquitectura de un juego 2D."
+
+policy:
+  allow_implicit_invocation: false

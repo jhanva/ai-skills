@@ -1,0 +1,7 @@
+interface:
+  display_name: "Optimize"
+  short_description: "Optimiza contexto y costo"
+  default_prompt: "Usa $optimize para revisar cómo reducir costo, contexto y trabajo innecesario en Codex."
+
+policy:
+  allow_implicit_invocation: false

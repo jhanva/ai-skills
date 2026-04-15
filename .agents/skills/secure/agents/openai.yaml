@@ -1,0 +1,7 @@
+interface:
+  display_name: "Secure"
+  short_description: "Auditoría de seguridad"
+  default_prompt: "Usa $secure para hacer una revisión de seguridad quick o full sobre un proyecto."
+
+policy:
+  allow_implicit_invocation: false

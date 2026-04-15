@@ -1,0 +1,7 @@
+interface:
+  display_name: "Debug"
+  short_description: "Encuentra la causa raíz"
+  default_prompt: "Usa $debug para investigar un bug o test roto antes de intentar arreglarlo."
+
+policy:
+  allow_implicit_invocation: true

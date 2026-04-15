@@ -1,0 +1,7 @@
+interface:
+  display_name: "Review"
+  short_description: "Code review con severidades"
+  default_prompt: "Usa $review para revisar cambios o procesar feedback técnico de review."
+
+policy:
+  allow_implicit_invocation: false

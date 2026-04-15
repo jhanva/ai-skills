@@ -1,0 +1,7 @@
+interface:
+  display_name: "Verify"
+  short_description: "Verifica con evidencia"
+  default_prompt: "Usa $verify para confirmar con comandos frescos que algo realmente funciona."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Brainstorm"
+  short_description: "Diseña antes de implementar"
+  default_prompt: "Usa $brainstorm para explorar enfoques y cerrar una spec antes de escribir código."
+
+policy:
+  allow_implicit_invocation: false

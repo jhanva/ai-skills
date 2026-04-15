@@ -1,0 +1,7 @@
+interface:
+  display_name: "TDD"
+  short_description: "RED-GREEN-REFACTOR"
+  default_prompt: "Usa $tdd para imponer TDD cuando vayas a cambiar código de producción."
+
+policy:
+  allow_implicit_invocation: true

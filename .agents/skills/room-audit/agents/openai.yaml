@@ -1,0 +1,7 @@
+interface:
+  display_name: "Room Audit"
+  short_description: "Audita Room y migraciones"
+  default_prompt: "Usa $room-audit para revisar Room, migraciones y seguridad de datos en Android."
+
+policy:
+  allow_implicit_invocation: false
