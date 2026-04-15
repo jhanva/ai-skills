@@ -34,6 +34,9 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
   game-arch/SKILL.md               — Arquitectura de juegos 2D (game loop, FSM, commands)
   pixel-pipeline/SKILL.md          — Pipeline de assets pixel art (sprites, tiles, atlas)
 
+.claude/commands/
+  git-identity.md                  — Auditoria y setup de cuentas git separadas
+
 .claude/agents/
   prompt-artist.md                 — Agent: prompts para generacion de imagen
   prompt-artist/domains.md         — 9 perfiles de dominio con pesos
@@ -119,6 +122,14 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
 ```
 @prompt-artist    Transforma ideas en prompts optimizados para imagen
                   (Gemini, DALL-E, Midjourney, Stable Diffusion)
+```
+
+### Comandos
+```
+/git-identity          Auditoria de cuentas git (4 capas)
+/git-identity setup    Configurar separacion de cuentas (macOS/Linux/Windows)
+                       Soporta hosts diferentes (GitHub+GitLab)
+                       y mismo host (GitHub+GitHub con SSH aliases)
 ```
 
 Para debugging: `/debug` (aplica `/tdd` para el fix y `/verify` para confirmar)

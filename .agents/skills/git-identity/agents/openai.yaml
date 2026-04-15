@@ -1,0 +1,7 @@
+interface:
+  display_name: "Git Identity"
+  short_description: "Audita y separa identidades Git"
+  default_prompt: "Usa $git-identity para auditar o configurar identidades Git separadas, incluso en mismo host con aliases SSH."
+
+policy:
+  allow_implicit_invocation: false

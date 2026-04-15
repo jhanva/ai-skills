@@ -44,6 +44,12 @@ docs/codex-adaptation.md    # esta guia
 - `security_auditor`: backend reusable para `$secure`
 - `prompt_artist`: adaptacion del agente original `prompt-artist`
 
+## Comandos migrados
+
+- El comando de Claude `.claude/commands/git-identity.md` se integró en Codex como la skill explícita `$git-identity` dentro de `.agents/skills/git-identity/`.
+- La adaptación de `$git-identity` cubre tanto hosts diferentes como mismo host con aliases SSH y auto-switch de `gh` por directorio.
+- En esta adaptación, los comandos explícitos de Claude se traducen preferentemente a skills explícitas de Codex en vez de depender de una capa separada de slash-commands.
+
 ## Notas de diseño
 
 - Las skills manuales quedaron con `allow_implicit_invocation: false`.
