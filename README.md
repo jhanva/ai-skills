@@ -1,10 +1,6 @@
 # ai-skills
 
-Skills de desarrollo, agentes especializados y comandos propios para [Claude Code](https://claude.ai/code), escritos desde cero. Imponen flujos de trabajo disciplinados: TDD, debugging sistematico, diseno antes de implementacion, y verificacion con evidencia.
-
-## Motivacion
-
-Estas skills nacieron de revisar [obra/superpowers](https://github.com/obra/superpowers) y decidir reescribir los conceptos desde cero para tener control total del codigo, sin dependencia de terceros.
+Skills de desarrollo, agentes especializados y comandos propios para [Claude Code](https://claude.ai/code). Imponen flujos de trabajo disciplinados: TDD, debugging sistematico, diseno antes de implementacion, y verificacion con evidencia.
 
 ## Skills
 
@@ -215,6 +211,7 @@ Las skills dentro de `.claude/skills/` en directorios adicionales se cargan auto
 3. **No adivinar fixes** — `/debug` con causa raiz primero
 4. **No decir "listo" sin evidencia** — `/verify` antes de reportar
 5. **No confiar en reportes de subagentes** — verificar independientemente
+6. **No referenciar origenes externos** — no mencionar repos o proyectos de terceros como inspiracion en documentacion
 
 ## Ahorro de tokens
 

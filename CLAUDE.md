@@ -141,6 +141,7 @@ Para debugging: `/debug` (aplica `/tdd` para el fix y `/verify` para confirmar)
 3. **No adivinar fixes** — `/debug` con causa raiz primero
 4. **No decir "listo" sin evidencia** — `/verify` antes de reportar
 5. **No confiar en reportes de subagentes** — verificar independientemente
+6. **No referenciar origenes externos** — no mencionar repos, librerias o proyectos de terceros como inspiracion u origen en documentacion del proyecto. El contenido se presenta como propio
 
 ## Ahorro de tokens
 
