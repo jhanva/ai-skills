@@ -37,11 +37,62 @@ Skills de desarrollo, agentes especializados y comandos propios para [Claude Cod
 
 ### Game development
 
-| Skill | Invocacion | Proposito |
-|---|---|---|
-| `/rpg-design` | Manual | Diseno de sistemas RPG (stats, formulas, turnos, balance, enemy AI) |
-| `/game-arch` | Manual | Arquitectura de juegos 2D (game loop, FSM, commands, save system) |
-| `/pixel-pipeline` | Manual | Pipeline de assets pixel art (sprites, tiles, atlas, palette swap) |
+Workflow completo para juegos 2D pixel art (RPG, platformer, roguelike) con Godot 4. Soporta GDScript y C#. 9 agentes especializados organizados en jerarquia de estudio + 4 hooks de validacion automatica.
+
+#### Onboarding
+
+| Skill | Invocacion | Agente | Proposito |
+|---|---|---|---|
+| `/game-start` | Manual | — | Setup guiado: Godot config, estructura de proyecto, GDScript vs C# |
+
+#### Concepto
+
+| Skill | Invocacion | Agente | Proposito |
+|---|---|---|---|
+| `/game-concept` | Manual | game-designer | Formalizar idea en concept doc (genero, pillars, target audience) |
+| `/art-bible` | Manual | pixel-artist + creative-director | Identidad visual: paleta, estilo, resoluciones, restricciones |
+
+#### Diseno
+
+| Skill | Invocacion | Agente | Proposito |
+|---|---|---|---|
+| `/rpg-design` | Manual | game-designer | Sistemas RPG (stats, formulas, turnos, balance, enemy AI) |
+| `/design-system` | Manual | game-designer | GDD para un sistema especifico (inventario, dialog, crafting) |
+| `/level-brief` | Manual | level-designer | Disenar nivel: layout, encounters, curva de dificultad, pacing |
+| `/balance-check` | Automatica | game-designer | Validar balance numerico (damage curves, economy sinks/faucets) |
+
+#### Arte y assets
+
+| Skill | Invocacion | Agente | Proposito |
+|---|---|---|---|
+| `/pixel-pipeline` | Manual | pixel-artist | Pipeline completo de pixel art (sprites, tiles, atlas, palette swap) |
+| `/sprite-spec` | Manual | pixel-artist | Spec de sprite sheet: frames, estados, dimensiones, hitbox |
+| `/tileset-spec` | Manual | pixel-artist | Spec de tileset: tile size, autotile rules, variantes |
+| `/palette` | Manual | pixel-artist | Crear/gestionar paletas de color (ramps, restrictions) |
+| `/sound-brief` | Manual | sound-designer | Brief de audio: SFX list, mood board musical, integracion Godot |
+
+#### Arquitectura
+
+| Skill | Invocacion | Agente | Proposito |
+|---|---|---|---|
+| `/game-arch` | Manual | godot-architect | Arquitectura de juegos 2D (game loop, FSM, commands, save system) |
+| `/godot-setup` | Manual | godot-architect | Config proyecto Godot: autoloads, input map, export, folder structure |
+| `/scene-design` | Manual | godot-architect | Disenar escena: node tree, signals, script responsibilities |
+
+#### Produccion
+
+| Skill | Invocacion | Agente | Proposito |
+|---|---|---|---|
+| `/sprint` | Manual | producer | Planificar sprint: stories, estimacion, prioridades |
+| `/story` | Manual | producer | Crear dev story desde seccion de GDD |
+| `/scope-check` | Automatica | producer | Verificar que el scope es realista vs tiempo disponible |
+
+#### QA
+
+| Skill | Invocacion | Agente | Proposito |
+|---|---|---|---|
+| `/playtest` | Manual | qa-analyst | Reporte estructurado de playtest session |
+| `/smoke-test` | Manual | qa-analyst | Checklist rapido pre-merge/pre-release |
 
 ### Texto
 
@@ -55,9 +106,50 @@ Skills de desarrollo, agentes especializados y comandos propios para [Claude Cod
 
 ## Agentes
 
+### Generales
+
 | Agente | Proposito |
 |---|---|
 | `@prompt-artist` | Transforma ideas en prompts narrativos optimizados para generacion de imagenes (Gemini, DALL-E, Midjourney, Stable Diffusion). Formula de 7 componentes con pesos por dominio |
+
+### Game dev — Jerarquia de estudio
+
+9 agentes organizados en 2 niveles. Directores para sintesis cross-dominio (opus, se activan poco). Especialistas para trabajo de dominio (sonnet, se activan frecuentemente).
+
+```
+Tier 1 — Directores (opus, auto-activacion en decisiones cross-dominio)
+  creative-director ──── pixel-artist
+    (vision, coherencia       sound-designer
+     arte + diseno)           game-designer
+                              level-designer
+
+  technical-director ─── godot-architect
+    (arquitectura,            qa-analyst
+     codigo + calidad)        producer
+```
+
+| Agente | Tier | Modelo | Dominio | Se activa cuando... |
+|---|---|---|---|---|
+| `creative-director` | Director | opus | Vision global, coherencia arte/diseno | Conflicto entre dominios creativos, review de concepto |
+| `technical-director` | Director | opus | Arquitectura global, performance | Conflicto codigo/performance, decision arquitectural |
+| `pixel-artist` | Especialista | sonnet | Sprites, tiles, animacion, paletas, atlas | Editando `assets/sprites/`, `assets/tiles/` |
+| `sound-designer` | Especialista | sonnet | SFX, musica, audio pipeline | Editando `assets/audio/`, definiendo audio en GDD |
+| `game-designer` | Especialista | sonnet | Sistemas, mecanicas, balance, economia | Escribiendo GDDs en `design/`, discutiendo mecanicas |
+| `level-designer` | Especialista | sonnet | Niveles, encounters, dificultad, world building | Editando `design/levels/`, discutiendo layout |
+| `godot-architect` | Especialista | sonnet | Escenas, signals, GDScript/C#, patterns Godot | Editando `.gd`, `.cs`, `.tscn`, `.tres` |
+| `qa-analyst` | Especialista | sonnet | Tests, bug triage, playtesting | Post-implementacion, pre-release |
+| `producer` | Especialista | sonnet | Sprints, scope, milestones, stories | Planificando trabajo, revisando progreso |
+
+## Hooks (game dev)
+
+4 hooks de validacion automatica para codigo y assets de juegos. Comparten biblioteca `_parse.sh` para parsing JSON (cero duplicacion).
+
+| Hook | Evento | Que valida |
+|---|---|---|
+| `validate-gameplay-code.sh` | PreToolUse (git commit) | No hardcoded values en `src/gameplay/`, delta time usage, no imports de UI en gameplay |
+| `validate-assets.sh` | PostToolUse (Write/Edit) | Naming convention en `assets/` (lowercase_snake), JSON valido en data files |
+| `check-design-coverage.sh` | PostToolUse (Write/Edit) | Advierte si existe codigo en `src/gameplay/X/` sin su `design/gdd/X.md` correspondiente |
+| `session-context.sh` | SessionStart | Muestra branch, sprint activo, archivos modificados sin commit |
 
 ## Comandos
 
@@ -95,15 +187,26 @@ Skills de desarrollo, agentes especializados y comandos propios para [Claude Cod
 ### Game development
 
 ```
-/rpg-design       -->  /plan  -->  /execute
-  (sistemas RPG)      (tareas)    (implementar con /tdd)
-
-/game-arch        -->  /plan  -->  /execute
-  (arquitectura)      (tareas)    (implementar)
-
-/pixel-pipeline   -->  assets listos para integracion
-  (sprites, tiles, atlas)
+Concepto:
+  /brainstorm  -->  /game-concept  -->  /art-bible
+                         |
+Diseno:                  |
+  /design-system  -->  /rpg-design     -->  /balance-check
+  /level-brief                                  |
+                                                v
+Arte:                                    Arquitectura:
+  /palette  -->  /pixel-pipeline           /game-arch  -->  /godot-setup
+  /sprite-spec   /tileset-spec             /scene-design
+  /sound-brief                                  |
+                                                v
+Produccion:                              QA:
+  /sprint  -->  /story  -->  /plan         /playtest  -->  /smoke-test
+                  |
+                  v
+            /execute (usa /tdd)  -->  /review  -->  /verify
 ```
+
+Integracion con skills generales: `/tdd` para todo codigo, `/debug` para bugs, `/verify` antes de completar, `/review` para code review de GDScript/C#.
 
 ### Auditorias
 
@@ -166,6 +269,23 @@ Skills de desarrollo, agentes especializados y comandos propios para [Claude Cod
     rpg-design/SKILL.md                # sistemas RPG
     game-arch/SKILL.md                 # arquitectura de juegos 2D
     pixel-pipeline/SKILL.md            # pipeline de assets pixel art
+    game-start/SKILL.md               # onboarding de proyecto Godot
+    game-concept/SKILL.md             # formalizar concepto de juego
+    art-bible/SKILL.md                # identidad visual y paleta
+    design-system/SKILL.md            # GDD por sistema
+    level-brief/SKILL.md              # diseno de nivel
+    balance-check/SKILL.md            # validacion de balance numerico
+    sprite-spec/SKILL.md              # spec de sprite sheet
+    tileset-spec/SKILL.md             # spec de tileset
+    palette/SKILL.md                  # gestion de paletas de color
+    sound-brief/SKILL.md              # brief de audio
+    godot-setup/SKILL.md              # config proyecto Godot
+    scene-design/SKILL.md             # diseno de escena Godot
+    sprint/SKILL.md                   # planificacion de sprint
+    story/SKILL.md                    # dev story desde GDD
+    scope-check/SKILL.md              # verificacion de scope
+    playtest/SKILL.md                 # reporte de playtest
+    smoke-test/SKILL.md               # checklist pre-release
   agents/
     prompt-artist.md                   # agente: prompts para imagen
     prompt-artist/
@@ -173,6 +293,22 @@ Skills de desarrollo, agentes especializados y comandos propios para [Claude Cod
       techniques.md                    # catalogo de tecnicas visuales
       platforms.md                     # adaptacion Gemini/MJ/DALL-E/SD
       text-safety.md                   # texto en imagenes y safety filters
+    gamedev/
+      creative-director.md             # director: vision arte + diseno
+      technical-director.md            # director: arquitectura + calidad
+      pixel-artist.md                  # especialista: sprites, tiles, animacion
+      sound-designer.md                # especialista: SFX, musica
+      game-designer.md                 # especialista: sistemas, mecanicas, balance
+      level-designer.md                # especialista: niveles, encounters
+      godot-architect.md               # especialista: engine patterns, escenas
+      qa-analyst.md                    # especialista: testing, playtesting
+      producer.md                      # especialista: sprints, scope, milestones
+  hooks/
+    _parse.sh                          # biblioteca compartida (JSON parsing)
+    validate-gameplay-code.sh          # hook: no hardcoded values, delta time
+    validate-assets.sh                 # hook: naming, JSON valido
+    check-design-coverage.sh           # hook: codigo sin GDD = warning
+    session-context.sh                 # hook: contexto al iniciar sesion
   commands/
     git-identity.md                    # auditoria y setup de cuentas git
 ```
