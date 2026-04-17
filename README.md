@@ -37,7 +37,7 @@ Skills de desarrollo, agentes especializados y comandos propios para [Claude Cod
 
 ### Game development
 
-Workflow completo para juegos 2D pixel art (RPG, platformer, roguelike) con Godot 4. Soporta GDScript y C#. 9 agentes especializados organizados en jerarquia de estudio + 4 hooks de validacion automatica.
+Workflow completo para juegos 2D pixel art (RPG, platformer, roguelike) con Godot 4. Soporta GDScript y C#. 20 skills, 9 agentes especializados organizados en jerarquia de estudio y 4 hooks de validacion automatica.
 
 #### Onboarding
 

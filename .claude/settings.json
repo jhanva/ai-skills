@@ -16,8 +16,6 @@
       "Bash(git clean -f*)",
       "Bash(sudo *)",
       "Bash(chmod 777*)",
-      "Bash(*>.env*)",
-      "Bash(cat *.env*)",
       "Read(**/.env*)"
     ]
   },
@@ -38,6 +36,11 @@
       {
         "matcher": "Bash",
         "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/block-env-access.sh",
+            "timeout": 5
+          },
           {
             "type": "command",
             "command": "bash .claude/hooks/validate-gameplay-code.sh",

@@ -7,7 +7,11 @@ Uso:
   git diff --name-only HEAD | python3 scan-secrets.py --stdin TARGET_DIR  # Solo archivos del stdin
 
 Output: JSON a stdout con hallazgos.
-Exit codes: 0 = limpio, 1 = hallazgos encontrados, 2 = error
+Exit codes:
+  0 = limpio (sin hallazgos)
+  1 = hallazgos encontrados
+  2 = error de uso / argumentos invalidos
+  3 = error inesperado en runtime (bug o IO)
 """
 
 import json
@@ -31,7 +35,7 @@ PATTERNS = [
     ("SendGrid API Key", r"SG\.[A-Za-z0-9\-_]{22}\.[A-Za-z0-9\-_]{43}", "high"),
     ("Google API Key", r"AIza[0-9A-Za-z\-_]{35}", "high"),
     ("npm Token", r"npm_[A-Za-z0-9]{36}", "high"),
-    ("PyPI Token", r"pypi-[A-Za-z0-9]{50,}", "high"),
+    ("PyPI Token", r"pypi-[A-Za-z0-9_\-]{50,}", "high"),
     ("Twilio API Key", r"SK[0-9a-fA-F]{32}", "high"),
     # Confianza media
     ("Private Key", r"-----BEGIN (RSA|DSA|EC|OPENSSH|PGP) PRIVATE KEY-----", "medium"),
@@ -57,7 +61,14 @@ IGNORE_FILENAMES = {
     "Pipfile.lock", "poetry.lock", "composer.lock", "go.sum",
 }
 
-IGNORE_PATTERNS_IN_PATH = {"test", "spec", "fixture", "mock", "fake", "example", "sample", "template"}
+# Nombres de directorios (componentes exactos del path) que indican codigo de
+# ejemplo/test y desactivan patrones de confianza media. NO usar como substring:
+# un proyecto en "sample-app/" no es todo test.
+TEST_PATH_COMPONENTS = {
+    "test", "tests", "spec", "specs", "__tests__",
+    "fixture", "fixtures", "mock", "mocks", "fake", "fakes",
+    "example", "examples", "sample", "samples", "template", "templates",
+}
 
 
 def should_scan(filepath: Path) -> bool:
@@ -74,12 +85,13 @@ def should_scan(filepath: Path) -> bool:
 
 def is_test_file(filepath: Path) -> bool:
     name = filepath.name.lower()
-    path_str = str(filepath).lower()
+    parts_lower = {p.lower() for p in filepath.parts}
     return (
-        any(p in path_str for p in IGNORE_PATTERNS_IN_PATH)
+        bool(parts_lower & TEST_PATH_COMPONENTS)
         or name.endswith((".test.js", ".test.ts", ".spec.js", ".spec.ts",
-                          "_test.py", "_test.go", ".test.jsx", ".test.tsx"))
-        or name.startswith("test_")
+                          "_test.py", "_test.go", ".test.jsx", ".test.tsx",
+                          ".example", ".sample", ".template"))
+        or name.startswith(("test_", "spec_"))
         or name in (".env.example", ".env.sample", ".env.template")
     )
 
@@ -113,7 +125,7 @@ def scan_file(filepath: Path) -> list:
 
 
 def main():
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 2 or sys.argv[-1] in ("-h", "--help"):
         print("Usage: scan-secrets.py [--stdin] TARGET_DIR", file=sys.stderr)
         sys.exit(2)
 
@@ -162,4 +174,15 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit:
+        raise
+    except KeyboardInterrupt:
+        print("scan-secrets.py: interrupted", file=sys.stderr)
+        sys.exit(3)
+    except Exception as exc:
+        # Exit 3 reserved for unexpected runtime errors so CI consumers can
+        # distinguish them from "findings" (1) and "usage error" (2).
+        print(f"scan-secrets.py: unexpected error: {exc}", file=sys.stderr)
+        sys.exit(3)

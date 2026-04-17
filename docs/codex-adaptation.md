@@ -39,10 +39,21 @@ docs/codex-adaptation.md    # esta guia
 
 ## Agentes custom agregados
 
+Reusables por skills y por el usuario:
+
 - `task_implementer`: backend reusable para `$execute`
 - `reviewer`: backend reusable para `$review`
 - `security_auditor`: backend reusable para `$secure`
 - `prompt_artist`: adaptacion del agente original `prompt-artist`
+
+Jerarquia gamedev (mirror directo de `.claude/agents/gamedev/`):
+
+- Directores: `creative_director`, `technical_director`
+- Especialistas: `game_designer`, `level_designer`, `godot_architect`,
+  `pixel_artist`, `sound_designer`, `qa_analyst`, `producer`
+
+Los pins de modelo se centralizan en `.codex/config.toml` y se propagan con
+`scripts/bump-codex-model.sh <model>`.
 
 ## Comandos migrados
 

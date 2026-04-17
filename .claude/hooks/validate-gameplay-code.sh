@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # PreToolUse hook (Bash: git commit) — valida codigo gameplay
-# Exit 0 = allow, Exit 2 = block
+# ADVISORY ONLY: imprime warnings a stderr pero siempre hace exit 0.
+# Si quieres convertirlo en bloqueante, cambia el `exit 0` final por `exit 2`
+# y documenta el comportamiento en el README.
 
 source "$(dirname "$0")/_parse.sh"
 

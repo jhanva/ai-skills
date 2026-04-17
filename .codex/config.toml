@@ -1,4 +1,32 @@
+# Codex project-wide settings for this repo.
+#
+# NOTE: Codex TOML agent files (.codex/agents/*.toml) do not support variable
+# interpolation. Each agent pins its own `model = "..."`. When bumping to a
+# new Codex model, update the pins in all files listed under `pinned_in`
+# atomically, or use the helper script: `scripts/bump-codex-model.sh`.
+
 [agents]
 max_threads = 6
 max_depth = 1
 
+[agents.models]
+# Single source of truth for the recommended models. Keep in sync with pins
+# in .codex/agents/*.toml. Bump here first, then mirror.
+default = "gpt-5.4"
+implementer = "gpt-5.2"
+
+pinned_in = [
+  ".codex/agents/prompt-artist.toml",
+  ".codex/agents/reviewer.toml",
+  ".codex/agents/security-auditor.toml",
+  ".codex/agents/task-implementer.toml",
+  ".codex/agents/creative-director.toml",
+  ".codex/agents/technical-director.toml",
+  ".codex/agents/game-designer.toml",
+  ".codex/agents/level-designer.toml",
+  ".codex/agents/godot-architect.toml",
+  ".codex/agents/pixel-artist.toml",
+  ".codex/agents/sound-designer.toml",
+  ".codex/agents/qa-analyst.toml",
+  ".codex/agents/producer.toml",
+]
