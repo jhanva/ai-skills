@@ -353,16 +353,14 @@ Las skills dentro de `.claude/skills/` en directorios adicionales se cargan auto
 
 ## Ahorro de tokens
 
-La skill `optimize` se carga automaticamente y aplica reglas de eficiencia en toda interaccion:
+La skill `optimize` se carga automaticamente y aplica reglas de eficiencia. Tecnicas de ahorro del proyecto:
 
 | Tecnica | Tokens ahorrados por uso |
 |---|---|
-| Read con offset/limit vs archivo completo | 500-2,500 |
-| Effort low vs high en tarea simple | 10,000-40,000 |
-| Subagente para tests vs inline | 1,000-5,000 en contexto principal |
 | Filtrar output de comando | 500-3,000 |
-| `/clear` entre tareas | todo el contexto acumulado |
+| Subagente para tests vs inline | 1,000-5,000 en contexto principal |
 | Modelo haiku vs opus en subagente mecanico | ~60% menos costo |
+| `/clear` entre tareas | todo el contexto acumulado |
 
 Ademas:
 

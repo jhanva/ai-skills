@@ -83,7 +83,7 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
 
 | Skill | Invocacion | Proposito |
 |---|---|---|
-| `optimize` | Siempre activa | Lecturas precisas, delegacion con umbral, filtrado, modelo por tarea |
+| `optimize` | Siempre activa | Filtrado de output, delegacion con umbral, seleccion de modelo |
 | `/brainstorm` | Solo usuario | Diseno antes de implementar |
 | `/plan` | Solo usuario | Spec -> plan con tareas de 2-5 min |
 | `/tdd` | Auto + usuario | TDD estricto RED-GREEN-REFACTOR |
@@ -215,8 +215,6 @@ Para debugging: `/debug` (aplica `/tdd` para el fix y `/verify` para confirmar)
 
 La skill `optimize` se carga automaticamente y aplica estas reglas en toda interaccion:
 
-- Lecturas precisas (offset/limit, Grep con output_mode ajustado)
-- Tool calls paralelos para herramientas independientes
-- Delegar a subagentes solo cuando output esperado > 50 lineas
 - Filtrar output de comandos con pipes antes de que entre al contexto
+- Delegar a subagentes solo cuando output esperado > 50 lineas
 - Seleccion de modelo para subagentes (haiku/sonnet/opus)
