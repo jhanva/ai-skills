@@ -14,13 +14,18 @@ Restricciones operativas accionables por el modelo. Aplican en cada accion.
 
 ## 1. Lecturas precisas
 
-- **Read con offset/limit** — si necesitas una funcion, lee solo esas lineas: `Read(file, offset=120, limit=30)`
+- **Read con offset/limit** — si necesitas una funcion, localiza con Grep y lee solo ese bloque con offset y limit. Si el archivo es corto (< 100 lineas) o desconocido, leelo completo en la primera lectura
 - **No releas archivos** que ya estan en el contexto de esta sesion
 - **Grep con output_mode ajustado** — usa `files_with_matches` (default) para localizar, `content` solo cuando necesites ver el codigo, `count` para dimensionar. Ajusta `head_limit` para controlar cuanto entra al contexto
 
 ## 2. Tool calls paralelos
 
-Cuando necesites ejecutar herramientas independientes (ej: 3 Reads, Grep + Glob, Read + Bash), lanzalas todas en un solo mensaje. Reduce latencia sin costo extra de tokens.
+Cuando necesites ejecutar herramientas independientes, lanzalas todas en un solo mensaje. Mismos tokens, menos turnos.
+
+```
+3 Reads independientes → 1 mensaje con 3 tool calls (1 turno)
+3 Reads en 3 mensajes separados → 3 turnos, triple latencia
+```
 
 ## 3. Delegar a subagentes (con umbral)
 
@@ -41,7 +46,7 @@ MAL:  "Corre npm test"
 
 ## 4. Filtrar output de comandos
 
-Cuando ejecutes comandos con output largo, filtra con pipes antes de que entre al contexto:
+Cuando ejecutes comandos con output largo, filtra con pipes en Bash antes de que entre al contexto. Nota: esto aplica a filtrar output de otros comandos, no a buscar en archivos (para eso usa la herramienta Grep).
 
 ```bash
 # Tests — solo fallos
@@ -56,7 +61,7 @@ tail -100 app.log | grep -i error
 
 ## 5. Seleccion de modelo para subagentes
 
-Usa el modelo mas barato que pueda completar la tarea:
+Usa el modelo de menor capacidad que pueda completar la tarea:
 
 | Modelo | Usar para |
 |---|---|

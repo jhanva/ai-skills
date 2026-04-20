@@ -63,10 +63,12 @@ tail -100 app.log | grep -i error
 
 ## 5. Seleccion de modelo para subagentes
 
-Usa el modelo mas barato que pueda completar la tarea:
+Usa el modelo de menor capacidad que pueda completar la tarea:
 
-| Modelo | Usar para |
+| Tier | Usar para |
 |---|---|
-| `gpt-5.4-mini` | Buscar archivos, extraer info, tareas mecanicas |
-| `gpt-5.2` | Implementar, integrar, logica de negocio |
-| `gpt-5.4` | Arquitectura, review, debugging complejo |
+| Ligero | Buscar archivos, extraer info, tareas mecanicas |
+| Medio | Implementar, integrar, logica de negocio |
+| Pesado | Arquitectura, review, debugging complejo |
+
+Los model IDs concretos se configuran en `.codex/config.toml`.
