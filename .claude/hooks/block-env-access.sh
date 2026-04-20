@@ -23,7 +23,7 @@ SAFE='\.env\.(example|sample|template)(\b|$)'
 
 # Normaliza a una linea con espacios simples para matching
 # Strip shell comments to avoid false positives on `.env` mentioned in comments
-NORMALIZED=$(printf '%s' "$COMMAND" | tr '\n' ' ' | sed 's/#.*$//' | tr -s '[:space:]' ' ')
+NORMALIZED=$(printf '%s' "$COMMAND" | sed 's/#.*$//' | tr '\n' ' ' | tr -s '[:space:]' ' ')
 
 # Extrae el target potencial. Si coincide con .env.* seguro, permitir.
 # Chequeamos por tokens de interes.
