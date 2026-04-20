@@ -442,99 +442,26 @@ ANTI-PATRON: No migration path
 
 ## FASE 8: Rendering y batching
 
-### 8.1 Sprite batching
+Antes de cerrar esta fase, lee `references/output-template.md` para la checklist completa de rendering.
 
-```kotlin
-// UN batch por frame, NO un batch por entity
-batch.begin()
-for (entity in renderOrder) {
-    val sprite = entity.get<Sprite>() ?: continue
-    val pos = entity.get<Position>() ?: continue
-    batch.draw(sprite.region, pos.x, pos.y)
-}
-batch.end()
-```
+### Reglas minimas
 
-### 8.2 Render order
-
-```kotlin
-// Para juegos top-down: ordenar por Y (menor Y = mas atras)
-val renderOrder = entities
-    .filter { it.has<Sprite>() && it.has<Position>() }
-    .sortedByDescending { it.get<Position>()!!.y }
-
-// Para juegos con layers: ordenar por layer, luego por Y
-val renderOrder = entities
-    .filter { it.has<Sprite>() }
-    .sortedWith(compareBy<Entity> { it.get<RenderLayer>()?.z ?: 0 }
-        .thenByDescending { it.get<Position>()?.y ?: 0f })
-```
-
-### 8.3 Camera
-
-```kotlin
-class GameCamera(viewportWidth: Float, viewportHeight: Float) {
-    val camera = OrthographicCamera(viewportWidth, viewportHeight)
-    val viewport = FitViewport(viewportWidth, viewportHeight, camera)
-
-    fun follow(target: Position, delta: Float, lerp: Float = 5f) {
-        camera.position.x += (target.x - camera.position.x) * lerp * delta
-        camera.position.y += (target.y - camera.position.y) * lerp * delta
-        camera.update()
-    }
-
-    fun resize(width: Int, height: Int) = viewport.update(width, height)
-}
-```
-
-### 8.4 Validacion de rendering
-
-```
-ANTI-PATRON: Multiple batch.begin()/end() por frame
-  → Cada begin/end es un flush = draw call extra
-  Solucion: un solo batch, ordenar draws por textura
-
-ANTI-PATRON: Crear SpriteBatch cada frame
-  → SpriteBatch es pesado, crear una vez
-  Solucion: campo de clase, dispose en Screen.dispose()
-
-ANTI-PATRON: No usar TextureAtlas
-  → Cada textura suelta = texture swap = draw call
-  Solucion: empaquetar en atlas, un draw call por atlas
-
-ANTI-PATRON: Nearest-neighbor no configurado
-  → Pixel art se ve borroso con linear filtering
-  Solucion: Texture.setFilter(Nearest, Nearest)
-```
+- Un batch por frame salvo justificacion fuerte
+- Render order claro: por layer, por Y o ambos
+- Camera con follow + resize definidos
+- TextureAtlas y filtering adecuados para el estilo visual
+- No crear batches ni texturas por frame
 
 ---
 
 ## FASE 9: Reporte
 
-### 9.1 Si es proyecto nuevo
+Lee `references/output-template.md` solo al redactar el cierre.
 
-Producir spec con:
+- Si es proyecto nuevo: producir spec de estructura, loop, entidades, estados, save y render
+- Si es proyecto existente: producir findings con severidad `CRITICO`, `WARNING` e `INFO`
 
-1. **Project structure:** carpetas y responsabilidades
-2. **Game loop:** fixed step config, delta handling
-3. **Entity model:** composicion o ECS, componentes identificados
-4. **State machine:** diagrama de estados con transiciones
-5. **Screen stack:** screens del juego con lifecycle
-6. **Command system:** commands identificados con serialize format
-7. **Save system:** save data structure con version
-8. **Render pipeline:** batch strategy, render order, camera
-
-### 9.2 Si es proyecto existente
-
-Producir reporte con:
-
-| Severidad | Significado |
-|---|---|
-| CRITICO | Bug activo o crash (memory leak, dispose faltante, state corruption) |
-| WARNING | Funcionara pero causara problemas al escalar |
-| INFO | Mejora recomendada, no urgente |
-
-Transicion: "Usa `$plan` para convertir esta arquitectura en tareas."
+Transicion: recomendar `$plan` para convertir la arquitectura en tareas.
 
 ## Entrada esperada
 

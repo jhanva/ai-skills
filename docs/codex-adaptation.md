@@ -18,12 +18,17 @@ AGENTS.md                   # reglas globales oficiales del repo para Codex
 docs/codex-adaptation.md    # esta guia
 ```
 
+Detalles importantes de la organizacion nativa:
+
+- cada skill de Codex mantiene el `SKILL.md` corto y manda ejemplos, plantillas y anexos a `references/`
+- las skills quedaron por debajo de 500 lineas siguiendo el patron de progressive disclosure de Codex
+- los agentes custom ahora usan `.toml` cortos y cargan su conocimiento extendido desde playbooks locales dentro de `.codex/agents/<agent>/`
+
 ## Que se mantuvo intacto
 
 - `.claude/skills/`
 - `.claude/agents/`
 - `CLAUDE.md`
-- `README.md`
 
 ## Mapeo de conceptos
 
@@ -65,4 +70,6 @@ Los pins de modelo se centralizan en `.codex/config.toml` y se propagan con
 
 - Las skills manuales quedaron con `allow_implicit_invocation: false`.
 - Las skills automáticas (`debug`, `tdd`, `verify`) quedaron habilitadas para matching implícito.
-- `optimize` se duplicó como skill de referencia, pero sus reglas base se movieron al `AGENTS.md` oficial del repo para evitar depender de archivos no documentados.
+- `optimize` se mantiene como skill de referencia, mientras que `AGENTS.md` cubre las reglas globales base del repo.
+- En la pasada de ajuste para Codex se normalizaron las invocaciones explicitas a `$skill` y los ejemplos operativos a herramientas nativas como `rg`, `find` y `sed -n`.
+- La pasada final de optimizacion dejó todas las `SKILL.md` bajo 500 lineas y convirtió los agentes custom largos en prompts cortos con `playbook.md`/`patterns.md` cargados on-demand, alineados con la guia oficial de skills y subagentes.

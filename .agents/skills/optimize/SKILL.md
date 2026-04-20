@@ -7,7 +7,8 @@ description: "Referencia para reducir costo y contexto en Codex: filtrado de out
 
 ## Uso en Codex
 
-- Las reglas de eficiencia viven en `AGENTS.md` como instrucciones globales.
+- `AGENTS.md` cubre las reglas globales base de eficiencia del repo.
+- `$optimize` conserva la guia especifica que no vive en `AGENTS.md`: umbral de delegacion y seleccion de modelo para subagentes.
 - Invoca `$optimize` para revisar costo, contexto o seleccion de modelos.
 
 ## 1. Filtrar output de comandos

@@ -311,73 +311,13 @@ void main() {
 
 ## FASE 5: TextureAtlas y packing
 
-### 5.1 Aseprite export workflow
+### 5.1 Workflow minimo
 
-```
-Aseprite → File → Export Sprite Sheet
-  Layout: By Rows
-  Sheet type: Packed (minimo espacio)
-  Output file: {entity}.png
-  JSON data: {entity}.json (Array format)
-  Split layers: NO (composite)
-  Split tags: SI (cada tag = una animacion)
-```
+- Exportar sprite sheets desde Aseprite con tags por animacion
+- Empaquetar con atlas, nunca con texturas sueltas en produccion
+- Mantener `Nearest`, padding >= 2 y atlas razonables para mobile
 
-### 5.2 LibGDX TexturePacker
-
-```
-Directorio de input:
-  raw/
-    player/
-      player_idle_0.png
-      player_idle_1.png
-      player_walk_down_0.png
-      ...
-    slime/
-      slime_idle_0.png
-      ...
-    tiles/
-      grass.png
-      water_0.png
-      ...
-
-Comando:
-  java -cp gdx-tools.jar com.badlogic.gdx.tools.texturepacker.TexturePacker
-       raw/ assets/ game
-
-Output:
-  assets/game.atlas   (metadata)
-  assets/game.png     (packed texture)
-```
-
-### 5.3 Pack settings
-
-```json
-{
-  "pot": true,
-  "paddingX": 2,
-  "paddingY": 2,
-  "edgePadding": true,
-  "duplicatePadding": true,
-  "bleed": true,
-  "maxWidth": 2048,
-  "maxHeight": 2048,
-  "filterMin": "Nearest",
-  "filterMag": "Nearest",
-  "stripWhitespaceX": false,
-  "stripWhitespaceY": false
-}
-```
-
-| Setting | Valor | Por que |
-|---|---|---|
-| filterMin/Mag | Nearest | Pixel art, nunca Linear |
-| paddingX/Y | 2 | Evita bleeding entre sprites |
-| bleed | true | Repite edge pixels para evitar seams |
-| maxWidth/Height | 2048 | Soporte universal en mobile |
-| stripWhitespace | false | Mantener posicion de sprites para alignment |
-
-### 5.4 Atlas por contexto
+### 5.2 Atlas por contexto
 
 No empaquetar TODO en un solo atlas. Separar por uso:
 
@@ -389,7 +329,7 @@ ui.atlas          → iconos, frames, fonts (siempre cargados)
 effects.atlas     → particulas, spell effects (cargados en batalla)
 ```
 
-### 5.5 Memory budget
+### 5.3 Memory budget
 
 ```
 Atlas 2048x2048 RGBA = 16MB en VRAM
@@ -445,74 +385,21 @@ Regla: tamano de font = multiplo del pixel size base
 
 ## FASE 7: Validacion
 
-### 7.1 Checklist de consistencia visual
+Antes del cierre, lee `references/output-template.md` para usar la checklist completa y revisar los anti-patrones relevantes.
 
-```
-[ ] Todos los sprites usan la misma paleta base
-[ ] Tamano de tiles consistente en todo el proyecto
-[ ] No hay sprites con resolucion mezclada (16x16 junto a 24x24)
-[ ] Filtering = Nearest en TODAS las texturas
-[ ] Integer scaling en la camara/viewport
-[ ] Outlines consistentes (todas o ninguna, mismo color)
-[ ] Sombras/highlights consistentes (misma direccion de luz)
-```
-
-### 7.2 Validacion tecnica
-
-```
-[ ] TextureAtlas usado (no texturas sueltas en produccion)
-[ ] Atlas size <= 2048x2048 (compatibilidad mobile)
-[ ] Padding >= 2 en atlas packing
-[ ] Todos los sprites en la misma pixels-per-unit
-[ ] Camera snapping a pixel grid implementado
-[ ] Dispose de texturas en Screen.dispose()
-[ ] No se cargan atlas innecesarios (por zona/contexto)
-```
-
-### 7.3 Anti-patrones
-
-```
-ANTI-PATRON: Texturas sueltas en assets/
-  → Cada textura = 1 draw call = performance muerte
-  Solucion: empaquetar en TextureAtlas
-
-ANTI-PATRON: Linear filtering en pixel art
-  → Sprites borrosos, bleeding entre frames
-  Solucion: Nearest en atlas settings Y en codigo
-
-ANTI-PATRON: Rotacion con angulos arbitrarios
-  → Pixels deformados, apariencia inconsistente
-  Solucion: solo 0/90/180/270, o pre-renderizar rotaciones
-
-ANTI-PATRON: Sprites de diferente resolucion mezclados
-  → Pixels de tamano visualmente diferente
-  Solucion: todo a la misma base, escalar en la herramienta de arte
-
-ANTI-PATRON: Animaciones hardcodeadas
-  → Cambiar timing requiere recompilar
-  Solucion: datos de animacion en JSON/XML, no en codigo
-
-ANTI-PATRON: No camera snap
-  → Sub-pixel movement causa shimmer/jitter en tiles
-  Solucion: snap camera position a pixel grid
-```
+Valida como minimo:
+- consistencia de paleta y resoluciones
+- `Nearest` + integer scaling
+- atlas, padding y camera snap
+- ausencia de texturas sueltas y animaciones hardcodeadas
 
 ---
 
 ## FASE 8: Spec de salida
 
-Producir documento con:
+Lee `references/output-template.md` solo en esta fase y usa esa estructura para producir la spec final del pipeline.
 
-1. **Convenciones:** resolucion, grid, paleta, render resolution
-2. **Sprite list:** tabla de entities con animaciones y frame counts
-3. **Tileset plan:** tilesets necesarios, autotile type, layer structure
-4. **Atlas strategy:** atlas por contexto con memory budget
-5. **Animation data format:** JSON schema para animaciones
-6. **Palette system:** paleta base + variantes + shader approach
-7. **Aseprite workflow:** export settings, naming convention, batch export
-8. **Integration:** como se cargan los assets en LibGDX (code snippets)
-
-Transicion: "Usa `$plan` para convertir este pipeline en tareas."
+Transicion: recomendar `$plan` para convertir el pipeline en tareas.
 
 ## Entrada esperada
 

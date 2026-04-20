@@ -8,7 +8,7 @@ Skills de desarrollo, agentes especializados y comandos propios para [Claude Cod
 
 | Skill | Invocacion | Proposito |
 |---|---|---|
-| `optimize` | Siempre activa | Optimizacion de tokens: lecturas precisas, filtrado de output, delegacion a subagentes |
+| `optimize` | Siempre activa | Filtrado de output, delegacion a subagentes y seleccion de modelo |
 | `/brainstorm` | Manual | Diseno antes de implementar. Dialogo socratico, multiples enfoques, spec escrita |
 | `/plan` | Manual | Convertir spec aprobada en plan de implementacion con tareas de 2-5 min |
 | `/tdd` | Automatica | Test-driven development estricto. Ciclo RED-GREEN-REFACTOR obligatorio |
