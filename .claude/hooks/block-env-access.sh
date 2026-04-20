@@ -12,24 +12,34 @@ COMMAND=$(parse_nested "$INPUT" "tool_input" "command")
 [ -z "$COMMAND" ] && exit 0
 
 # Patrones que bloqueamos (regex extendido):
-#   - redireccion a .env o .env.* : `>`, `>>`, `tee`
-#   - lectura explicita de .env    : `cat`, `less`, `more`, `bat`, `head`, `tail`
+#   - redireccion a .env o .env.*  : `>`, `>>`, `<`, `tee`
+#   - lectura explicita de .env    : `cat`, `less`, `more`, `bat`, `head`, `tail`,
+#                                    `grep`, `sed`, `awk`
+#   - source de .env               : `source`, `.`
 #   - copia/mv a .env              : `cp`, `mv`
 #
 # Se permiten nombres seguros explicitos: .env.example, .env.sample, .env.template
 SAFE='\.env\.(example|sample|template)(\b|$)'
 
 # Normaliza a una linea con espacios simples para matching
-NORMALIZED=$(printf '%s' "$COMMAND" | tr '\n' ' ' | tr -s '[:space:]' ' ')
+# Strip shell comments to avoid false positives on `.env` mentioned in comments
+NORMALIZED=$(printf '%s' "$COMMAND" | tr '\n' ' ' | sed 's/#.*$//' | tr -s '[:space:]' ' ')
 
 # Extrae el target potencial. Si coincide con .env.* seguro, permitir.
 # Chequeamos por tokens de interes.
 blocked=""
 
-# Redirecciones (`> .env`, `>>.env.local`, `tee -a .env`)
+# Redirecciones: output (`> .env`, `>>.env.local`) and input (`< .env`)
 if echo "$NORMALIZED" | grep -qE '(^|[^>])>[>]?\s*\.env\b' ; then
   if ! echo "$NORMALIZED" | grep -qE ">\s*$SAFE" ; then
     blocked="write redirect to .env file"
+  fi
+fi
+
+# Input redirection (`< .env`, `<.env.local`)
+if echo "$NORMALIZED" | grep -qE '<\s*\.env\b' ; then
+  if ! echo "$NORMALIZED" | grep -qE "<\s*$SAFE" ; then
+    blocked="input redirect from .env file"
   fi
 fi
 
@@ -40,10 +50,17 @@ if echo "$NORMALIZED" | grep -qE '\btee(\s+-[aA])?\s+\.env\b' ; then
   fi
 fi
 
-# Lectura de .env (cat/less/more/bat/head/tail)
-if echo "$NORMALIZED" | grep -qE '\b(cat|less|more|bat|head|tail)\s+[^|]*\.env\b' ; then
-  if ! echo "$NORMALIZED" | grep -qE "\b(cat|less|more|bat|head|tail)\s+[^|]*$SAFE" ; then
+# Lectura de .env (cat/less/more/bat/head/tail/grep/sed/awk)
+if echo "$NORMALIZED" | grep -qE '\b(cat|less|more|bat|head|tail|grep|sed|awk)\s+[^|]*\.env\b' ; then
+  if ! echo "$NORMALIZED" | grep -qE "\b(cat|less|more|bat|head|tail|grep|sed|awk)\s+[^|]*$SAFE" ; then
     blocked="read of .env file"
+  fi
+fi
+
+# source/dot (`. .env`, `source .env.local`)
+if echo "$NORMALIZED" | grep -qE '(\bsource\s+|^\.\s+|\s\.\s+)\.env\b' ; then
+  if ! echo "$NORMALIZED" | grep -qE "(\bsource\s+|^\.\s+|\s\.\s+)$SAFE" ; then
+    blocked="source of .env file"
   fi
 fi
 

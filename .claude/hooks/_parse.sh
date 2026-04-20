@@ -34,6 +34,11 @@ else:
 
 _parse_path() {
   local input="$1" path="$2"
+  # Validate path contains only safe characters (alphanumeric, dots, underscores)
+  if [[ ! "$path" =~ ^[a-zA-Z0-9_.]+$ ]]; then
+    echo "hooks/_parse.sh: invalid path '$path' — only [a-zA-Z0-9_.] allowed" >&2
+    return 1
+  fi
   if command -v jq >/dev/null 2>&1; then
     printf '%s' "$input" | jq -r ".${path} // empty" 2>/dev/null
   elif command -v python3 >/dev/null 2>&1; then

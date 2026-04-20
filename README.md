@@ -37,7 +37,7 @@ Skills de desarrollo, agentes especializados y comandos propios para [Claude Cod
 
 ### Game development
 
-Workflow completo para juegos 2D pixel art (RPG, platformer, roguelike) con Godot 4. Soporta GDScript y C#. 20 skills, 9 agentes especializados organizados en jerarquia de estudio y 4 hooks de validacion automatica.
+Workflow completo para juegos 2D pixel art (RPG, platformer, roguelike) con Godot 4. Soporta GDScript y C#. 20 skills, 9 agentes especializados organizados en jerarquia de estudio y 5 hooks de validacion automatica.
 
 #### Onboarding
 
@@ -142,10 +142,11 @@ Tier 1 — Directores (opus, auto-activacion en decisiones cross-dominio)
 
 ## Hooks (game dev)
 
-4 hooks de validacion automatica para codigo y assets de juegos. Comparten biblioteca `_parse.sh` para parsing JSON (cero duplicacion).
+5 hooks de validacion automatica para codigo, assets y seguridad. Comparten biblioteca `_parse.sh` para parsing JSON (cero duplicacion).
 
 | Hook | Evento | Que valida |
 |---|---|---|
+| `block-env-access.sh` | PreToolUse (Bash) | Bloquea lectura/escritura/source de archivos `.env` (permite `.env.example`, `.env.sample`, `.env.template`) |
 | `validate-gameplay-code.sh` | PreToolUse (git commit) | No hardcoded values en `src/gameplay/`, delta time usage, no imports de UI en gameplay |
 | `validate-assets.sh` | PostToolUse (Write/Edit) | Naming convention en `assets/` (lowercase_snake), JSON valido en data files |
 | `check-design-coverage.sh` | PostToolUse (Write/Edit) | Advierte si existe codigo en `src/gameplay/X/` sin su `design/gdd/X.md` correspondiente |
@@ -305,6 +306,7 @@ Integracion con skills generales: `/tdd` para todo codigo, `/debug` para bugs, `
       producer.md                      # especialista: sprints, scope, milestones
   hooks/
     _parse.sh                          # biblioteca compartida (JSON parsing)
+    block-env-access.sh                # hook: bloquea acceso a .env files
     validate-gameplay-code.sh          # hook: no hardcoded values, delta time
     validate-assets.sh                 # hook: naming, JSON valido
     check-design-coverage.sh           # hook: codigo sin GDD = warning

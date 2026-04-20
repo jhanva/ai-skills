@@ -72,6 +72,7 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
 
 .claude/hooks/
   _parse.sh                        — Biblioteca compartida (JSON parsing)
+  block-env-access.sh              — Bloquea acceso a archivos .env
   validate-gameplay-code.sh        — No hardcoded values, delta time, layer separation
   validate-assets.sh               — Naming convention, JSON valido en data files
   check-design-coverage.sh         — Codigo sin GDD = warning
@@ -158,7 +159,7 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
 
 ### Game development
 
-Workflow completo para juegos 2D pixel art con Godot 4. 9 agentes en jerarquia de estudio + 4 hooks.
+Workflow completo para juegos 2D pixel art con Godot 4. 9 agentes en jerarquia de estudio + 5 hooks.
 
 #### Concepto → Diseno → Arte → Arquitectura → Produccion → QA
 ```

@@ -12,6 +12,7 @@ max_depth = 1
 [agents.models]
 # Single source of truth for the recommended models. Keep in sync with pins
 # in .codex/agents/*.toml. Bump here first, then mirror.
+# Placeholder model names — update to actual Codex model IDs when available
 default = "gpt-5.4"
 implementer = "gpt-5.2"
 
