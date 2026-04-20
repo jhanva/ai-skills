@@ -1,0 +1,7 @@
+interface:
+  display_name: "Story"
+  short_description: "Convierte GDD en una dev story"
+  default_prompt: "Usa $story para extraer una story implementable desde una seccion del GDD."
+
+policy:
+  allow_implicit_invocation: false

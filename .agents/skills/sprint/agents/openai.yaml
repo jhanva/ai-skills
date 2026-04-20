@@ -1,0 +1,7 @@
+interface:
+  display_name: "Sprint"
+  short_description: "Planifica un sprint ejecutable"
+  default_prompt: "Usa $sprint para convertir el backlog del juego en un sprint pequeño, claro y verificable."
+
+policy:
+  allow_implicit_invocation: false

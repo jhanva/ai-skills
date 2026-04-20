@@ -1,0 +1,7 @@
+interface:
+  display_name: "Playtest"
+  short_description: "Guia y documenta playtests"
+  default_prompt: "Usa $playtest para conducir una sesion de prueba y registrar hallazgos de funcionalidad y game feel."
+
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Smoke Test"
+  short_description: "Checklist rapido antes de merge"
+  default_prompt: "Usa $smoke-test para hacer una pasada rapida de checks antes de merge o release."
+
+policy:
+  allow_implicit_invocation: false

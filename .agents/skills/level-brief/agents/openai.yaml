@@ -1,0 +1,7 @@
+interface:
+  display_name: "Level Brief"
+  short_description: "Diseña un nivel jugable"
+  default_prompt: "Usa $level-brief para diseñar layout, flow, encounters y requirements de un nivel."
+
+policy:
+  allow_implicit_invocation: false

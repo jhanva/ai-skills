@@ -8,6 +8,13 @@ description: >-
 
 # Palette Management
 
+## Uso en Codex
+
+- Esta skill esta pensada para invocacion explicita con `$palette`.
+- Cuando aqui se indique buscar patrones, usa `rg -n`; para listar archivos, usa `rg --files` o `find`; para leer fragmentos concretos, usa `sed -n`.
+- Cuando aqui se hable de subagentes, usa los agentes integrados de Codex o los definidos en `.codex/agents/`, y solo delega si el usuario lo pidio explicitamente.
+- Cuando un ejemplo heredado mencione tools de Claude, aplica la traduccion de `AGENTS.md` y expresa la accion con herramientas reales de Codex (`rg`, `find`, `sed -n`, shell puntual y patch nativo).
+
 Crear, validar, y gestionar color palettes para pixel art. Output: `design/palette.md` + archivos GPL/JSON.
 
 ## FASE 1: Determinar modo

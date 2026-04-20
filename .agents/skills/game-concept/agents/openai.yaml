@@ -1,0 +1,7 @@
+interface:
+  display_name: "Game Concept"
+  short_description: "Formaliza el concepto del juego"
+  default_prompt: "Usa $game-concept para convertir una idea en pillars, core loop y alcance inicial."
+
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Design System"
+  short_description: "Diseña un sistema de juego"
+  default_prompt: "Usa $design-system para definir un sistema como inventario, dialogo, crafting o movement."
+
+policy:
+  allow_implicit_invocation: false

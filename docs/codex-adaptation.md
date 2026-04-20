@@ -70,6 +70,8 @@ Los pins de modelo se centralizan en `.codex/config.toml` y se propagan con
 
 - Las skills manuales quedaron con `allow_implicit_invocation: false`.
 - Las skills automáticas (`debug`, `tdd`, `verify`) quedaron habilitadas para matching implícito.
+- En gamedev, `balance-check` y `scope-check` tambien quedaron con matching implicito para preservar el comportamiento automatico que tenia la capa original.
 - `optimize` se mantiene como skill de referencia, mientras que `AGENTS.md` cubre las reglas globales base del repo.
 - En la pasada de ajuste para Codex se normalizaron las invocaciones explicitas a `$skill` y los ejemplos operativos a herramientas nativas como `rg`, `find` y `sed -n`.
 - La pasada final de optimizacion dejó todas las `SKILL.md` bajo 500 lineas y convirtió los agentes custom largos en prompts cortos con `playbook.md`/`patterns.md` cargados on-demand, alineados con la guia oficial de skills y subagentes.
+- La capa gamedev de Codex ahora incluye `agents/openai.yaml` para sus skills clave, de modo que queden descubribles en UI y con politicas de invocacion consistentes con Codex.

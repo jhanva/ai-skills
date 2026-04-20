@@ -9,6 +9,13 @@ description: >-
 
 # Sprite Specification
 
+## Uso en Codex
+
+- Esta skill esta pensada para invocacion explicita con `$sprite-spec`.
+- Cuando aqui se indique buscar patrones, usa `rg -n`; para listar archivos, usa `rg --files` o `find`; para leer fragmentos concretos, usa `sed -n`.
+- Cuando aqui se hable de subagentes, usa los agentes integrados de Codex o los definidos en `.codex/agents/`, y solo delega si el usuario lo pidio explicitamente.
+- Cuando un ejemplo heredado mencione tools de Claude, aplica la traduccion de `AGENTS.md` y expresa la accion con herramientas reales de Codex (`rg`, `find`, `sed -n`, shell puntual y patch nativo).
+
 Specs completas para sprites de entities: animation states, frame counts, timing, hitbox, y formato de export. Output: `design/sprites/{entity}-spec.md`.
 
 ## FASE 1: Leer art-bible y contexto

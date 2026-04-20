@@ -1,0 +1,7 @@
+interface:
+  display_name: "Godot Setup"
+  short_description: "Configura un proyecto Godot 4"
+  default_prompt: "Usa $godot-setup para definir autoloads, input map, display y export presets en Godot 4."
+
+policy:
+  allow_implicit_invocation: false

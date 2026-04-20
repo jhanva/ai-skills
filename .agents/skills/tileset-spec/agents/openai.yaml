@@ -1,0 +1,7 @@
+interface:
+  display_name: "Tileset Spec"
+  short_description: "Especifica un tileset de juego"
+  default_prompt: "Usa $tileset-spec para definir tiles, variantes, autotiles y reglas de export de un tileset."
+
+policy:
+  allow_implicit_invocation: false

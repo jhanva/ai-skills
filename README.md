@@ -37,62 +37,62 @@ Skills de desarrollo, agentes especializados y comandos propios para [Claude Cod
 
 ### Game development
 
-Workflow completo para juegos 2D pixel art (RPG, platformer, roguelike) con Godot 4. Soporta GDScript y C#. 20 skills, 9 agentes especializados organizados en jerarquia de estudio y 5 hooks de validacion automatica.
+En la capa Codex, el workflow gamedev cubre juegos 2D pixel art (RPG, platformer, roguelike) con Godot 4 y soporta GDScript y C#. Incluye 20 skills y 9 agentes custom. Los hooks listados mas abajo pertenecen a la capa original de Claude.
 
 #### Onboarding
 
 | Skill | Invocacion | Agente | Proposito |
 |---|---|---|---|
-| `/game-start` | Manual | — | Setup guiado: Godot config, estructura de proyecto, GDScript vs C# |
+| `$game-start` | Explícita | — | Setup guiado: Godot config, estructura de proyecto, GDScript vs C# |
 
 #### Concepto
 
 | Skill | Invocacion | Agente | Proposito |
 |---|---|---|---|
-| `/game-concept` | Manual | game-designer | Formalizar idea en concept doc (genero, pillars, target audience) |
-| `/art-bible` | Manual | pixel-artist + creative-director | Identidad visual: paleta, estilo, resoluciones, restricciones |
+| `$game-concept` | Explícita | game-designer | Formalizar idea en concept doc (genero, pillars, target audience) |
+| `$art-bible` | Explícita | pixel-artist + creative-director | Identidad visual: paleta, estilo, resoluciones, restricciones |
 
 #### Diseno
 
 | Skill | Invocacion | Agente | Proposito |
 |---|---|---|---|
-| `/rpg-design` | Manual | game-designer | Sistemas RPG (stats, formulas, turnos, balance, enemy AI) |
-| `/design-system` | Manual | game-designer | GDD para un sistema especifico (inventario, dialog, crafting) |
-| `/level-brief` | Manual | level-designer | Disenar nivel: layout, encounters, curva de dificultad, pacing |
-| `/balance-check` | Automatica | game-designer | Validar balance numerico (damage curves, economy sinks/faucets) |
+| `$rpg-design` | Explícita | game-designer | Sistemas RPG (stats, formulas, turnos, balance, enemy AI) |
+| `$design-system` | Explícita | game-designer | GDD para un sistema especifico (inventario, dialog, crafting) |
+| `$level-brief` | Explícita | level-designer | Disenar nivel: layout, encounters, curva de dificultad, pacing |
+| `$balance-check` | Implícita + explícita | game-designer | Validar balance numerico (damage curves, economy sinks/faucets) |
 
 #### Arte y assets
 
 | Skill | Invocacion | Agente | Proposito |
 |---|---|---|---|
-| `/pixel-pipeline` | Manual | pixel-artist | Pipeline completo de pixel art (sprites, tiles, atlas, palette swap) |
-| `/sprite-spec` | Manual | pixel-artist | Spec de sprite sheet: frames, estados, dimensiones, hitbox |
-| `/tileset-spec` | Manual | pixel-artist | Spec de tileset: tile size, autotile rules, variantes |
-| `/palette` | Manual | pixel-artist | Crear/gestionar paletas de color (ramps, restrictions) |
-| `/sound-brief` | Manual | sound-designer | Brief de audio: SFX list, mood board musical, integracion Godot |
+| `$pixel-pipeline` | Explícita | pixel-artist | Pipeline completo de pixel art (sprites, tiles, atlas, palette swap) |
+| `$sprite-spec` | Explícita | pixel-artist | Spec de sprite sheet: frames, estados, dimensiones, hitbox |
+| `$tileset-spec` | Explícita | pixel-artist | Spec de tileset: tile size, autotile rules, variantes |
+| `$palette` | Explícita | pixel-artist | Crear/gestionar paletas de color (ramps, restrictions) |
+| `$sound-brief` | Explícita | sound-designer | Brief de audio: SFX list, mood board musical, integracion Godot |
 
 #### Arquitectura
 
 | Skill | Invocacion | Agente | Proposito |
 |---|---|---|---|
-| `/game-arch` | Manual | godot-architect | Arquitectura de juegos 2D (game loop, FSM, commands, save system) |
-| `/godot-setup` | Manual | godot-architect | Config proyecto Godot: autoloads, input map, export, folder structure |
-| `/scene-design` | Manual | godot-architect | Disenar escena: node tree, signals, script responsibilities |
+| `$game-arch` | Explícita | godot-architect | Arquitectura de juegos 2D (game loop, FSM, commands, save system) |
+| `$godot-setup` | Explícita | godot-architect | Config proyecto Godot: autoloads, input map, export, folder structure |
+| `$scene-design` | Explícita | godot-architect | Disenar escena: node tree, signals, script responsibilities |
 
 #### Produccion
 
 | Skill | Invocacion | Agente | Proposito |
 |---|---|---|---|
-| `/sprint` | Manual | producer | Planificar sprint: stories, estimacion, prioridades |
-| `/story` | Manual | producer | Crear dev story desde seccion de GDD |
-| `/scope-check` | Automatica | producer | Verificar que el scope es realista vs tiempo disponible |
+| `$sprint` | Explícita | producer | Planificar sprint: stories, estimacion, prioridades |
+| `$story` | Explícita | producer | Crear dev story desde seccion de GDD |
+| `$scope-check` | Implícita + explícita | producer | Verificar que el scope es realista vs tiempo disponible |
 
 #### QA
 
 | Skill | Invocacion | Agente | Proposito |
 |---|---|---|---|
-| `/playtest` | Manual | qa-analyst | Reporte estructurado de playtest session |
-| `/smoke-test` | Manual | qa-analyst | Checklist rapido pre-merge/pre-release |
+| `$playtest` | Explícita | qa-analyst | Reporte estructurado de playtest session |
+| `$smoke-test` | Explícita | qa-analyst | Checklist rapido pre-merge/pre-release |
 
 ### Texto
 
@@ -114,10 +114,10 @@ Workflow completo para juegos 2D pixel art (RPG, platformer, roguelike) con Godo
 
 ### Game dev — Jerarquia de estudio
 
-9 agentes organizados en 2 niveles. Directores para sintesis cross-dominio (opus, se activan poco). Especialistas para trabajo de dominio (sonnet, se activan frecuentemente).
+9 agentes organizados en 2 niveles. En la capa Codex usan `gpt-5.4`; los directores llevan razonamiento `high` y los especialistas `medium`.
 
 ```
-Tier 1 — Directores (opus, auto-activacion en decisiones cross-dominio)
+Tier 1 — Directores (gpt-5.4, razonamiento high)
   creative-director ──── pixel-artist
     (vision, coherencia       sound-designer
      arte + diseno)           game-designer
@@ -130,17 +130,17 @@ Tier 1 — Directores (opus, auto-activacion en decisiones cross-dominio)
 
 | Agente | Tier | Modelo | Dominio | Se activa cuando... |
 |---|---|---|---|---|
-| `creative-director` | Director | opus | Vision global, coherencia arte/diseno | Conflicto entre dominios creativos, review de concepto |
-| `technical-director` | Director | opus | Arquitectura global, performance | Conflicto codigo/performance, decision arquitectural |
-| `pixel-artist` | Especialista | sonnet | Sprites, tiles, animacion, paletas, atlas | Editando `assets/sprites/`, `assets/tiles/` |
-| `sound-designer` | Especialista | sonnet | SFX, musica, audio pipeline | Editando `assets/audio/`, definiendo audio en GDD |
-| `game-designer` | Especialista | sonnet | Sistemas, mecanicas, balance, economia | Escribiendo GDDs en `design/`, discutiendo mecanicas |
-| `level-designer` | Especialista | sonnet | Niveles, encounters, dificultad, world building | Editando `design/levels/`, discutiendo layout |
-| `godot-architect` | Especialista | sonnet | Escenas, signals, GDScript/C#, patterns Godot | Editando `.gd`, `.cs`, `.tscn`, `.tres` |
-| `qa-analyst` | Especialista | sonnet | Tests, bug triage, playtesting | Post-implementacion, pre-release |
-| `producer` | Especialista | sonnet | Sprints, scope, milestones, stories | Planificando trabajo, revisando progreso |
+| `creative-director` | Director | gpt-5.4 / high | Vision global, coherencia arte/diseno | Conflicto entre dominios creativos, review de concepto |
+| `technical-director` | Director | gpt-5.4 / high | Arquitectura global, performance | Conflicto codigo/performance, decision arquitectural |
+| `pixel-artist` | Especialista | gpt-5.4 / medium | Sprites, tiles, animacion, paletas, atlas | Editando `assets/sprites/`, `assets/tiles/` |
+| `sound-designer` | Especialista | gpt-5.4 / medium | SFX, musica, audio pipeline | Editando `assets/audio/`, definiendo audio en GDD |
+| `game-designer` | Especialista | gpt-5.4 / medium | Sistemas, mecanicas, balance, economia | Escribiendo GDDs en `design/`, discutiendo mecanicas |
+| `level-designer` | Especialista | gpt-5.4 / medium | Niveles, encounters, dificultad, world building | Editando `design/levels/`, discutiendo layout |
+| `godot-architect` | Especialista | gpt-5.4 / medium | Escenas, signals, GDScript/C#, patterns Godot | Editando `.gd`, `.cs`, `.tscn`, `.tres` |
+| `qa-analyst` | Especialista | gpt-5.4 / medium | Tests, bug triage, playtesting | Post-implementacion, pre-release |
+| `producer` | Especialista | gpt-5.4 / medium | Sprints, scope, milestones, stories | Planificando trabajo, revisando progreso |
 
-## Hooks (game dev)
+## Hooks (game dev, capa Claude)
 
 5 hooks de validacion automatica para codigo, assets y seguridad. Comparten biblioteca `_parse.sh` para parsing JSON (cero duplicacion).
 
@@ -189,25 +189,25 @@ Tier 1 — Directores (opus, auto-activacion en decisiones cross-dominio)
 
 ```
 Concepto:
-  /brainstorm  -->  /game-concept  -->  /art-bible
+  $brainstorm  -->  $game-concept  -->  $art-bible
                          |
 Diseno:                  |
-  /design-system  -->  /rpg-design     -->  /balance-check
-  /level-brief                                  |
+  $design-system  -->  $rpg-design     -->  $balance-check
+  $level-brief                                  |
                                                 v
 Arte:                                    Arquitectura:
-  /palette  -->  /pixel-pipeline           /game-arch  -->  /godot-setup
-  /sprite-spec   /tileset-spec             /scene-design
-  /sound-brief                                  |
+  $palette  -->  $pixel-pipeline           $game-arch  -->  $godot-setup
+  $sprite-spec   $tileset-spec             $scene-design
+  $sound-brief                                  |
                                                 v
 Produccion:                              QA:
-  /sprint  -->  /story  -->  /plan         /playtest  -->  /smoke-test
+  $sprint  -->  $story  -->  $plan         $playtest  -->  $smoke-test
                   |
                   v
-            /execute (usa /tdd)  -->  /review  -->  /verify
+            $execute (usa $tdd)  -->  $review  -->  $verify
 ```
 
-Integracion con skills generales: `/tdd` para todo codigo, `/debug` para bugs, `/verify` antes de completar, `/review` para code review de GDScript/C#.
+Integracion con skills generales: `$tdd` para todo codigo, `$debug` para bugs, `$verify` antes de completar, `$review` para code review de GDScript/C#.
 
 ### Auditorias
 

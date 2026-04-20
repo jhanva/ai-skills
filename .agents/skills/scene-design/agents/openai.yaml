@@ -1,0 +1,7 @@
+interface:
+  display_name: "Scene Design"
+  short_description: "Diseña escenas y node trees"
+  default_prompt: "Usa $scene-design para definir node tree, signals, scripts y data flow de una escena."
+
+policy:
+  allow_implicit_invocation: false

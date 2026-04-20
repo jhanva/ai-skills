@@ -1,0 +1,7 @@
+interface:
+  display_name: "Game Start"
+  short_description: "Arranca un proyecto Godot 2D"
+  default_prompt: "Usa $game-start para preparar el proyecto, elegir lenguaje y dejar la base de trabajo lista."
+
+policy:
+  allow_implicit_invocation: false

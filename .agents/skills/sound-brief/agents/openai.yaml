@@ -1,0 +1,7 @@
+interface:
+  display_name: "Sound Brief"
+  short_description: "Define audio para gameplay y zonas"
+  default_prompt: "Usa $sound-brief para definir SFX, musica, buses y notas de integracion de audio."
+
+policy:
+  allow_implicit_invocation: false

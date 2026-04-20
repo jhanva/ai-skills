@@ -1,0 +1,7 @@
+interface:
+  display_name: "Sprite Spec"
+  short_description: "Especifica sprites y animaciones"
+  default_prompt: "Usa $sprite-spec para definir estados, frames, timing, dimensiones e hitbox de un sprite."
+
+policy:
+  allow_implicit_invocation: false

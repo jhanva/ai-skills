@@ -1,0 +1,7 @@
+interface:
+  display_name: "Art Bible"
+  short_description: "Define identidad visual pixel art"
+  default_prompt: "Usa $art-bible para definir paleta, resolucion, estilo y reglas visuales del proyecto."
+
+policy:
+  allow_implicit_invocation: false

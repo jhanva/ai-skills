@@ -1,0 +1,7 @@
+interface:
+  display_name: "Scope Check"
+  short_description: "Mide si el MVP es realista"
+  default_prompt: "Usa $scope-check para contrastar backlog, GDDs, stories y velocity contra el alcance MVP."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Palette"
+  short_description: "Crea y valida paletas pixel art"
+  default_prompt: "Usa $palette para crear, revisar o exportar una paleta y sus variantes."
+
+policy:
+  allow_implicit_invocation: false

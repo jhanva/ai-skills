@@ -1,0 +1,7 @@
+interface:
+  display_name: "Balance Check"
+  short_description: "Valida formulas y curvas de juego"
+  default_prompt: "Usa $balance-check para revisar formulas, ratios, outliers y breakpoints de un sistema."
+
+policy:
+  allow_implicit_invocation: true
