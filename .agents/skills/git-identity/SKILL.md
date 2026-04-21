@@ -7,7 +7,8 @@ description: "Audita y configura identidades Git separadas por directorio, host,
 
 ## Uso en Codex
 
-- Esta skill está pensada para invocación explícita con `$git-identity`.
+- Esta skill esta pensada para invocacion explicita con `$git-identity`.
+- Usa lecturas puntuales para revisar config: `git config`, `git remote -v`, `sed -n` y lectura directa de archivos concretos.
 - Modo por defecto: `audit`.
 - Si el prompt menciona `setup`, ejecutar el flujo de configuración.
 - `audit` es read-only.

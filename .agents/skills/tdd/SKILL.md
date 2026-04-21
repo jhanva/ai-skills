@@ -7,9 +7,10 @@ description: Impone RED-GREEN-REFACTOR al escribir o modificar código de produc
 
 ## Uso en Codex
 
-- Codex puede activar esta skill por contexto o puedes invocarla explícitamente con `$tdd`.
-- Para buscar y leer código, prioriza `rg`, `rg --files` y lecturas puntuales con `sed -n` en lugar de escaneos completos.
-- Si el flujo menciona subagentes, en Codex usa `worker`, `explorer` o un agente personalizado solo cuando la tarea realmente lo justifique.
+- Codex puede activar esta skill por contexto o puedes invocarla explicitamente con `$tdd`.
+- Para buscar y leer codigo, prioriza `rg`, `rg --files` y lecturas puntuales con `sed -n` en lugar de escaneos completos.
+- Trabaja localmente por defecto. Solo delega si el usuario pidio paralelismo o delegacion.
+- Si falta contexto menor, define el comportamiento esperado antes de escribir el test y dejalo explicito.
 ## Ley de hierro
 
 **PROHIBIDO escribir codigo de produccion sin un test que falle primero.** Si se escribio codigo antes del test, se borra y se empieza de nuevo. Sin excepciones.

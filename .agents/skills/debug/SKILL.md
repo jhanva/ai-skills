@@ -7,9 +7,10 @@ description: Aplica debugging sistemático con investigación de causa raíz ant
 
 ## Uso en Codex
 
-- Codex puede activar esta skill por contexto o puedes invocarla explícitamente con `$debug`.
-- Para buscar y leer código, prioriza `rg`, `rg --files` y lecturas puntuales con `sed -n` en lugar de escaneos completos.
-- Si el flujo menciona subagentes, en Codex usa `worker`, `explorer` o un agente personalizado solo cuando la tarea realmente lo justifique.
+- Codex puede activar esta skill por contexto o puedes invocarla explicitamente con `$debug`.
+- Para buscar y leer codigo, prioriza `rg`, `rg --files` y lecturas puntuales con `sed -n` en lugar de escaneos completos.
+- Investiga en la sesion principal por defecto. Solo delega si el usuario pidio paralelismo o delegacion.
+- Si falta contexto menor, formula una hipotesis provisional y validala con evidencia antes de preguntar.
 ## Ley de hierro
 
 **PROHIBIDO aplicar fixes sin investigar la causa raiz.** Debugging sistematico: 15-30 min. Adivinar y probar: 2-3 horas.

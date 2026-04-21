@@ -7,9 +7,10 @@ description: Exige verificación fresca con comandos reales antes de afirmar éx
 
 ## Uso en Codex
 
-- Codex puede activar esta skill por contexto o puedes invocarla explícitamente con `$verify`.
-- Para buscar y leer código, prioriza `rg`, `rg --files` y lecturas puntuales con `sed -n` en lugar de escaneos completos.
-- Si el flujo menciona subagentes, en Codex usa `worker`, `explorer` o un agente personalizado solo cuando la tarea realmente lo justifique.
+- Codex puede activar esta skill por contexto o puedes invocarla explicitamente con `$verify`.
+- Para buscar y leer codigo, prioriza `rg`, `rg --files` y lecturas puntuales con `sed -n` en lugar de escaneos completos.
+- Verifica en la sesion principal por defecto. Solo delega si el usuario pidio paralelismo o delegacion.
+- Si falta contexto menor, identifica primero que claim exacto necesitas validar antes de correr comandos.
 ## Ley de hierro
 
 **PROHIBIDO decir que algo funciona sin ejecutar la verificacion y leer el output completo.** "Deberia funcionar" no es evidencia. Solo cuenta output real de un comando ejecutado AHORA.

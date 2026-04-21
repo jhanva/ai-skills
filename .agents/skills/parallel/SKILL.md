@@ -7,9 +7,10 @@ description: Orquesta trabajo paralelo con subagentes solo para problemas realme
 
 ## Uso en Codex
 
-- Esta skill está pensada para invocación explícita con `$parallel`.
-- Cuando aquí se indique buscar patrones, usa `rg -n`; para listar archivos, usa `rg --files` o `find`; para leer fragmentos concretos, usa `sed -n`.
-- Cuando aquí se hable de subagentes, usa los agentes integrados de Codex o los definidos en `.codex/agents/`, y solo delega si el usuario pidió paralelismo o delegación.
+- Esta skill esta pensada para invocacion explicita con `$parallel`.
+- Trabaja con lecturas puntuales: `rg -n` para buscar, `rg --files` o `find` para listar, y `sed -n` para leer solo el fragmento necesario.
+- Solo aplica cuando el usuario pidio paralelismo o delegacion. Si no, resuelve el trabajo en la sesion principal.
+- Cada agente debe tener ownership explicito por archivos o responsabilidad.
 ## Cuando SI usar
 
 - 3+ archivos de test fallando con causas raiz DIFERENTES
@@ -64,13 +65,15 @@ Reporta: causa raiz, fix aplicado, tests que pasan, archivos modificados
 
 ### 3. Despachar en paralelo
 
-Usar multiples subagentes de Codex en UN SOLO mensaje. Para investigacion read-only, prefiere `explorer`; para cambios acotados, prefiere `task_implementer` o `worker`:
+Lanza todos los agentes en una sola ronda de delegacion. Para investigacion read-only, prefiere `explorer`; para cambios acotados, prefiere `task_implementer` o `worker`.
 
-```
-spawn_agent(explorer, prompt_A)
-spawn_agent(explorer, prompt_B)
-spawn_agent(worker, prompt_C)
-```
+Cada prompt debe incluir:
+
+- dominio exacto
+- problema concreto
+- archivos que puede tocar
+- archivos que NO debe tocar
+- output esperado con evidencia
 
 ### 4. Integrar resultados
 

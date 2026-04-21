@@ -7,9 +7,10 @@ description: Convierte una spec aprobada en un plan de implementación concreto,
 
 ## Uso en Codex
 
-- Esta skill está pensada para invocación explícita con `$plan`.
-- Cuando aquí se indique buscar patrones, usa `rg -n`; para listar archivos, usa `rg --files` o `find`; para leer fragmentos concretos, usa `sed -n`.
-- Cuando aquí se hable de subagentes, usa los agentes integrados de Codex o los definidos en `.codex/agents/`, y solo delega si el usuario pidió paralelismo o delegación.
+- Esta skill esta pensada para invocacion explicita con `$plan`.
+- Trabaja con lecturas puntuales: `rg -n` para buscar, `rg --files` o `find` para listar, y `sed -n` para leer solo el fragmento necesario.
+- Si falta contexto menor, asume una convencion razonable y dejala explicita; pregunta solo si faltan datos que cambian el plan.
+- Delega solo si el usuario pidio paralelismo o delegacion.
 ## Regla absoluta
 
 **CERO PLACEHOLDERS.** Cada paso tiene codigo real, comandos reales, y output esperado real. El plan debe ser ejecutable por alguien sin contexto del codebase.
@@ -55,9 +56,8 @@ Cada tarea sigue esta estructura:
 **Paso 4 — Verificar que pasa:**
 [comando exacto y output esperado]
 
-**Paso 5 — Commit:**
-git add [archivos especificos]
-git commit -m "[mensaje descriptivo]"
+**Paso 5 — Cierre de la tarea:**
+[verificacion final, riesgos restantes y siguiente paso]
 ```
 
 ### Granularidad
@@ -80,20 +80,18 @@ Si una tarea necesita mas de 2 archivos de produccion (excluyendo tests), es dem
 - [ ] Los imports y rutas de archivo son correctos
 - [ ] El orden de ejecucion es logico (dependencias primero)
 
-### Paso 5: Ofrecer ejecucion
+### Paso 5: Transicion
 
-```
-Plan listo con N tareas. Como quieres ejecutarlo?
-a) Con subagentes (recomendado) — usa $execute
-b) Paso a paso en esta sesion
-c) Revisar/ajustar el plan primero
-```
+Cierra con el siguiente paso recomendado:
+
+- si el usuario quiere implementacion a partir de este plan, continuar con `$execute`
+- si el plan necesita ajuste, marcar que puntos revisar antes de ejecutar
 
 ## Reglas de calidad
 
 - Nombres de variables y funciones consistentes en todo el plan
 - Cada test testea UN comportamiento con nombre descriptivo
-- Commits atomicos: un commit por tarea
+- Si el usuario pidio commits atomicos, proponer un commit por tarea o por grupo coherente
 - Si hay mas de 10 tareas, agrupa en fases logicas
 
 ## Entrada esperada

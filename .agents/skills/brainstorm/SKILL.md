@@ -7,9 +7,10 @@ description: Guía diseño riguroso antes de implementar una feature o cambio no
 
 ## Uso en Codex
 
-- Esta skill está pensada para invocación explícita con `$brainstorm`.
-- Cuando aquí se indique buscar patrones, usa `rg -n`; para listar archivos, usa `rg --files` o `find`; para leer fragmentos concretos, usa `sed -n`.
-- Cuando aquí se hable de subagentes, usa los agentes integrados de Codex o los definidos en `.codex/agents/`, y solo delega si el usuario pidió paralelismo o delegación.
+- Esta skill esta pensada para invocacion explicita con `$brainstorm`.
+- Trabaja con lecturas puntuales: `rg -n` para buscar, `rg --files` o `find` para listar, y `sed -n` para leer solo el fragmento necesario.
+- Si falta contexto menor, asume una opcion razonable y dejala explicita; pregunta solo por bloqueos reales o tradeoffs con consecuencias.
+- Delega solo si el usuario pidio paralelismo o delegacion.
 ## Regla absoluta
 
 **PROHIBIDO implementar sin diseno aprobado.** Todo proyecto pasa por este proceso sin importar que tan "simple" parezca. La complejidad oculta se descubre aqui, no en produccion.
@@ -18,14 +19,14 @@ description: Guía diseño riguroso antes de implementar una feature o cambio no
 
 ### Fase 1: Entender el problema
 
-Haz preguntas UNA POR UNA para entender el contexto completo:
+Aclara solo lo que sea bloqueante para disenar bien:
 
 - Que problema se resuelve y para quien
 - Que restricciones existen (tecnologia, tiempo, infraestructura)
 - Que ya se intento o se descarto
 - Cuales son los criterios de exito
 
-Preferir preguntas de opcion multiple para reducir friccion:
+Si ya puedes proponer una spec util con supuestos razonables, hazlo y marca los supuestos. Si necesitas preguntar, usa 1-3 preguntas concretas y, cuando ayude, ofrece opciones cerradas:
 
 ```
 Como se consumiran estos datos?
@@ -89,7 +90,7 @@ Antes de presentar al usuario, verifica:
 
 ### Fase 6: Transicion
 
-Cuando el usuario aprueba la spec: "Spec aprobada. Usa `$plan` para convertirla en un plan de implementacion paso a paso."
+Cuando la spec ya este cerrada, transiciona directo a `$plan` o deja claro que ya esta lista para planificar.
 
 ## Anti-patrones
 

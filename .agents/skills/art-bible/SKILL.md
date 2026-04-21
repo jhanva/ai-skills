@@ -12,9 +12,9 @@ description: >-
 ## Uso en Codex
 
 - Esta skill esta pensada para invocacion explicita con `$art-bible`.
-- Cuando aqui se indique buscar patrones, usa `rg -n`; para listar archivos, usa `rg --files` o `find`; para leer fragmentos concretos, usa `sed -n`.
-- Cuando aqui se hable de subagentes, usa los agentes integrados de Codex o los definidos en `.codex/agents/`, y solo delega si el usuario lo pidio explicitamente.
-- Cuando un ejemplo heredado mencione tools de Claude, aplica la traduccion de `AGENTS.md` y expresa la accion con herramientas reales de Codex (`rg`, `find`, `sed -n`, shell puntual y patch nativo).
+- Trabaja con lecturas puntuales: `rg -n` para buscar, `rg --files` o `find` para listar, y `sed -n` para leer solo el fragmento necesario.
+- Si falta un dato menor, asume una opcion razonable y dejala explicita; pregunta solo por decisiones que cambian la direccion visual.
+- Delega solo si el usuario pidio paralelismo o delegacion.
 
 Crear la biblia de arte del proyecto: convenciones de resolucion, paleta, estilo de sprites, animaciones, y UI. Asegura consistencia visual. Output: `design/art-bible.md`.
 

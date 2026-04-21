@@ -1,6 +1,8 @@
 # ai-skills
 
-Skills de desarrollo, agentes especializados y comandos propios para [Claude Code](https://claude.ai/code). Imponen flujos de trabajo disciplinados: TDD, debugging sistematico, diseno antes de implementacion, y verificacion con evidencia.
+Skills de desarrollo, agentes especializados y comandos propios para [Claude Code](https://claude.ai/code), con una capa paralela nativa para Codex. Imponen flujos de trabajo disciplinados: TDD, debugging sistematico, diseno antes de implementacion, y verificacion con evidencia.
+
+En la capa Codex, las invocaciones explicitas usan `$skill`. En la capa original de Claude, el equivalente sigue siendo `/skill`.
 
 ## Skills
 
@@ -9,31 +11,37 @@ Skills de desarrollo, agentes especializados y comandos propios para [Claude Cod
 | Skill | Invocacion | Proposito |
 |---|---|---|
 | `optimize` | Siempre activa | Filtrado de output, delegacion a subagentes y seleccion de modelo |
-| `/brainstorm` | Manual | Diseno antes de implementar. Dialogo socratico, multiples enfoques, spec escrita |
-| `/plan` | Manual | Convertir spec aprobada en plan de implementacion con tareas de 2-5 min |
-| `/tdd` | Automatica | Test-driven development estricto. Ciclo RED-GREEN-REFACTOR obligatorio |
-| `/debug` | Automatica | Debugging sistematico en 4 fases con investigacion de causa raiz |
-| `/verify` | Automatica | Verificacion con evidencia antes de cualquier claim de exito |
-| `/execute` | Manual | Ejecucion de plan con subagentes frescos y revision de 2 etapas (spec + calidad) |
-| `/review` | Manual | Code review estructurado con severidades |
-| `/parallel` | Manual | Despachar agentes paralelos para problemas independientes |
-| `/secure` | Manual | Analisis de seguridad: secrets, injection, auth, crypto, infra. Modo quick o full |
+| `$brainstorm` | Manual | Diseno antes de implementar. Dialogo socratico, multiples enfoques, spec escrita |
+| `$plan` | Manual | Convertir spec aprobada en plan de implementacion con tareas de 2-5 min |
+| `$tdd` | Automatica | Test-driven development estricto. Ciclo RED-GREEN-REFACTOR obligatorio |
+| `$debug` | Automatica | Debugging sistematico en 4 fases con investigacion de causa raiz |
+| `$verify` | Automatica | Verificacion con evidencia antes de cualquier claim de exito |
+| `$execute` | Manual | Ejecucion de plan con revision de 2 etapas; delegacion solo cuando aplica |
+| `$review` | Manual | Code review estructurado con severidades |
+| `$parallel` | Manual | Despachar agentes paralelos para problemas independientes |
+| `$secure` | Manual | Analisis de seguridad: secrets, injection, auth, crypto, infra. Modo quick o full |
 
 ### Android
 
 | Skill | Invocacion | Proposito |
 |---|---|---|
-| `/android-arch` | Manual | Validacion de boundaries de Clean Architecture Android |
-| `/bitmap-safety` | Manual | Auditoria de pipelines de procesamiento de imagen (memory, threading, errors) |
-| `/room-audit` | Manual | Auditoria de seguridad de datos con Room (migraciones, schema, data safety) |
+| `$android-arch` | Manual | Validacion de boundaries de Clean Architecture Android |
+| `$bitmap-safety` | Manual | Auditoria de pipelines de procesamiento de imagen (memory, threading, errors) |
+| `$room-audit` | Manual | Auditoria de seguridad de datos con Room (migraciones, schema, data safety) |
+
+### Windows / Repo Ops
+
+| Skill | Invocacion | Proposito |
+|---|---|---|
+| `$windows-symlink` | Manual | Audita, habilita y repara soporte de symlinks en Windows para Git y checkouts de Codex |
 
 ### Imagen
 
 | Skill | Invocacion | Proposito |
 |---|---|---|
-| `/image-algo` | Manual | Diseno de algoritmos de imagen (hashing, similarity, clustering) |
-| `/ml-ondevice` | Manual | Integracion de modelos ML on-device en Android |
-| `/image-pipeline` | Manual | Diseno de pipelines de procesamiento de imagen multi-paso |
+| `$image-algo` | Manual | Diseno de algoritmos de imagen (hashing, similarity, clustering) |
+| `$ml-ondevice` | Manual | Integracion de modelos ML on-device en Android |
+| `$image-pipeline` | Manual | Diseno de pipelines de procesamiento de imagen multi-paso |
 
 ### Game development
 
@@ -156,32 +164,32 @@ Tier 1 — Directores (gpt-5.4, razonamiento high)
 
 | Comando | Proposito |
 |---|---|
-| `/git-identity` | Auditoria de cuentas git (4 capas: includeIf, shell guards, pre-commit hook, SSH keys) |
-| `/git-identity setup` | Configurar separacion de cuentas (macOS/Linux/Windows, mismo host o hosts diferentes) |
+| `$git-identity` | Auditoria de cuentas git (4 capas: includeIf, shell guards, pre-commit hook, SSH keys) |
+| `$git-identity setup` | Configurar separacion de cuentas (macOS/Linux/Windows, mismo host o hosts diferentes) |
 
 ## Flujos de trabajo
 
 ### Desarrollo general
 
 ```
-/brainstorm  -->  /plan  -->  /execute (usa /tdd internamente)
+$brainstorm  -->  $plan  -->  $execute (usa $tdd internamente)
                                   |
-                              /review  -->  /verify  -->  merge
+                              $review  -->  $verify  -->  merge
 ```
 
 ### Debugging
 
 ```
-/debug  -->  /tdd (para el fix)  -->  /verify
+$debug  -->  $tdd (para el fix)  -->  $verify
 ```
 
 ### Features de imagen
 
 ```
-/image-algo     -->  /image-pipeline  -->  /plan  -->  /execute
+$image-algo     -->  $image-pipeline  -->  $plan  -->  $execute
   (algoritmo)       (arquitectura)       (tareas)    (implementar)
 
-/ml-ondevice    -->  /image-pipeline  -->  /plan  -->  /execute
+$ml-ondevice    -->  $image-pipeline  -->  $plan  -->  $execute
   (modelo ML)       (arquitectura)       (tareas)    (implementar)
 ```
 

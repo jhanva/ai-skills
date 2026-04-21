@@ -1,0 +1,7 @@
+interface:
+  display_name: "Windows Symlink"
+  short_description: "Audita y habilita symlinks en Windows"
+  default_prompt: "Usa $windows-symlink para auditar, configurar o reparar soporte de symlinks en Windows y Git."
+
+policy:
+  allow_implicit_invocation: false

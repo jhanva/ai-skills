@@ -7,12 +7,13 @@ description: Realiza code review estructurado o ayuda a procesar feedback de rev
 
 ## Uso en Codex
 
-- Esta skill está pensada para invocación explícita con `$review`.
-- Cuando aquí se indique buscar patrones, usa `rg -n`; para listar archivos, usa `rg --files` o `find`; para leer fragmentos concretos, usa `sed -n`.
-- Cuando aquí se hable de subagentes, usa los agentes integrados de Codex o los definidos en `.codex/agents/`, y solo delega si el usuario pidió paralelismo o delegación.
+- Esta skill esta pensada para invocacion explicita con `$review`.
+- Trabaja con lecturas puntuales: `rg -n` para buscar, `rg --files` o `find` para listar, y `sed -n` para leer solo el fragmento necesario.
+- Haz review local por defecto. Solo delega si el usuario pidio paralelismo o delegacion.
+- Si falta contexto menor, revisa con lo que se pueda verificar y declara las suposiciones.
 ## Modo 1: Solicitar review
 
-Despachar el agente `reviewer` de `.codex/agents/` con contexto preciso. Si no esta disponible, usar un `explorer` o `worker` en modo read-only con estas mismas instrucciones:
+Haz el review en la sesion principal por defecto. Si el usuario pidio delegacion y existe el agente `reviewer` de `.codex/agents/`, puedes despacharlo con contexto preciso. Si `reviewer` no esta disponible, manten el review en la sesion principal; usa `explorer` solo para reunir evidencia read-only cuando el usuario haya autorizado delegacion.
 
 ```
 Eres un code reviewer senior. Revisa los cambios entre [BASE_SHA] y [HEAD_SHA].

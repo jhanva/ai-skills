@@ -7,9 +7,10 @@ description: Audita pipelines de imágenes en Android para detectar riesgos de O
 
 ## Uso en Codex
 
-- Esta skill está pensada para invocación explícita con `$bitmap-safety`.
-- Cuando aquí se indique buscar patrones, usa `rg -n`; para listar archivos, usa `rg --files` o `find`; para leer fragmentos concretos, usa `sed -n`.
-- Cuando aquí se hable de subagentes, usa los agentes integrados de Codex o los definidos en `.codex/agents/`, y solo delega si el usuario pidió paralelismo o delegación.
+- Esta skill esta pensada para invocacion explicita con `$bitmap-safety`.
+- Trabaja con lecturas puntuales: `rg -n` para buscar, `rg --files` o `find` para listar, y `sed -n` para leer solo el fragmento necesario.
+- Haz la auditoria en la sesion principal. Solo delega si el usuario pidio paralelismo o delegacion.
+- Si falta contexto menor, audita el target actual y declara cualquier limitacion.
 ## Ley de hierro: READ-ONLY
 
 **PROHIBIDO modificar archivos.** Solo reportar hallazgos inline.

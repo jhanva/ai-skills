@@ -7,9 +7,10 @@ description: "Hace auditoría de seguridad read-only sobre cambios o sobre un pr
 
 ## Uso en Codex
 
-- Esta skill está pensada para invocación explícita con `$secure`.
-- Cuando aquí se indique buscar patrones, usa `rg -n`; para listar archivos, usa `rg --files` o `find`; para leer fragmentos concretos, usa `sed -n`.
-- Cuando aquí se hable de subagentes, usa los agentes integrados de Codex o los definidos en `.codex/agents/`, y solo delega si el usuario pidió paralelismo o delegación.
+- Esta skill esta pensada para invocacion explicita con `$secure`.
+- Trabaja con lecturas puntuales: `rg -n` para buscar, `rg --files` o `find` para listar, y `sed -n` para leer solo el fragmento necesario.
+- Haz el scan local por defecto. Solo delega si el usuario pidio paralelismo o delegacion.
+- Si falta contexto menor, usa el target actual y declara cualquier limitacion del scan.
 ## Ley de hierro: READ-ONLY
 
 **PROHIBIDO modificar, eliminar o crear archivos en el proyecto escaneado.**
@@ -43,7 +44,7 @@ Solo aplica las verificaciones relevantes a los archivos cambiados.
 
 ### Modo FULL
 
-Escanea **todo el proyecto**. Para auditorias periodicas o antes de release. Usa subagentes paralelos para proyectos medianos/grandes.
+Escanea **todo el proyecto**. Para auditorias periodicas o antes de release. Hazlo localmente por defecto; usa subagentes read-only solo si el usuario pidio paralelismo y el proyecto lo justifica.
 
 Si el prompt menciona un modo explicito, usarlo:
 - `quick` o sin argumento = modo quick
@@ -134,9 +135,11 @@ Para cada archivo cambiado, verificar con `rg -n`:
 4. **Error handling** — stack traces expuestos al usuario, catch vacios
 5. **Datos sensibles** — PII en logs, tokens en URLs, secrets en comentarios
 
-### Modo full — subagentes paralelos (si proyecto mediano+)
+### Modo full — profundizar el scan
 
-Despachar 3 subagentes en un solo mensaje. Si existe el agente custom `security_auditor`, usarlo para los frentes read-only; si no, usar `explorer` con prompts especializados:
+Si el proyecto es pequeno, resuelve el scan completo en la sesion principal.
+
+Si el usuario pidio paralelismo y el proyecto es mediano o grande, reparte el trabajo en frentes read-only. Si existe el agente custom `security_auditor`, usalo para los frentes especializados; si no, usa `explorer` con prompts enfocados:
 
 **Subagente 1: Code Security**
 - Injection patterns en rutas/handlers

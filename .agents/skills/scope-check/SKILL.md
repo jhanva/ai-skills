@@ -15,9 +15,9 @@ description: >-
 ## Uso en Codex
 
 - Esta skill esta pensada para matching implicito y tambien para invocacion explicita con `$scope-check`.
-- Cuando aqui se indique buscar patrones, usa `rg -n`; para listar archivos, usa `rg --files` o `find`; para leer fragmentos concretos, usa `sed -n`.
-- Cuando aqui se hable de subagentes, usa los agentes integrados de Codex o los definidos en `.codex/agents/`, y solo delega si el usuario lo pidio explicitamente.
-- Cuando un ejemplo heredado mencione tools de Claude, aplica la traduccion de `AGENTS.md` y expresa la accion con herramientas reales de Codex (`rg`, `find`, `sed -n`, shell puntual y patch nativo).
+- Trabaja con lecturas puntuales: `rg -n` para buscar, `rg --files` o `find` para listar, y `sed -n` para leer solo el fragmento necesario.
+- Si falta un dato menor, usa una estimacion conservadora y declarala; si faltan base de scope o velocity, deten el veredicto y dilo explicitamente.
+- Delega solo si el usuario pidio paralelismo o delegacion.
 
 Responder: "Vamos a llegar a completar el MVP?" Analizar features planeadas vs implementadas, velocity, proyeccion temporal, riesgos. Veredicto: ON TRACK / AT RISK / OVER-SCOPED.
 

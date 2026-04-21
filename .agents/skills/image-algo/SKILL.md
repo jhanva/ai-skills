@@ -7,9 +7,10 @@ description: Diseña algoritmos de imagen como hashing, similarity, clustering o
 
 ## Uso en Codex
 
-- Esta skill está pensada para invocación explícita con `$image-algo`.
-- Cuando aquí se indique buscar patrones, usa `rg -n`; para listar archivos, usa `rg --files` o `find`; para leer fragmentos concretos, usa `sed -n`.
-- Cuando aquí se hable de subagentes, usa los agentes integrados de Codex o los definidos en `.codex/agents/`, y solo delega si el usuario pidió paralelismo o delegación.
+- Esta skill esta pensada para invocacion explicita con `$image-algo`.
+- Trabaja con lecturas puntuales: `rg -n` para buscar, `rg --files` o `find` para listar, y `sed -n` para leer solo el fragmento necesario.
+- Si falta contexto menor, asume un baseline razonable y declaralo; pregunta solo por restricciones que cambian el algoritmo.
+- Delega solo si el usuario pidio paralelismo o delegacion.
 ## Objetivo
 
 Disenar un algoritmo de procesamiento de imagen con fundamento matematico,
