@@ -54,7 +54,8 @@ La auditoria debe responder como minimo:
 - si el volumen parece NTFS
 - si la sesion es admin
 - si Developer Mode parece activo
-- valor de `git config --global core.symlinks`
+- valor global de `git config --global core.symlinks`
+- valor efectivo de `core.symlinks` dentro de `-RepoPath` y si existe override local
 - si se pudo crear un symlink real en una carpeta temporal
 - si el repo tiene entradas `120000` en Git y si hoy existen como symlink real o como archivo plano
 
@@ -63,10 +64,11 @@ La auditoria debe responder como minimo:
 Antes de modificar nada, explica el plan. El setup ideal incluye:
 
 1. asegurar `git config --global core.symlinks true`
-2. si el sistema no puede crear symlinks y el usuario autoriza cambios del OS:
+2. si `-RepoPath` es un repo Git y tiene override local en `false`, corregir `git -C <repo> config --local core.symlinks true`
+3. si el sistema no puede crear symlinks y el usuario autoriza cambios del OS:
    - intentar habilitar Developer Mode desde PowerShell elevada
    - si no se puede, dar la ruta exacta en Settings para activarlo manualmente
-3. volver a correr la auditoria
+4. volver a correr la auditoria
 
 Usa:
 
@@ -90,7 +92,7 @@ Si el repo ya esta mal chequeado:
 
 - No confundas symlink con junction o hard link: para entradas Git `120000`, no son reemplazos equivalentes.
 - Si el filesystem no soporta bien symlinks o la politica del equipo los bloquea, dilo explicitamente y usa el fallback documentado en `references/git-recovery.md`.
-- Si la auditoria ya muestra `can_create_symlink = true` y `core.symlinks = true`, pero el repo sigue roto, el problema casi siempre es el checkout previo.
+- Si la auditoria ya muestra `can_create_symlink = true` y el valor efectivo de `core.symlinks` en el repo es `true`, pero el repo sigue roto, el problema casi siempre es el checkout previo.
 
 ## Output esperado
 
@@ -102,7 +104,9 @@ Si el repo ya esta mal chequeado:
 - Filesystem:
 - Admin:
 - Developer Mode:
-- Git core.symlinks:
+- Git core.symlinks global:
+- Git core.symlinks efectivo:
+- Override local en repo:
 - Temp symlink test:
 
 ### Repo

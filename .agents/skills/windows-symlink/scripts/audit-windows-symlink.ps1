@@ -120,6 +120,29 @@ function Get-GitConfigValue {
     }
 }
 
+function Get-RepoGitConfigValue {
+    param(
+        [string]$Path,
+        [string]$Scope,
+        [string]$Key
+    )
+
+    try {
+        $args = @("-C", $Path, "config")
+        if ($Scope) {
+            $args += $Scope
+        }
+        $args += @("--get", $Key)
+        $value = & git @args 2>$null
+        if ($LASTEXITCODE -eq 0) {
+            return $value
+        }
+        return $null
+    } catch {
+        return $null
+    }
+}
+
 function Get-RepoSymlinkStatus {
     param([string]$Path)
 
@@ -169,8 +192,12 @@ $repoResolved = try { (Resolve-Path -LiteralPath $RepoPath).Path } catch { $Repo
 $fsInfo = Get-FilesystemInfo -Path $RepoPath
 $developerMode = Get-DeveloperModeState
 $symlinkTest = Test-SymlinkCreate
+$repoIsGit = (Test-IsGitWorkTree $RepoPath)
 $repoEntries = Get-RepoSymlinkStatus -Path $RepoPath
 $brokenEntries = @($repoEntries | Where-Object { $_.state -ne "symlink" })
+$gitCoreSymlinksGlobal = if (Test-CommandExists "git") { (Get-GitConfigValue -Scope "--global" -Key "core.symlinks") } else { $null }
+$gitCoreSymlinksLocal = if ($repoIsGit) { (Get-RepoGitConfigValue -Path $RepoPath -Scope "--local" -Key "core.symlinks") } else { $null }
+$gitCoreSymlinksEffective = if ($repoIsGit) { (Get-RepoGitConfigValue -Path $RepoPath -Scope $null -Key "core.symlinks") } else { $gitCoreSymlinksGlobal }
 
 $result = [ordered]@{
     os = "Windows"
@@ -181,10 +208,12 @@ $result = [ordered]@{
     is_admin = (Test-IsAdmin)
     developer_mode = ($developerMode -eq 1)
     filesystem = $fsInfo
-    git_core_symlinks = if (Test-CommandExists "git") { (Get-GitConfigValue -Scope "--global" -Key "core.symlinks") } else { $null }
+    git_core_symlinks = $gitCoreSymlinksEffective
+    git_core_symlinks_global = $gitCoreSymlinksGlobal
+    git_core_symlinks_local = $gitCoreSymlinksLocal
     can_create_symlink = [bool]$symlinkTest.ok
     symlink_test = $symlinkTest
-    repo_is_git = (Test-IsGitWorkTree $RepoPath)
+    repo_is_git = $repoIsGit
     repo_symlink_count = $repoEntries.Count
     repo_broken_symlink_count = $brokenEntries.Count
     repo_symlink_entries = $repoEntries
@@ -195,8 +224,16 @@ if (-not $result.git_found) {
     $result.recommendations += "Install Git for Windows before attempting symlink setup."
 }
 
-if ($result.git_core_symlinks -ne "true") {
+if ($result.git_core_symlinks_global -ne "true") {
     $result.recommendations += "Run: git config --global core.symlinks true"
+}
+
+if ($result.repo_is_git -and $result.git_core_symlinks_local -and $result.git_core_symlinks_local -ne "true") {
+    $result.recommendations += ("Repo override detected. Run: git -C `"{0}`" config --local core.symlinks true" -f $result.repo_path)
+}
+
+if ($result.repo_is_git -and $result.git_core_symlinks -ne "true") {
+    $result.recommendations += "The effective core.symlinks value for this repo is not true. Fix the repo override before re-checkout."
 }
 
 if (-not $result.can_create_symlink) {
@@ -227,6 +264,8 @@ Write-Host ("Admin:               {0}" -f $result.is_admin)
 Write-Host ("Developer Mode:      {0}" -f $result.developer_mode)
 Write-Host ("Filesystem:          {0}" -f $result.filesystem.filesystem)
 Write-Host ("git core.symlinks:   {0}" -f $result.git_core_symlinks)
+Write-Host ("global core.symlinks:{0}" -f $result.git_core_symlinks_global)
+Write-Host ("local core.symlinks: {0}" -f $result.git_core_symlinks_local)
 Write-Host ("Temp symlink test:   {0}" -f $result.can_create_symlink)
 Write-Host ("Repo symlink count:  {0}" -f $result.repo_symlink_count)
 Write-Host ("Broken in checkout:  {0}" -f $result.repo_broken_symlink_count)

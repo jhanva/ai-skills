@@ -26,6 +26,38 @@ function Test-IsAdmin {
     }
 }
 
+function Test-IsGitWorkTree {
+    param([string]$Path)
+
+    if (-not (Test-CommandExists "git")) {
+        return $false
+    }
+
+    try {
+        $value = git -C $Path rev-parse --is-inside-work-tree 2>$null
+        return ($LASTEXITCODE -eq 0 -and $value -eq "true")
+    } catch {
+        return $false
+    }
+}
+
+function Get-RepoLocalGitConfigValue {
+    param(
+        [string]$Path,
+        [string]$Key
+    )
+
+    try {
+        $value = git -C $Path config --local --get $Key 2>$null
+        if ($LASTEXITCODE -eq 0) {
+            return $value
+        }
+        return $null
+    } catch {
+        return $null
+    }
+}
+
 $actions = @()
 
 if (-not (Test-IsWindowsHost)) {
@@ -46,6 +78,25 @@ if (Test-CommandExists "git") {
         status = "set"
         previous = $previous
         current = "true"
+    }
+
+    if (Test-IsGitWorkTree $RepoPath) {
+        $previousLocal = Get-RepoLocalGitConfigValue -Path $RepoPath -Key "core.symlinks"
+        if ($previousLocal -and $previousLocal -ne "true") {
+            git -C $RepoPath config --local core.symlinks true
+            $actions += [ordered]@{
+                action = "repo_git_core_symlinks"
+                status = "set"
+                previous = $previousLocal
+                current = "true"
+            }
+        } elseif ($previousLocal -eq "true") {
+            $actions += [ordered]@{
+                action = "repo_git_core_symlinks"
+                status = "already_set"
+                current = "true"
+            }
+        }
     }
 } else {
     $actions += [ordered]@{
@@ -132,7 +183,9 @@ $actions | ForEach-Object {
 Write-Host ""
 Write-Host "Audit summary:"
 Write-Host ("- Developer Mode: {0}" -f $audit.developer_mode)
-Write-Host ("- git core.symlinks: {0}" -f $audit.git_core_symlinks)
+Write-Host ("- git core.symlinks effective: {0}" -f $audit.git_core_symlinks)
+Write-Host ("- git core.symlinks global: {0}" -f $audit.git_core_symlinks_global)
+Write-Host ("- git core.symlinks local: {0}" -f $audit.git_core_symlinks_local)
 Write-Host ("- Temp symlink test: {0}" -f $audit.can_create_symlink)
 Write-Host ("- Broken repo symlinks: {0}" -f $audit.repo_broken_symlink_count)
 
