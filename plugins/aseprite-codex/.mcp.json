@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "aseprite-codex": {
+      "command": "python3",
+      "args": [
+        "./scripts/aseprite_mcp.py"
+      ],
+      "cwd": "."
+    }
+  }
+}

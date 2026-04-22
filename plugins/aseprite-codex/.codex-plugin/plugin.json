@@ -1,0 +1,43 @@
+{
+  "name": "aseprite-codex",
+  "version": "0.1.0",
+  "description": "Automate Aseprite exports and inspections from Codex using a local MCP server.",
+  "author": {
+    "name": "Johan Vargas",
+    "email": "jarbey.mejia@gmail.com",
+    "url": "https://github.com/jhanva/ai-skills"
+  },
+  "homepage": "https://www.aseprite.org/docs/cli/",
+  "repository": "https://github.com/jhanva/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "aseprite",
+    "pixel-art",
+    "spritesheet",
+    "mcp",
+    "codex",
+    "game-development"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Aseprite",
+    "shortDescription": "Inspect and export Aseprite assets",
+    "longDescription": "Bring Aseprite into Codex with a local MCP server built for pixel-art workflows. Inspect layers, tags, and slices, export sprite sheets and frame sequences, and run Lua scripts without leaving your coding session.",
+    "developerName": "Johan Vargas",
+    "category": "Game Development",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://www.aseprite.org/docs/cli/",
+    "privacyPolicyURL": "https://github.com/jhanva/ai-skills",
+    "termsOfServiceURL": "https://github.com/jhanva/ai-skills",
+    "defaultPrompt": [
+      "Inspect this .aseprite file and list its tags and layers",
+      "Export this sprite as a packed sheet plus json metadata",
+      "Run an Aseprite Lua script over my sprite assets"
+    ],
+    "brandColor": "#7C3AED"
+  }
+}

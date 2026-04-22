@@ -1,0 +1,7 @@
+interface:
+  display_name: "Aseprite Workflows"
+  short_description: "Automatiza exports y metadata de Aseprite"
+  default_prompt: "Usa esta skill para inspeccionar .aseprite, exportar sprite sheets o correr scripts Lua."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,20 @@
+{
+  "name": "ai-skills-local",
+  "interface": {
+    "displayName": "ai-skills Local Plugins"
+  },
+  "plugins": [
+    {
+      "name": "aseprite-codex",
+      "source": {
+        "source": "local",
+        "path": "./plugins/aseprite-codex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Game Development"
+    }
+  ]
+}
