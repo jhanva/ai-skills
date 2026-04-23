@@ -1,0 +1,43 @@
+{
+  "name": "godot-codex",
+  "version": "0.1.0",
+  "description": "Automate Godot 4 project inspection, imports, exports, and scripts from Codex using a local MCP server.",
+  "author": {
+    "name": "Johan Vargas",
+    "email": "jarbey.mejia@gmail.com",
+    "url": "https://github.com/jhanva/ai-skills"
+  },
+  "homepage": "https://docs.godotengine.org/en/4.4/tutorials/editor/command_line_tutorial.html",
+  "repository": "https://github.com/jhanva/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "godot",
+    "godot-4",
+    "gdscript",
+    "mcp",
+    "codex",
+    "game-development"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Godot",
+    "shortDescription": "Inspect and automate Godot 4 projects",
+    "longDescription": "Bring Godot 4 into Codex with headless project inspection, imports, exports, and script execution through a local MCP server tuned for game-development workflows.",
+    "developerName": "Johan Vargas",
+    "category": "Game Development",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://docs.godotengine.org/en/4.4/tutorials/editor/command_line_tutorial.html",
+    "privacyPolicyURL": "https://github.com/jhanva/ai-skills",
+    "termsOfServiceURL": "https://github.com/jhanva/ai-skills",
+    "defaultPrompt": [
+      "Inspect this Godot project and list its export presets",
+      "Run headless import for this Godot project",
+      "Export this Godot build using the Windows preset"
+    ],
+    "brandColor": "#478CBF"
+  }
+}

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Godot Workflows"
+  short_description: "Automatiza inspeccion, import y export headless de Godot"
+  default_prompt: "Usa esta skill para inspeccionar un proyecto Godot, correr import headless o exportar builds."
+
+policy:
+  allow_implicit_invocation: true

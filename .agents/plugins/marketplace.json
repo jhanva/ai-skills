@@ -15,6 +15,30 @@
         "authentication": "ON_INSTALL"
       },
       "category": "Game Development"
+    },
+    {
+      "name": "godot-codex",
+      "source": {
+        "source": "local",
+        "path": "./plugins/godot-codex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Game Development"
+    },
+    {
+      "name": "pixellab-codex",
+      "source": {
+        "source": "local",
+        "path": "./plugins/pixellab-codex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Game Development"
     }
   ]
 }

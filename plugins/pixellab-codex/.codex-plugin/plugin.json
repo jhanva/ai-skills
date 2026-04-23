@@ -1,0 +1,43 @@
+{
+  "name": "pixellab-codex",
+  "version": "0.1.0",
+  "description": "Connect Codex to the official PixelLab MCP server for pixel-art generation workflows.",
+  "author": {
+    "name": "Johan Vargas",
+    "email": "jarbey.mejia@gmail.com",
+    "url": "https://github.com/jhanva/ai-skills"
+  },
+  "homepage": "https://www.pixellab.ai/mcp",
+  "repository": "https://github.com/jhanva/ai-skills",
+  "license": "MIT",
+  "keywords": [
+    "pixellab",
+    "pixel-art",
+    "tileset",
+    "mcp",
+    "codex",
+    "game-development"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "PixelLab AI",
+    "shortDescription": "Use PixelLab's official MCP from Codex",
+    "longDescription": "Add PixelLab's hosted MCP tools to Codex for characters, animations, tilesets, isometric tiles, and map objects directly from your game-development workflow.",
+    "developerName": "Johan Vargas",
+    "category": "Game Development",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://www.pixellab.ai/mcp",
+    "privacyPolicyURL": "https://www.pixellab.ai/privacypolicy",
+    "termsOfServiceURL": "https://www.pixellab.ai/termsofservice",
+    "defaultPrompt": [
+      "Create an 8-direction PixelLab wizard character",
+      "Generate a PixelLab top-down grass to dirt tileset",
+      "Animate this PixelLab character with an idle loop"
+    ],
+    "brandColor": "#00B8A9"
+  }
+}

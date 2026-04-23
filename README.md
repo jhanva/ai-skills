@@ -51,7 +51,7 @@ En este README, las tablas se enfocan primero en la capacidad que aporta cada sk
 |---|---:|---|
 | Skills | 39 | Workflows para desarrollo general, Android, imagen, game dev, texto y operaciones de repo |
 | Agentes Codex | 13 | Especialistas para implementacion, review, seguridad, prompt design y game development |
-| Plugins Codex | 1 | Integracion local instalable para Aseprite via plugin + MCP |
+| Plugins Codex | 3 | Integraciones instalables para Aseprite, Godot y PixelLab via plugin + MCP |
 | Hooks Claude | 5 | Validaciones automaticas para codigo, assets y contexto de sesion |
 | Biblioteca compartida | 1 | `_parse.sh` para utilidades reutilizadas por hooks de Claude |
 | Runtimes | 2 | Mismas capacidades adaptadas a Claude Code y Codex |
@@ -224,6 +224,8 @@ Tier 1 — Directores
 | Plugin | Ruta | Proposito |
 |---|---|---|
 | [`aseprite-codex`](./plugins/aseprite-codex/.codex-plugin/plugin.json) | `plugins/aseprite-codex/` | Integracion local para Aseprite con `skill` + `MCP` para inspeccionar sprites, exportar sprite sheets y correr scripts Lua desde Codex |
+| [`godot-codex`](./plugins/godot-codex/.codex-plugin/plugin.json) | `plugins/godot-codex/` | Integracion local para Godot 4 con `skill` + `MCP` para inspeccionar proyectos, correr imports headless, exportar builds y ejecutar scripts desde Codex |
+| [`pixellab-codex`](./plugins/pixellab-codex/.codex-plugin/plugin.json) | `plugins/pixellab-codex/` | Integracion para PixelLab AI con `skill` + `MCP` oficial hospedado para generar personajes, animaciones, tilesets y props pixel art desde Codex |
 
 ## Flujos de trabajo
 

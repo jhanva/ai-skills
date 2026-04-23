@@ -1,0 +1,7 @@
+interface:
+  display_name: "PixelLab Workflows"
+  short_description: "Usa el MCP oficial de PixelLab desde Codex"
+  default_prompt: "Usa esta skill para generar personajes, animaciones o tilesets con PixelLab MCP."
+
+policy:
+  allow_implicit_invocation: true
