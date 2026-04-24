@@ -50,6 +50,19 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
   scope-check/SKILL.md             — Validacion de scope (MVP alcanzable? velocity, riesgos)
   playtest/SKILL.md                — Sesion de playtest con checklist y game feel rating
   smoke-test/SKILL.md              — Smoke test pre-merge/pre-release (automated + manual)
+  aseprite-workflows/SKILL.md      — Automatizacion de Aseprite via MCP (inspect, export, Lua)
+  aseprite-workflows/references/tool-map.md  — Recetas y mapeo de tools MCP
+  godot-workflows/SKILL.md         — Automatizacion headless de Godot 4 via MCP (import, export, scripts)
+  godot-workflows/references/tool-map.md     — Recetas y mapeo de tools MCP
+  pixellab-workflows/SKILL.md      — Generacion de assets pixel art via PixelLab MCP
+  pixellab-workflows/references/tool-map.md  — Catalogo de tools del MCP oficial
+  windows-symlink/SKILL.md         — Soporte de symlinks en Windows (audit, setup, repair)
+  windows-symlink/references/windows-requirements.md  — Prerequisitos y permisos Windows
+  windows-symlink/references/git-recovery.md           — Recuperacion de symlinks rotos en Git
+  windows-symlink/scripts/audit-windows-symlink.ps1    — Script de auditoria PowerShell
+  windows-symlink/scripts/setup-windows-symlink.ps1    — Script de setup PowerShell
+  git-identity/SKILL.md            — Identidades Git separadas (4 capas, audit/setup)
+  git-identity/references/setup.md — Referencia para modo setup
 
 .claude/commands/
   git-identity.md                  — Auditoria y setup de cuentas git separadas
@@ -120,6 +133,11 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
 | `/scope-check` | Auto + usuario | Validar si MVP es alcanzable (velocity, proyeccion, riesgos) |
 | `/playtest` | Solo usuario | Playtest estructurado (funcionalidad + game feel + bugs) |
 | `/smoke-test` | Solo usuario | Smoke test pre-merge/pre-release (automated + manual) |
+| `/aseprite-workflows` | Solo usuario | Inspeccionar, exportar y automatizar Aseprite via MCP |
+| `/godot-workflows` | Solo usuario | Import headless, export builds, scripts de Godot 4 via MCP |
+| `/pixellab-workflows` | Solo usuario | Generar personajes, tilesets y props con PixelLab MCP |
+| `/windows-symlink` | Solo usuario | Auditar/habilitar/reparar symlinks en Windows |
+| `/git-identity` | Solo usuario | Identidades Git separadas: audit y setup de 4 capas |
 
 "Siempre activa" = `user-invocable: false` (Claude la carga automaticamente, no aparece en menu `/`)
 "Solo usuario" = `disable-model-invocation: true` (se invoca manualmente con `/nombre`)
@@ -170,7 +188,8 @@ Workflow completo para juegos 2D pixel art con Godot 4. 9 agentes en jerarquia d
                                                             |
 /palette  -->  /pixel-pipeline                     /game-arch  -->  /godot-setup
 /sprite-spec   /tileset-spec                       /scene-design
-/sound-brief                                            |
+/sound-brief   /pixellab-workflows                      |
+/aseprite-workflows                                     |
                                                         v
 /scope-check  -->  /sprint  -->  /story  -->  /plan  -->  /execute (usa /tdd)
                                                               |
@@ -192,12 +211,22 @@ Tier 1 — Directores (opus)
                   (Gemini, DALL-E, Midjourney, Stable Diffusion)
 ```
 
-### Comandos
+### Herramientas externas (MCP)
 ```
-/git-identity          Auditoria de cuentas git (4 capas)
+/aseprite-workflows    Inspeccionar .aseprite, exportar sheets/frames, correr Lua
+/godot-workflows       Import headless, export builds, scripts de automatizacion
+/pixellab-workflows    Generar personajes, tilesets, props con PixelLab AI
+```
+
+### Infraestructura
+```
+/git-identity          Auditoria de cuentas git (4 capas, audit/setup)
 /git-identity setup    Configurar separacion de cuentas (macOS/Linux/Windows)
                        Soporta hosts diferentes (GitHub+GitLab)
                        y mismo host (GitHub+GitHub con SSH aliases)
+/windows-symlink       Auditar symlinks en Windows (Developer Mode, core.symlinks)
+/windows-symlink setup Habilitar soporte de symlinks
+/windows-symlink repair Recuperar checkout con symlinks rotos
 ```
 
 Para debugging: `/debug` (aplica `/tdd` para el fix y `/verify` para confirmar)
