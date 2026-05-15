@@ -1,0 +1,151 @@
+---
+name: browser-control
+description: >
+  Control directo del browser via CDP (Chrome DevTools Protocol). Conecta al
+  Chrome real del usuario y ejecuta navegacion, screenshots, clicks, input,
+  evaluacion JS y manejo de tabs. Sin frameworks, un WebSocket a Chrome.
+disable-model-invocation: true
+argument-hint: "[tarea a realizar en el browser]"
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - Edit
+---
+
+# Browser Control — CDP directo
+
+Control del browser real del usuario via Chrome DevTools Protocol. Un WebSocket a Chrome, nada entre medio.
+
+## Primer movimiento
+
+1. Si es la primera vez, leer `references/connection-guide.md` y configurar la conexion.
+2. Ejecutar el test de conexion para confirmar que Chrome responde:
+
+```bash
+python3 ${CLAUDE_SKILL_DIR}/references/cdp_helpers.py
+```
+
+3. Si falla, seguir la guia de troubleshooting en `references/connection-guide.md`.
+
+## Patron de uso
+
+Ejecutar scripts Python inline via heredoc. Los helpers se importan desde el modulo de referencia:
+
+```bash
+python3 <<'PY'
+import sys; sys.path.insert(0, "${CLAUDE_SKILL_DIR}/references")
+from cdp_helpers import *
+
+connect()
+new_tab("https://example.com")
+wait_for_load()
+info = page_info()
+print(f"{info['title']} — {info['url']}")
+path = screenshot("/tmp/page.png")
+print(f"Screenshot: {path}")
+close()
+PY
+```
+
+Siempre usar el heredoc `<<'PY'` (comillas en PY) para evitar expansion de variables shell dentro del Python.
+
+## API de helpers
+
+### Conexion
+
+| Funcion | Descripcion |
+|---|---|
+| `connect(ws_url=None)` | Conectar a Chrome. Auto-descubre si no se pasa URL |
+| `close()` | Cerrar la conexion WebSocket |
+| `cdp(method, **params)` | Enviar comando CDP raw. Retorna el resultado |
+
+### Navegacion
+
+| Funcion | Descripcion |
+|---|---|
+| `goto(url)` | Navegar a una URL en el tab actual |
+| `page_info()` | `{url, title, w, h, sx, sy, pw, ph}` — viewport + scroll + dimensiones |
+| `wait_for_load(timeout=15)` | Esperar `readyState == 'complete'` |
+| `wait_for_element(selector, timeout=10, visible=False)` | Esperar a que un selector CSS exista en el DOM |
+| `wait_for_idle(timeout=10)` | Esperar a que no haya requests de red pendientes |
+
+### Input
+
+| Funcion | Descripcion |
+|---|---|
+| `click_at_xy(x, y, button="left", clicks=1)` | Click en coordenadas CSS. Nivel compositor: atraviesa iframes y shadow DOM |
+| `type_text(text)` | Insertar texto en el foco actual. Rapido pero sin event listeners |
+| `fill_input(selector, text, clear_first=True)` | Llenar input con key events reales (React, Vue, etc.) |
+| `press_key(key, modifiers=0)` | Tecla individual. Modifiers: 1=Alt, 2=Ctrl, 4=Meta, 8=Shift |
+| `scroll(x, y, dy=-300, dx=0)` | Scroll en las coordenadas dadas. dy negativo = hacia abajo |
+
+### Visual
+
+| Funcion | Descripcion |
+|---|---|
+| `screenshot(path="/tmp/cdp_screenshot.png", full=False)` | Capturar viewport como PNG. `full=True` para pagina completa |
+
+### Tabs
+
+| Funcion | Descripcion |
+|---|---|
+| `list_tabs(include_internal=False)` | Listar tabs abiertas `[{targetId, title, url}]` |
+| `current_tab()` | Info del tab actual |
+| `new_tab(url="about:blank")` | Abrir tab nuevo y cambiar a el |
+| `switch_tab(target)` | Cambiar a tab por targetId (string o dict) |
+| `ensure_real_tab()` | Ir a un tab real si estamos en uno interno |
+
+### DOM / JS
+
+| Funcion | Descripcion |
+|---|---|
+| `js(expression)` | Evaluar JavaScript. Retorna el valor |
+| `upload_file(selector, filepath)` | Subir archivo a un `<input type=file>` |
+| `handle_dialog(accept=True)` | Aceptar o cancelar dialog JS (alert/confirm/prompt) |
+
+### Utilidad
+
+| Funcion | Descripcion |
+|---|---|
+| `wait(seconds=1.0)` | Sleep. Preferir `wait_for_load()` o `wait_for_element()` |
+
+## Que funciona
+
+- **Screenshots first**: `screenshot()` para entender la pagina, encontrar targets visibles, decidir si hacer click o usar selectores.
+- **Clicking**: `screenshot()` -> localizar target en la imagen -> `click_at_xy(x, y)` -> `screenshot()` para verificar. Preferir sobre selectores DOM.
+- **Framework inputs**: `fill_input(selector, text)` cuando `type_text()` no dispara validacion de React/Vue/Angular.
+- **Bulk HTTP sin browser**: `urllib.request.urlopen()` con ThreadPoolExecutor para scraping de paginas estaticas.
+- **Auth wall**: si la pagina redirige a login, detenerse y preguntar al usuario. No escribir credenciales leidas de screenshots.
+
+## Gotchas
+
+- **Omnibox popups** son targets falsos tipo `page`. Filtrar URLs que empiezan con `chrome://omnibox-popup`.
+- **DevicePixelRatio**: screenshots son en device pixels. En displays 2x, dividir coordenadas de la imagen por `js("window.devicePixelRatio")` antes de pasarlas a `click_at_xy()`.
+- **Primer tab**: usar `new_tab(url)`, no `goto(url)` — goto navega en el tab activo del usuario y sobreescribe su trabajo.
+- **Dialogs bloquean JS**: si `page_info()` falla despues de una accion, puede haber un dialog pendiente. Usar `handle_dialog()`.
+- **Tab order CDP != visual**: el orden de `list_tabs()` no coincide con la barra de tabs visible. Usar AppleScript en macOS si importa el orden visual.
+- **Stale sessions**: si un tab se cierra externamente, las llamadas CDP fallan. Reconectar con `ensure_real_tab()`.
+- **Verificar despues de actuar**: siempre `screenshot()` despues de clicks o navegacion para confirmar que la accion funciono.
+
+## Reglas
+
+- Conectar al Chrome que el usuario ya tiene abierto. No lanzar un browser nuevo salvo que el usuario lo pida.
+- `cdp()` para cualquier cosa que los helpers no cubran. La referencia completa del protocolo esta en chromedevtools.github.io/devtools-protocol.
+- Mantener scripts cortos y autocontenidos. Si algo se vuelve complejo, escribir un helper reutilizable.
+- No agregar layers de abstraccion (retry framework, session manager, config system). Si falla, diagnosticar.
+
+## Carga just-in-time
+
+- `references/cdp_helpers.py` — modulo Python con todos los helpers
+- `references/connection-guide.md` — setup y troubleshooting de conexion al browser
+- `references/interaction-patterns.md` — patrones para mecanicas web complejas (dialogs, iframes, dropdowns, uploads)
+
+## Variables de entorno
+
+| Variable | Uso |
+|---|---|
+| `CDP_WS_URL` | WebSocket URL directa (override de auto-discovery) |
+| `CDP_URL` | HTTP DevTools endpoint (ej: `http://127.0.0.1:9222`). Se resuelve a WS via `/json/version` |
+
+## Argumento: $ARGUMENTS

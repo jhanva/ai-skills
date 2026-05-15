@@ -4,9 +4,9 @@
 
 Convierte un repositorio en un stack de desarrollo asistido por IA con skills, agentes y reglas reutilizables.
 
-**39 skills. 13 agentes de Codex. 5 hooks de Claude. Dos runtimes, un mismo workflow.**
+**40 skills. 13 agentes de Codex. 5 hooks de Claude. Dos runtimes, un mismo workflow.**
 
-[![Skills](https://img.shields.io/badge/skills-39-84cc16?style=for-the-badge)](#skills)
+[![Skills](https://img.shields.io/badge/skills-40-84cc16?style=for-the-badge)](#skills)
 [![Codex Agents](https://img.shields.io/badge/codex%20agents-13-8b5cf6?style=for-the-badge)](#agentes)
 [![Claude Hooks](https://img.shields.io/badge/claude%20hooks-5-f97316?style=for-the-badge)](#hooks-game-dev-capa-claude)
 [![Runtimes](https://img.shields.io/badge/runtimes-2-0ea5e9?style=for-the-badge)](#compatibilidad-por-runtime)
@@ -37,6 +37,7 @@ En este README, las tablas se enfocan primero en la capacidad que aporta cada sk
 - [Skills Android](#android)
 - [Skills Windows / Repo Ops](#windows--repo-ops)
 - [Skills de Imagen](#imagen)
+- [Browser Automation](#browser-automation)
 - [Skills de Game Development](#game-development)
 - [Agentes](#agentes)
 - [Plugins](#plugins)
@@ -49,7 +50,7 @@ En este README, las tablas se enfocan primero en la capacidad que aporta cada sk
 
 | Categoria | Cantidad | Descripcion |
 |---|---:|---|
-| Skills | 39 | Workflows para desarrollo general, Android, imagen, game dev, texto y operaciones de repo |
+| Skills | 40 | Workflows para desarrollo general, Android, imagen, game dev, browser automation, texto y operaciones de repo |
 | Agentes Codex | 13 | Especialistas para implementacion, review, seguridad, prompt design y game development |
 | Plugins Codex | 3 | Integraciones instalables para Aseprite, Godot y PixelLab via plugin + MCP |
 | Hooks Claude | 5 | Validaciones automaticas para codigo, assets y contexto de sesion |
@@ -94,6 +95,14 @@ En este README, las tablas se enfocan primero en la capacidad que aporta cada sk
 | [`image-algo`](./.agents/skills/image-algo/SKILL.md) | Explicita | Diseno de algoritmos de imagen (hashing, similarity, clustering) |
 | [`ml-ondevice`](./.agents/skills/ml-ondevice/SKILL.md) | Explicita | Integracion de modelos ML on-device en Android |
 | [`image-pipeline`](./.agents/skills/image-pipeline/SKILL.md) | Explicita | Diseno de pipelines de procesamiento de imagen multi-paso |
+
+### Browser automation
+
+| Skill | Activacion | Proposito |
+|---|---|---|
+| [`browser-control`](./.claude/skills/browser-control/SKILL.md) | Explicita | Control directo del browser via CDP (Chrome DevTools Protocol). Conecta al Chrome real del usuario y ejecuta navegacion, screenshots, clicks por coordenadas, input de teclado, evaluacion JS y manejo de tabs. Sin frameworks intermedios — un WebSocket al browser, scripts Python inline con libreria de helpers autocontenida |
+
+Incluye libreria Python CDP (`cdp_helpers.py`, ~370 lineas) con auto-discovery de Chrome, guia de conexion (Way 1: checkbox en chrome://inspect, Way 2: flag de linea de comandos) y referencia de patrones para mecanicas web complejas (dialogs, iframes, shadow DOM, uploads, dropdowns).
 
 ### Game development
 
@@ -292,6 +301,12 @@ secure full     (proyecto completo, antes de deploy/release)
 ```
 humanize review [archivo]    (diagnostico sin modificar)
 humanize rewrite [archivo]   (reescritura completa)
+```
+
+### Browser automation
+
+```
+browser-control [tarea]     (conecta al browser y ejecuta la tarea)
 ```
 
 ### Multiples problemas independientes

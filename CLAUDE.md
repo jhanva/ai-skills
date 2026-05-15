@@ -61,6 +61,10 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
   windows-symlink/references/git-recovery.md           — Recuperacion de symlinks rotos en Git
   windows-symlink/scripts/audit-windows-symlink.ps1    — Script de auditoria PowerShell
   windows-symlink/scripts/setup-windows-symlink.ps1    — Script de setup PowerShell
+  browser-control/SKILL.md          — Control de browser via CDP (navegacion, screenshots, input, tabs)
+  browser-control/references/cdp_helpers.py       — Libreria Python CDP autocontenida
+  browser-control/references/connection-guide.md  — Setup y troubleshooting de conexion al browser
+  browser-control/references/interaction-patterns.md — Patrones para mecanicas web complejas
   git-identity/SKILL.md            — Identidades Git separadas (4 capas, audit/setup)
   git-identity/references/setup.md — Referencia para modo setup
 
@@ -137,6 +141,7 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
 | `/godot-workflows` | Solo usuario | Import headless, export builds, scripts de Godot 4 via MCP |
 | `/pixellab-workflows` | Solo usuario | Generar personajes, tilesets y props con PixelLab MCP |
 | `/windows-symlink` | Solo usuario | Auditar/habilitar/reparar symlinks en Windows |
+| `/browser-control` | Solo usuario | Control de browser via CDP (navegacion, screenshots, clicks, tabs) |
 | `/git-identity` | Solo usuario | Identidades Git separadas: audit y setup de 4 capas |
 
 "Siempre activa" = `user-invocable: false` (Claude la carga automaticamente, no aparece en menu `/`)
@@ -209,6 +214,13 @@ Tier 1 — Directores (opus)
 ```
 @prompt-artist    Transforma ideas en prompts optimizados para imagen
                   (Gemini, DALL-E, Midjourney, Stable Diffusion)
+```
+
+### Browser automation
+```
+/browser-control       Control de browser via CDP (screenshots, clicks, input, tabs)
+                       Conecta al Chrome real del usuario via WebSocket
+                       Zero frameworks — scripts Python inline con helpers CDP
 ```
 
 ### Herramientas externas (MCP)
