@@ -41,6 +41,7 @@ En este README, las tablas se enfocan primero en la capacidad que aporta cada sk
 - [Skills de Game Development](#game-development)
 - [Agentes](#agentes)
 - [Plugins](#plugins)
+- [Pets](#pets)
 - [Flujos de trabajo](#flujos-de-trabajo)
 - [Compatibilidad por runtime](#compatibilidad-por-runtime)
 - [Instalacion](#instalacion)
@@ -235,6 +236,12 @@ Tier 1 — Directores
 | [`aseprite-codex`](./plugins/aseprite-codex/.codex-plugin/plugin.json) | `plugins/aseprite-codex/` | Integracion local para Aseprite con `skill` + `MCP` para inspeccionar sprites, exportar sprite sheets y correr scripts Lua desde Codex |
 | [`godot-codex`](./plugins/godot-codex/.codex-plugin/plugin.json) | `plugins/godot-codex/` | Integracion local para Godot 4 con `skill` + `MCP` para inspeccionar proyectos, correr imports headless, exportar builds y ejecutar scripts desde Codex |
 | [`pixellab-codex`](./plugins/pixellab-codex/.codex-plugin/plugin.json) | `plugins/pixellab-codex/` | Integracion para PixelLab AI con `skill` + `MCP` oficial hospedado para generar personajes, animaciones, tilesets y props pixel art desde Codex |
+
+## Pets
+
+Custom pets portables para Codex, listas para copiar a otra maquina:
+
+- [`the-lich-king`](./pets/the-lich-king/README.md): paquete portable con `pet.json`, `spritesheet.webp`, QA visual y guia de instalacion, transporte y regeneracion con `hatch-pet`
 
 ## Flujos de trabajo
 
