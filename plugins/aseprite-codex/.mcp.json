@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "aseprite-codex": {
-      "command": "python3",
+      "command": "python",
       "args": [
         "./scripts/aseprite_mcp.py"
       ],

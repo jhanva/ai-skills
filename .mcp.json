@@ -1,25 +1,22 @@
 {
   "mcpServers": {
     "aseprite": {
-      "command": "python3",
+      "command": "python",
       "args": [
         "./plugins/aseprite-codex/scripts/aseprite_mcp.py"
       ],
       "cwd": "."
     },
     "godot": {
-      "command": "python3",
+      "command": "python",
       "args": [
         "./plugins/godot-codex/scripts/godot_mcp.py"
       ],
       "cwd": "."
     },
     "pixellab": {
-      "type": "url",
       "url": "https://api.pixellab.ai/mcp",
-      "headers": {
-        "Authorization": "Bearer ${PIXELLAB_API_TOKEN}"
-      }
+      "bearer_token_env_var": "PIXELLAB_API_TOKEN"
     }
   }
 }
