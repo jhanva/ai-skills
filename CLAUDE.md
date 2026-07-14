@@ -65,6 +65,15 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
   browser-control/references/cdp_helpers.py       — Libreria Python CDP autocontenida
   browser-control/references/connection-guide.md  — Setup y troubleshooting de conexion al browser
   browser-control/references/interaction-patterns.md — Patrones para mecanicas web complejas
+  codegraph/SKILL.md               — Knowledge graph consultable de proyectos (build, query, comunidades)
+  codegraph/references/query-guide.md          — Expansion de vocabulario y flujo de consultas
+  codegraph/references/semantic-extraction.md  — Pase semantico opcional con subagentes
+  codegraph/references/graph-format.md         — Schema de graph.json y rubrica de confianza
+  codegraph/scripts/codegraph.py               — CLI zero-deps (pipeline completo en un comando)
+  codegraph/scripts/cg_extract.py              — Extractores por lenguaje (ast + regex)
+  codegraph/scripts/cg_analyze.py              — Clustering Louvain, god nodes, reporte
+  codegraph/scripts/cg_query.py                — Query/path/explain con scoring IDF
+  codegraph/scripts/cg_html.py                 — Visualizacion HTML autocontenida
   git-identity/SKILL.md            — Identidades Git separadas (4 capas, audit/setup)
   git-identity/references/setup.md — Referencia para modo setup
 
@@ -142,6 +151,7 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
 | `/pixellab-workflows` | Solo usuario | Generar personajes, tilesets y props con PixelLab MCP |
 | `/windows-symlink` | Solo usuario | Auditar/habilitar/reparar symlinks en Windows |
 | `/browser-control` | Solo usuario | Control de browser via CDP (navegacion, screenshots, clicks, tabs) |
+| `/codegraph` | Auto + usuario | Knowledge graph consultable del proyecto (build, query, path, explain) |
 | `/git-identity` | Solo usuario | Identidades Git separadas: audit y setup de 4 capas |
 
 "Siempre activa" = `user-invocable: false` (Claude la carga automaticamente, no aparece en menu `/`)
@@ -221,6 +231,16 @@ Tier 1 — Directores (opus)
 /browser-control       Control de browser via CDP (screenshots, clicks, input, tabs)
                        Conecta al Chrome real del usuario via WebSocket
                        Zero frameworks — scripts Python inline con helpers CDP
+```
+
+### Knowledge graph
+```
+/codegraph build [ruta]        Construye/actualiza el grafo (incremental, zero deps)
+/codegraph query [ruta] "..."  Responde desde el grafo sin releer el codigo
+/codegraph path [ruta] A B     Camino mas corto entre dos conceptos
+/codegraph explain [ruta] X    Un nodo y todas sus conexiones
+                               Si codegraph-out/graph.json existe, las preguntas
+                               de arquitectura se responden consultando el grafo
 ```
 
 ### Herramientas externas (MCP)

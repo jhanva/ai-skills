@@ -38,6 +38,7 @@ En este README, las tablas se enfocan primero en la capacidad que aporta cada sk
 - [Skills Windows / Repo Ops](#windows--repo-ops)
 - [Skills de Imagen](#imagen)
 - [Browser Automation](#browser-automation)
+- [Knowledge Graph](#knowledge-graph)
 - [Skills de Game Development](#game-development)
 - [Agentes](#agentes)
 - [Plugins](#plugins)
@@ -51,7 +52,7 @@ En este README, las tablas se enfocan primero en la capacidad que aporta cada sk
 
 | Categoria | Cantidad | Descripcion |
 |---|---:|---|
-| Skills | 40 | Workflows para desarrollo general, Android, imagen, game dev, browser automation, texto y operaciones de repo |
+| Skills | 41 | Workflows para desarrollo general, Android, imagen, game dev, browser automation, knowledge graphs, texto y operaciones de repo |
 | Agentes Codex | 13 | Especialistas para implementacion, review, seguridad, prompt design y game development |
 | Plugins Codex | 3 | Integraciones instalables para Aseprite, Godot y PixelLab via plugin + MCP |
 | Hooks Claude | 5 | Validaciones automaticas para codigo, assets y contexto de sesion |
@@ -104,6 +105,14 @@ En este README, las tablas se enfocan primero en la capacidad que aporta cada sk
 | [`browser-control`](./.claude/skills/browser-control/SKILL.md) | Explicita | Control directo del browser via CDP (Chrome DevTools Protocol). Conecta al Chrome real del usuario y ejecuta navegacion, screenshots, clicks por coordenadas, input de teclado, evaluacion JS y manejo de tabs. Sin frameworks intermedios — un WebSocket al browser, scripts Python inline con libreria de helpers autocontenida |
 
 Incluye libreria Python CDP (`cdp_helpers.py`, ~370 lineas) con auto-discovery de Chrome, guia de conexion (Way 1: checkbox en chrome://inspect, Way 2: flag de linea de comandos) y referencia de patrones para mecanicas web complejas (dialogs, iframes, shadow DOM, uploads, dropdowns).
+
+### Knowledge graph
+
+| Skill | Activacion | Proposito |
+|---|---|---|
+| [`codegraph`](./.claude/skills/codegraph/SKILL.md) | Contextual + explicita | Convierte cualquier proyecto (codigo, SQL, docs, configs) en un knowledge graph persistente y consultable. Extraccion deterministica (Python via ast nativo, 16 lenguajes via regex), clustering de comunidades por modularidad, tags de confianza EXTRACTED/INFERRED/AMBIGUOUS, y comandos query/path/explain que responden desde el grafo sin releer el codigo |
+
+Zero dependencias (solo stdlib de Python 3.10+, sin pip install), pipeline completo en un comando, builds incrementales por hash de contenido. Outputs: `graph.json` (node-link, compatible d3/GraphRAG), `GRAPH_REPORT.md` (god nodes, conexiones sorprendentes, preguntas sugeridas) y `graph.html` (visualizacion interactiva offline). El directorio `codegraph-out/` es committeable: el equipo comparte un solo grafo.
 
 ### Game development
 
@@ -241,6 +250,7 @@ Tier 1 — Directores
 
 Custom pets portables para Codex, listas para copiar a otra maquina:
 
+- [`albedo`](./pets/albedo/README.md): paquete portable final con `pet.json` y `spritesheet.webp`
 - [`the-lich-king`](./pets/the-lich-king/README.md): paquete portable con `pet.json`, `spritesheet.webp`, QA visual y guia de instalacion, transporte y regeneracion con `hatch-pet`
 
 ## Flujos de trabajo
@@ -314,6 +324,15 @@ humanize rewrite [archivo]   (reescritura completa)
 
 ```
 browser-control [tarea]     (conecta al browser y ejecuta la tarea)
+```
+
+### Knowledge graph
+
+```
+codegraph build [ruta]           (construye/actualiza el grafo, incremental)
+codegraph query [ruta] "..."     (responde desde el grafo, BFS o --dfs)
+codegraph path [ruta] "A" "B"    (camino mas corto entre dos conceptos)
+codegraph explain [ruta] "X"     (un nodo y todas sus conexiones)
 ```
 
 ### Multiples problemas independientes
