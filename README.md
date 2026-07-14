@@ -110,9 +110,9 @@ Incluye libreria Python CDP (`cdp_helpers.py`, ~370 lineas) con auto-discovery d
 
 | Skill | Activacion | Proposito |
 |---|---|---|
-| [`codegraph`](./.claude/skills/codegraph/SKILL.md) | Contextual + explicita | Convierte cualquier proyecto (codigo, SQL, docs, configs) en un knowledge graph persistente y consultable. Extraccion deterministica (Python via ast nativo, 16 lenguajes via regex), clustering de comunidades por modularidad, tags de confianza EXTRACTED/INFERRED/AMBIGUOUS, y comandos query/path/explain que responden desde el grafo sin releer el codigo |
+| [`codegraph`](./.agents/skills/codegraph/SKILL.md) ([Claude Code](./.claude/skills/codegraph/SKILL.md)) | Contextual + explicita | Convierte cualquier proyecto (codigo, SQL, docs, configs) en un knowledge graph persistente y consultable. Extraccion deterministica (Python via ast nativo, 16 lenguajes via regex), clustering de comunidades por modularidad, tags de confianza EXTRACTED/INFERRED/AMBIGUOUS, y comandos query/path/explain que responden desde el grafo sin releer el codigo |
 
-Zero dependencias (solo stdlib de Python 3.10+, sin pip install), pipeline completo en un comando, builds incrementales por hash de contenido. Outputs: `graph.json` (node-link, compatible d3/GraphRAG), `GRAPH_REPORT.md` (god nodes, conexiones sorprendentes, preguntas sugeridas) y `graph.html` (visualizacion interactiva offline). El directorio `codegraph-out/` es committeable: el equipo comparte un solo grafo.
+Disponible en ambos runtimes: `$codegraph` en Codex y `/codegraph` en Claude Code. Zero dependencias (solo stdlib de Python 3.10+, sin pip install), pipeline completo en un comando, builds incrementales por hash de contenido. Outputs: `graph.json` (node-link, compatible d3/GraphRAG), `GRAPH_REPORT.md` (god nodes, conexiones sorprendentes, preguntas sugeridas) y `graph.html` (visualizacion interactiva offline). El directorio `codegraph-out/` es committeable: el equipo comparte un solo grafo.
 
 ### Game development
 
