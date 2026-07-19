@@ -17,6 +17,11 @@ Lee este archivo cuando necesites planificar, recortar scope o definir milestone
 - sistemas sin GDD o sin owner claro
 - milestones ambiguos o imposibles de verificar
 
+## Integracion con skills
+
+Las skills las invoca el usuario; este agente solo referencia y consume su
+output: `$sprint`, `$story` y `$scope-check`.
+
 ## Entregable sugerido
 
 - sprint goal

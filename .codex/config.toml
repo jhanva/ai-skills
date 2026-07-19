@@ -9,25 +9,5 @@
 max_threads = 6
 max_depth = 1
 
-[agents.models]
-# Single source of truth for the recommended models. Keep in sync with pins
-# in .codex/agents/*.toml. Bump here first, then mirror.
-# Model IDs soportados por este entorno de Codex; mantenlos sincronizados con `.codex/agents/*.toml`
-default = "gpt-5.4"
-implementer = "gpt-5.2"
-
-pinned_in = [
-  ".codex/agents/prompt-artist.toml",
-  ".codex/agents/reviewer.toml",
-  ".codex/agents/security-auditor.toml",
-  ".codex/agents/task-implementer.toml",
-  ".codex/agents/creative-director.toml",
-  ".codex/agents/technical-director.toml",
-  ".codex/agents/game-designer.toml",
-  ".codex/agents/level-designer.toml",
-  ".codex/agents/godot-architect.toml",
-  ".codex/agents/pixel-artist.toml",
-  ".codex/agents/sound-designer.toml",
-  ".codex/agents/qa-analyst.toml",
-  ".codex/agents/producer.toml",
-]
+[features]
+hooks = true

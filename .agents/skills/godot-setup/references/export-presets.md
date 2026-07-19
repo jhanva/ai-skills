@@ -5,7 +5,7 @@ Lee este archivo solo cuando vayas a definir o justificar export presets concret
 ## Presets iniciales recomendados
 
 - Windows Desktop: baseline para pruebas locales y playtests
-- HTML5: opcional si el juego apunta a itch.io, demos web o validacion rapida
+- Web: opcional si el juego apunta a itch.io, demos web o validacion rapida
 - Linux/macOS: agregarlos cuando el target lo requiera, no por defecto
 
 ## Campos a decidir
@@ -14,7 +14,7 @@ Lee este archivo solo cuando vayas a definir o justificar export presets concret
 - `exclude_filter`
 - embed de PCK
 - texture compression por plataforma
-- resize/canvas policy si es HTML5
+- resize/canvas policy si es Web
 
 ## Reglas
 

@@ -1,0 +1,59 @@
+{
+  "description": "Validaciones nativas de Codex para seguridad, gameplay, assets y cobertura de diseno.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/codex_hooks.py\" session-context",
+            "commandWindows": "powershell -NoProfile -Command \"$repo = git rev-parse --show-toplevel; python (Join-Path $repo '.codex/hooks/codex_hooks.py') session-context\"",
+            "timeout": 10,
+            "statusMessage": "Loading project context"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "^(Bash|apply_patch|Edit|Write)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/codex_hooks.py\" pre-tool-policy",
+            "commandWindows": "powershell -NoProfile -Command \"$repo = git rev-parse --show-toplevel; python (Join-Path $repo '.codex/hooks/codex_hooks.py') pre-tool-policy\"",
+            "timeout": 5,
+            "statusMessage": "Checking repository policy"
+          }
+        ]
+      },
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/codex_hooks.py\" validate-gameplay-code",
+            "commandWindows": "powershell -NoProfile -Command \"$repo = git rev-parse --show-toplevel; python (Join-Path $repo '.codex/hooks/codex_hooks.py') validate-gameplay-code\"",
+            "timeout": 15,
+            "statusMessage": "Checking staged gameplay code"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^(apply_patch|Edit|Write)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/codex_hooks.py\" post-edit-checks",
+            "commandWindows": "powershell -NoProfile -Command \"$repo = git rev-parse --show-toplevel; python (Join-Path $repo '.codex/hooks/codex_hooks.py') post-edit-checks\"",
+            "timeout": 10,
+            "statusMessage": "Validating edited files"
+          }
+        ]
+      }
+    ]
+  }
+}

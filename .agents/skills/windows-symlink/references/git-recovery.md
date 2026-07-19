@@ -46,8 +46,7 @@ Si el equipo o la politica del OS no permite symlinks reales:
 
 ## Nota para este repo
 
-Hay al menos un caso real de symlink de archivo en:
-
-- `.agents/skills/secure/scripts/scan-secrets.py`
-
-Si Windows no puede materializarlo como symlink real, el fallback portable es un archivo real o shim en la capa Codex, no un junction.
+La capa Codex no debe depender de symlinks hacia `.claude/`. Los scripts que
+Codex ejecuta, como `.agents/skills/secure/scripts/scan_secrets.py`, son archivos
+reales y portables. Si aparece una entrada `120000` nueva, validar el checkout y
+preferir un archivo real o shim propio de Codex, no un junction.

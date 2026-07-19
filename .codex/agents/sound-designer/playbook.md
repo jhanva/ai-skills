@@ -16,6 +16,11 @@ Lee este archivo cuando necesites especificar SFX, musica o integracion de audio
 - separar buses: Master, Music, SFX, Ambient, UI
 - evitar volumen y triggers hardcoded sin control central
 
+## Integracion con skills
+
+Las skills las invoca el usuario; este agente solo referencia y consume el
+output de `$sound-brief`.
+
 ## Entregable sugerido
 
 - SFX list por sistema

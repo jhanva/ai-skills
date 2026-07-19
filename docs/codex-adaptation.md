@@ -15,6 +15,8 @@ AGENTS.md                   # reglas globales oficiales del repo para Codex
 .agents/skills/             # skills nativas para Codex
 .codex/config.toml          # settings de subagentes del proyecto
 .codex/agents/              # agentes custom reutilizables
+.codex/hooks.json           # lifecycle hooks nativos de Codex
+.codex/hooks/               # handlers Python multiplataforma
 docs/codex-adaptation.md    # esta guia
 ```
 
@@ -40,6 +42,7 @@ Detalles importantes de la organizacion nativa:
 | `Read`, `Grep`, `Glob`, `Bash` | `rg`, `rg --files`, `find`, `sed -n`, shell puntual |
 | `Agent` | `worker`, `explorer` o agentes custom en `.codex/agents/` |
 | `Edit`, `Write` | herramienta nativa de patch del entorno de Codex (por ejemplo `apply_patch`) |
+| hooks shell de `.claude/settings.json` | `.codex/hooks.json` + handlers que leen JSON de Codex |
 | skill siempre activa | reglas globales en `AGENTS.md` |
 
 ## Agentes custom agregados
@@ -75,3 +78,5 @@ Los pins de modelo se centralizan en `.codex/config.toml` y se propagan con
 - En la pasada de ajuste para Codex se normalizaron las invocaciones explicitas a `$skill` y los ejemplos operativos a herramientas nativas como `rg`, `find` y `sed -n`.
 - La pasada final de optimizacion dejó todas las `SKILL.md` bajo 500 lineas y convirtió los agentes custom largos en prompts cortos con `playbook.md`/`patterns.md` cargados on-demand, alineados con la guia oficial de skills y subagentes.
 - La capa gamedev de Codex ahora incluye `agents/openai.yaml` para sus skills clave, de modo que queden descubribles en UI y con politicas de invocacion consistentes con Codex.
+- Los hooks de Codex analizan `tool_input.command`; en `apply_patch` extraen las rutas desde el patch porque Codex no envia el campo Claude `tool_input.file_path`.
+- No agregues tablas auxiliares bajo `[agents]`: Codex interpreta cada subtaba como una definicion de agente. Los pins de modelo viven en los TOML standalone de `.codex/agents/`.

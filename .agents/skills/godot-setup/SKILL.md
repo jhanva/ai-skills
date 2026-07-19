@@ -89,11 +89,23 @@ Incluir input actions completas para project.godot.
 | Texture filter | 0 (Nearest) | Critico para pixel art |
 | GPU pixel snap | true | Alinea sprites al grid |
 
+Keys concretas de Godot 4:
+
+```ini
+[display]
+window/stretch/mode="canvas_items"
+window/stretch/scale_mode="integer"
+
+[rendering]
+textures/canvas_textures/default_texture_filter=0
+2d/snap/snap_2d_transforms_to_pixel=true
+```
+
 ## FASE 6: Export presets
 
 Leer `references/export-presets.md` para presets concretos.
 
-Regla: empezar con 1-2 presets (Windows baseline, HTML5 opcional). Excluir `design/`, `tests/`, markdown.
+Regla: empezar con 1-2 presets (Windows baseline, Web opcional). Excluir `design/`, `tests/`, markdown.
 
 Entregable: tabla por preset + checklist de verificacion.
 

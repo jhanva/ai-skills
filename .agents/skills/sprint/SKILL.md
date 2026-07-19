@@ -26,7 +26,7 @@ Leer `design/gdd/game-concept.md` para MVP mechanics y scope. Buscar GDDs en `de
 
 Si existe `production/sprints/sprint-{N-1}.md`: extraer stories completadas, pendientes, velocity (S/M/L completados). Rollover: stories con Status != DONE pasan automaticamente.
 
-Si sprint 1: velocity default = 2S + 1M por semana, sin rollover.
+Si sprint 1: velocity default = 3S + 1M por semana, sin rollover.
 
 ## FASE 3: Stories candidatas
 
@@ -48,7 +48,9 @@ Forzar L si: 6+ archivos nuevos, integra 3+ sistemas, requiere assets inexistent
 
 ## FASE 5: Seleccionar stories
 
-Capacity (2 semanas): 8S + 4M (ajustar por velocity real si hay sprints anteriores).
+Capacity (2 semanas): 6S + 2M, igual a dos semanas de velocity default.
+Ajustar por velocity real si hay sprints anteriores; nunca usar una capacidad
+teorica mayor que el historial sin explicar por que.
 
 Prioridad: 1) rollover (forzado), 2) dependencies de stories en progreso, 3) MVP mechanics, 4) nice-to-have.
 
@@ -66,7 +68,8 @@ Escribir `production/sprints/sprint-{N}.md` con: sprint goal (1 frase), stories 
 
 ## Edge cases
 
-- **Sin game-concept.md**: error, crear concepto primero
+- **Sin `design/gdd/game-concept.md`**: error, crear concepto primero
+- **Sin GDDs de sistemas**: advertir y sugerir `$design-system` o `$rpg-design`
 - **Sin stories**: error, usar `$story` para crearlas
 - **Capacity overflow por rollover**: warning, sugerir mover stories a backlog
 - **Dependencies circulares**: error, sugerir romper ciclo

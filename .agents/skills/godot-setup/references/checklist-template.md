@@ -42,7 +42,7 @@ Lee este archivo solo cuando vayas a redactar el checklist final o cuando necesi
 
 ## 6. Export Presets
 - Windows Desktop
-- HTML5 opcional
+- Web opcional
 
 ## 7. Testing
 - Test scene

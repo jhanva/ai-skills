@@ -26,7 +26,7 @@ Incluye findings con severidad:
 - Un batch por frame
 - Render order claro
 - Camera follow/resize definido
-- TextureAtlas y filtering adecuados
+- Atlas `Texture2D`/`SpriteFrames` y filtering adecuados
 
 ## Cierre sugerido
 

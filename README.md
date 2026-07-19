@@ -4,11 +4,11 @@
 
 Convierte un repositorio en un stack de desarrollo asistido por IA con skills, agentes y reglas reutilizables.
 
-**43 skills. 13 agentes de Codex. 5 hooks de Claude. Dos runtimes, un mismo workflow.**
+**43 skills. 13 agentes de Codex. Hooks nativos en Codex y Claude. Dos runtimes, un mismo workflow.**
 
 [![Skills](https://img.shields.io/badge/skills-43-84cc16?style=for-the-badge)](#skills)
 [![Codex Agents](https://img.shields.io/badge/codex%20agents-13-8b5cf6?style=for-the-badge)](#agentes)
-[![Claude Hooks](https://img.shields.io/badge/claude%20hooks-5-f97316?style=for-the-badge)](#hooks-game-dev-capa-claude)
+[![Hooks](https://img.shields.io/badge/hooks-codex%20%2B%20claude-f97316?style=for-the-badge)](#hooks-game-dev)
 [![Runtimes](https://img.shields.io/badge/runtimes-2-0ea5e9?style=for-the-badge)](#compatibilidad-por-runtime)
 [![Game Dev](https://img.shields.io/badge/game%20dev-20%20skills-ec4899?style=for-the-badge)](#game-development)
 
@@ -54,8 +54,8 @@ En este README, las tablas se enfocan primero en la capacidad que aporta cada sk
 | Skills | 43 | Workflows para desarrollo general, Android, imagen, game dev, browser automation, herramientas MCP (Aseprite, Godot, PixelLab), texto y operaciones de repo |
 | Agentes Codex | 13 | Especialistas para implementacion, review, seguridad, prompt design y game development |
 | Plugins Codex | 3 | Integraciones instalables para Aseprite, Godot y PixelLab via plugin + MCP |
-| Hooks Claude | 5 | Validaciones automaticas para codigo, assets y contexto de sesion |
-| Biblioteca compartida | 1 | `_parse.sh` para utilidades reutilizadas por hooks de Claude |
+| Hooks Codex | 4 handlers | Politica pre-tool, gameplay pre-commit, validacion post-edit y contexto de sesion |
+| Hooks Claude | 5 | Implementacion original equivalente para Claude Code |
 | Runtimes | 2 | Mismas capacidades adaptadas a Claude Code y Codex |
 
 ## Skills
@@ -101,7 +101,7 @@ En este README, las tablas se enfocan primero en la capacidad que aporta cada sk
 
 | Skill | Activacion | Proposito |
 |---|---|---|
-| [`browser-control`](./.claude/skills/browser-control/SKILL.md) | Explicita | Control directo del browser via CDP (Chrome DevTools Protocol). Conecta al Chrome real del usuario y ejecuta navegacion, screenshots, clicks por coordenadas, input de teclado, evaluacion JS y manejo de tabs. Sin frameworks intermedios — un WebSocket al browser, scripts Python inline con libreria de helpers autocontenida |
+| [`browser-control`](./.agents/skills/browser-control/SKILL.md) | Explicita | Control directo del browser via CDP (Chrome DevTools Protocol). Conecta al Chrome real del usuario y ejecuta navegacion, screenshots, clicks por coordenadas, input de teclado, evaluacion JS y manejo de tabs. Sin frameworks intermedios — un WebSocket al browser, scripts Python inline con libreria de helpers autocontenida |
 
 Incluye libreria Python CDP (`cdp_helpers.py`, ~370 lineas) con auto-discovery de Chrome, guia de conexion (Way 1: checkbox en chrome://inspect, Way 2: flag de linea de comandos) y referencia de patrones para mecanicas web complejas (dialogs, iframes, shadow DOM, uploads, dropdowns).
 
@@ -210,7 +210,21 @@ Tier 1 — Directores
 | [`qa-analyst`](./.codex/agents/qa-analyst.toml) | Especialista | Tests, bug triage, playtesting | Post-implementacion, pre-release |
 | [`producer`](./.codex/agents/producer.toml) | Especialista | Sprints, scope, milestones, stories | Planificando trabajo, revisando progreso |
 
-## Hooks (game dev, capa Claude)
+## Hooks (game dev)
+
+Codex carga [`hooks.json`](./.codex/hooks.json) desde la capa confiable del
+proyecto. Los handlers multiplataforma viven en
+[`codex_hooks.py`](./.codex/hooks/codex_hooks.py) y consumen el JSON nativo de
+`PreToolUse`, `PostToolUse` y `SessionStart`.
+
+| Handler Codex | Evento | Que valida |
+|---|---|---|
+| `pre-tool-policy` | PreToolUse (Bash/apply_patch) | Bloquea `.env`, comandos destructivos y edits protegidos |
+| `validate-gameplay-code` | PreToolUse (git commit) | Valores hardcoded, estrategia de delta y dependencias UI |
+| `post-edit-checks` | PostToolUse (apply_patch) | Naming/JSON de assets y cobertura GDD de gameplay |
+| `session-context` | SessionStart | Branch, commits, sprint y archivos modificados |
+
+La capa Claude conserva sus cinco scripts originales:
 
 5 hooks de validacion automatica para codigo, assets y seguridad. Comparten biblioteca `_parse.sh` para parsing JSON (cero duplicacion).
 
@@ -325,7 +339,7 @@ parallel  -->  verify
 ## Compatibilidad por runtime
 
 - Claude Code: usa `.claude/skills/`, `.claude/agents/`, `.claude/commands/` y hooks. La invocacion explicita es `/skill`.
-- Codex: usa `.agents/skills/`, `.codex/agents/`, `.codex/config.toml` y `AGENTS.md`. La invocacion explicita es `$skill`.
+- Codex: usa `.agents/skills/`, `.codex/agents/`, `.codex/config.toml`, `.codex/hooks.json` y `AGENTS.md`. La invocacion explicita es `$skill`.
 - Las tablas y flujos de este README describen la capacidad funcional; la sintaxis exacta depende del runtime.
 
 ## Estructura
@@ -335,6 +349,8 @@ parallel  -->  verify
 .agents/skills/                        # skills adaptadas para Codex
 .codex/agents/                         # agentes custom para Codex
 .codex/config.toml                     # configuracion de proyecto para Codex
+.codex/hooks.json                      # registro de hooks nativos de Codex
+.codex/hooks/codex_hooks.py            # handlers Python multiplataforma
 AGENTS.md                              # reglas globales del repo para Codex
 ```
 
@@ -362,7 +378,7 @@ claude --add-dir /ruta/a/ai-skills
 
 **Codex**
 
-- Copiar `.agents/skills/`, `.codex/agents/`, `.codex/config.toml` y `AGENTS.md` a la estructura del proyecto destino
+- Copiar `.agents/skills/`, `.codex/agents/`, `.codex/config.toml`, `.codex/hooks.json`, `.codex/hooks/` y `AGENTS.md` a la estructura del proyecto destino
 - conservar `.claude/` solo si tambien quieres mantener compatibilidad con Claude Code
 
 Las tablas y flujos anteriores siguen siendo validos en ambos casos; lo que cambia es la capa de integracion.

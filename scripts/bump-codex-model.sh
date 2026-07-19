@@ -9,7 +9,6 @@
 #   scripts/bump-codex-model.sh gpt-5.5 gpt-5.3
 #
 # Actualiza:
-#   - .codex/config.toml ([agents.models])
 #   - .codex/agents/prompt-artist.toml
 #   - .codex/agents/reviewer.toml
 #   - .codex/agents/security-auditor.toml
@@ -36,7 +35,20 @@ IMPL_MODEL="${2:-$DEFAULT_MODEL}"
 
 cd "$(dirname "$0")/.."
 
-python3 - "$DEFAULT_MODEL" "$IMPL_MODEL" <<'PY'
+PYTHON_BIN=""
+for candidate in python python3 py; do
+  if command -v "$candidate" >/dev/null 2>&1 && "$candidate" -c "import pathlib" >/dev/null 2>&1; then
+    PYTHON_BIN="$candidate"
+    break
+  fi
+done
+
+if [ -z "$PYTHON_BIN" ]; then
+  echo "Error: Python is required (python, python3 or py)." >&2
+  exit 3
+fi
+
+"$PYTHON_BIN" - "$DEFAULT_MODEL" "$IMPL_MODEL" <<'PY'
 import re, sys, pathlib
 
 default_model, impl_model = sys.argv[1], sys.argv[2]
@@ -75,14 +87,6 @@ for a in default_agents:
     bump(a, default_model)
 for a in impl_agents:
     bump(a, impl_model)
-
-# Update .codex/config.toml too
-cfg = pathlib.Path(".codex/config.toml")
-text = cfg.read_text()
-text = re.sub(r'^(default\s*=\s*)"[^"]+"', rf'\1"{default_model}"', text, count=1, flags=re.M)
-text = re.sub(r'^(implementer\s*=\s*)"[^"]+"', rf'\1"{impl_model}"', text, count=1, flags=re.M)
-cfg.write_text(text)
-print("  updated .codex/config.toml")
 PY
 
 echo "Done. Review changes with: git diff .codex/"

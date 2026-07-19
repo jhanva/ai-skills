@@ -16,6 +16,11 @@ Lee este archivo cuando necesites reglas de estilo, paleta o especificacion de a
 - estados de animacion claros
 - naming de export uniforme
 
+## Integracion con skills
+
+Las skills las invoca el usuario; este agente solo referencia y consume su
+output: `$sprite-spec`, `$tileset-spec`, `$palette` y `$art-bible`.
+
 ## Entregable sugerido
 
 - sprite o tileset spec

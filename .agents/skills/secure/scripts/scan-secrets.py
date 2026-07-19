@@ -1,1 +1,0 @@
-../../../../.claude/skills/secure/scripts/scan-secrets.py

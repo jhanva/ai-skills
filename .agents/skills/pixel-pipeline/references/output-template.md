@@ -20,7 +20,7 @@ Lee este archivo solo cuando vayas a producir la spec final del pipeline o cuand
 - No hay resoluciones mezcladas
 - Filtering nearest en todas las texturas
 - Integer scaling
-- TextureAtlas definido
+- Atlas `Texture2D`/`SpriteFrames` definido para Godot 4
 - Padding suficiente
 - Camera snapping
 

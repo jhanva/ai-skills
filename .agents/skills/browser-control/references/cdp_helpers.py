@@ -4,18 +4,18 @@ Auto-discovers a running Chrome with remote debugging enabled, connects via
 WebSocket, and exposes helpers for navigation, screenshots, input, tabs, and
 DOM evaluation. Designed to be imported by agent-generated scripts.
 
-Dependencies: websockets.
+Dependencies: websockets (install manually if missing).
 """
-import base64, json, os, sys, time
+import base64, json, os, sys, tempfile, time
 from pathlib import Path
 from urllib.request import urlopen
 
 try:
     import websockets.sync.client as _ws
-except ImportError:
+except ImportError as exc:
     raise ImportError(
-        "Missing dependency: websockets. Install it with: python3 -m pip install websockets"
-    ) from None
+        "cdp_helpers requires 'websockets'. Install it with: pip install websockets"
+    ) from exc
 
 
 _conn = None
@@ -193,7 +193,7 @@ _KEYS = {
 
 def press_key(key, modifiers=0):
     """Press a key. Modifiers: 1=Alt, 2=Ctrl, 4=Meta(Cmd), 8=Shift."""
-    vk, code, text = _KEYS.get(key, (ord(key[0]) if len(key) == 1 else 0, key, key if len(key) == 1 else ""))
+    vk, code, text = _KEYS.get(key, (ord(key.upper()[0]) if len(key) == 1 else 0, key, key if len(key) == 1 else ""))
     base = {"key": key, "code": code, "modifiers": modifiers,
             "windowsVirtualKeyCode": vk, "nativeVirtualKeyCode": vk}
     cdp("Input.dispatchKeyEvent", type="keyDown", **base, **({"text": text} if text else {}))
@@ -233,8 +233,10 @@ def scroll(x, y, dy=-300, dx=0):
     cdp("Input.dispatchMouseEvent", type="mouseWheel", x=x, y=y, deltaX=dx, deltaY=dy)
 
 
-def screenshot(path="/tmp/cdp_screenshot.png", full=False):
+def screenshot(path=None, full=False):
     """Capture the viewport (or full page) as PNG. Returns the file path."""
+    if path is None:
+        path = os.path.join(tempfile.gettempdir(), "cdp_screenshot.png")
     r = cdp("Page.captureScreenshot", format="png", captureBeyondViewport=full)
     with open(path, "wb") as f:
         f.write(base64.b64decode(r["data"]))
