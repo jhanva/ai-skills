@@ -7,7 +7,6 @@ description: >
   Output: design/palette.md o design/palettes/{name}.md
 argument-hint: "[crear | swap | revisar]"
 disable-model-invocation: true
-agent: pixel-artist
 allowed-tools:
   - Read
   - Grep

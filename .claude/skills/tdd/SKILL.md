@@ -3,9 +3,7 @@ name: tdd
 description: >
   Impone ciclo RED-GREEN-REFACTOR estricto durante implementacion.
   No se permite codigo de produccion sin test que falle primero.
-when_to_use: >
-  Cuando se esta escribiendo codigo nuevo, implementando features,
-  arreglando bugs, o cualquier tarea que involucre escribir codigo de produccion.
+  Usar cuando: se esta escribiendo codigo nuevo, implementando features, arreglando bugs, o cualquier tarea que involucre escribir codigo de produccion.
 argument-hint: "[que se va a implementar]"
 ---
 
@@ -76,4 +74,4 @@ Consulta [testing-anti-patterns.md](testing-anti-patterns.md) para anti-patrones
 - [ ] Tests cubren happy path Y al menos un caso de error
 - [ ] No hay tests comentados o skipped
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

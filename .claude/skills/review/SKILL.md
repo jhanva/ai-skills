@@ -3,9 +3,7 @@ name: review
 description: >
   Code review estructurado con severidades. Solicitar review con subagente
   revisor o manejar feedback recibido con evaluacion tecnica, no sycophancy.
-when_to_use: >
-  Despues de implementar una feature, antes de merge, cuando el usuario dice
-  "review", "revisa", "revisar codigo", o cuando se recibe feedback de un reviewer.
+  Usar cuando: se termina una feature, antes de merge, o al recibir feedback de un reviewer.
 argument-hint: "[SHA base o descripcion]"
 disable-model-invocation: true
 ---
@@ -87,4 +85,4 @@ LEER feedback completo
 
 Rechazar con evidencia tecnica, nunca con opinion.
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

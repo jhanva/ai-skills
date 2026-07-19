@@ -4,11 +4,7 @@ description: >
   Diseña pipelines de procesamiento de imagen multi-paso para Android.
   Cubre stages, memory budget, concurrency model, progress/cancellation,
   error strategy, y caching. Para batch processing y flujos complejos.
-when_to_use: >
-  Cuando el usuario quiere construir un pipeline de imagen multi-paso
-  (scan, load, process, store, display). Tambien cuando dice "image-pipeline",
-  "pipeline", "batch processing", "procesamiento de imagenes",
-  "como proceso muchas imagenes", "flujo de imagenes".
+  Usar cuando: se quiere construir un pipeline de imagen multi-paso (scan, load, process, store, display) o batch processing.
 argument-hint: "[descripcion del pipeline]"
 disable-model-invocation: true
 allowed-tools:
@@ -16,8 +12,8 @@ allowed-tools:
   - Grep
   - Glob
   - Agent
-  - Bash(find *)
-  - Bash(wc *)
+  - Bash(find:*)
+  - Bash(wc:*)
 ---
 
 # Image Pipeline — Diseño de pipelines de procesamiento de imagen
@@ -346,4 +342,4 @@ Producir documento con:
 
 Transicion: "Usa `/plan` para convertir este diseño en tareas de implementacion."
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

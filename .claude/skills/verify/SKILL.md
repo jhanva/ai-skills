@@ -3,10 +3,7 @@ name: verify
 description: >
   Verifica con evidencia fresca antes de cualquier claim de exito.
   Prohibido decir "listo" sin ejecutar verificacion y leer el output.
-when_to_use: >
-  Antes de reportar tarea completada, decir que tests pasan, que un bug
-  esta arreglado, hacer commit, crear PR, o cualquier afirmacion de exito.
-  Tambien cuando el usuario dice "verifica", "confirma", "esta listo?".
+  Usar cuando: antes de reportar tarea completada, decir que tests pasan, que un bug esta arreglado, hacer commit, crear PR, o cualquier afirmacion de exito; tambien si el usuario dice "verifica", "confirma", "esta listo?".
 argument-hint: "[que verificar]"
 ---
 
@@ -56,4 +53,4 @@ Cualquier expresion de confianza SIN output de comando que la respalde = no veri
 - Despues de que un subagente reporta "completado", ejecutar verificaciones desde la sesion principal
 - Si no puedes verificar, di explicitamente: "No pude verificar porque [razon]. El subagente reporta exito pero no tengo evidencia independiente"
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

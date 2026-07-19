@@ -10,6 +10,7 @@ allowed-tools:
   - Grep
   - Glob
   - Bash
+  - mcp__aseprite
 ---
 
 # Aseprite Workflows

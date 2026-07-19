@@ -8,7 +8,6 @@ description: >
   completas para implementacion.
 argument-hint: "<nombre de escena> (ej: player, battle_screen, inventory_ui)"
 disable-model-invocation: true
-agent: godot-architect
 allowed-tools:
   - Read
   - Grep
@@ -25,9 +24,9 @@ Define arquitectura completa de scenes en Godot: node hierarchy, signals, script
 **Objetivo**: Cargar informacion del sistema al que pertenece la scene.
 
 1. Buscar documentacion del sistema relevante:
-   - Para "player": `design/player-controller.md`, `design/combat-system.md`
-   - Para "enemy" (slime, skeleton): `design/enemies/{name}.md`, `design/combat-system.md`
-   - Para UI (inventory, pause menu): `design/ui-flow.md`, `design/{system}.md`
+   - Para "player": `design/gdd/player-controller.md`, `design/gdd/combat-system.md`
+   - Para "enemy" (slime, skeleton): `design/gdd/enemies/{name}.md`, `design/gdd/combat-system.md`
+   - Para UI (inventory, pause menu): `design/gdd/ui-flow.md`, `design/gdd/{system}.md`
    - Para levels: `design/levels/{name}.md`
 2. Extraer requisitos funcionales:
    - Que debe hacer esta scene (movimiento, combate, UI interactions)
@@ -501,7 +500,7 @@ HUD updates (external scene)
 **Scene Path**: res://scenes/characters/player.tscn
 **Root Node**: CharacterBody2D
 **Purpose**: Controllable player character con movement, combat, y health system
-**Date**: 2026-04-17
+**Date**: YYYY-MM-DD
 
 ## Node Tree
 

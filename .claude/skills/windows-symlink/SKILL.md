@@ -49,7 +49,7 @@ Conseguir que los symlinks de archivo funcionen de forma real en Windows y que G
 
 ## Paso 1: Auditoria base
 
-Ejecuta:
+Ejecuta (desde la raiz del repo):
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .claude/skills/windows-symlink/scripts/audit-windows-symlink.ps1 -RepoPath .
@@ -80,7 +80,7 @@ Antes de modificar nada, explica el plan. El setup ideal incluye:
    - si no se puede, dar la ruta exacta en Settings para activarlo manualmente
 4. volver a correr la auditoria
 
-Usa:
+Usa (desde la raiz del repo):
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .claude/skills/windows-symlink/scripts/setup-windows-symlink.ps1 -RepoPath .

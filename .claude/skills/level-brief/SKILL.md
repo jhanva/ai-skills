@@ -4,9 +4,7 @@ description: >
   Disenar un level brief: proposito del nivel, layout ASCII, encounter table,
   difficulty curve, secrets, tileset requirements. Produce design/levels/{name}.md
   listo para implementacion.
-when_to_use: >
-  Cuando el usuario quiere disenar un nivel, zona, o area de juego, o cuando
-  dice "level-brief", "disenar nivel", "mapa", "zona", "area", "level design".
+  Usar cuando: el usuario quiere disenar un nivel, zona o area de juego.
 argument-hint: "<nombre del nivel o zona>"
 disable-model-invocation: true
 allowed-tools:
@@ -14,7 +12,6 @@ allowed-tools:
   - Grep
   - Glob
   - Write
-agent: level-designer
 ---
 
 # Level Brief — Disenar niveles y zonas
@@ -566,4 +563,4 @@ ANTI-PATRON: No playtesting estimado
   Solucion: estimar pacing en FASE 5, validar con playtest
 ```
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

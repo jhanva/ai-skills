@@ -4,9 +4,8 @@ description: >
   Setup inicial de proyecto de juego 2D: detecta estado del proyecto,
   pregunta lenguaje (GDScript vs C#) y genero (RPG/platformer/roguelike),
   crea estructura de directorios, .gitignore para Godot.
-when_to_use: >
-  Cuando el usuario quiere iniciar un nuevo proyecto de juego 2D con Godot,
-  o cuando dice "nuevo juego", "empezar juego", "game-start", "setup proyecto".
+  Usar cuando: el usuario quiere iniciar un nuevo proyecto de juego 2D con Godot
+  o dice "nuevo juego", "empezar juego", "game-start", "setup proyecto".
 argument-hint: "[no arguments]"
 disable-model-invocation: true
 allowed-tools:
@@ -15,8 +14,8 @@ allowed-tools:
   - Glob
   - Write
   - Edit
-  - Bash(mkdir *)
-  - Bash(ls *)
+  - Bash(mkdir:*)
+  - Bash(ls:*)
 ---
 
 # Game Start — Setup inicial de proyecto de juego 2D
@@ -160,11 +159,15 @@ Estructura unificada para TODOS los generos:
 ```
 project-root/
 ├── src/                      # codigo fuente (GDScript o C#)
-│   ├── core/                 # game loop, state machine, managers
-│   ├── entities/             # player, enemies, NPCs
-│   ├── systems/              # combat, dialogue, inventory (segun genero)
+│   ├── core/                 # game loop, state machine, helpers compartidos
+│   ├── gameplay/             # player, enemies, sistemas (combat, dialogue, inventory)
 │   ├── ui/                   # menus, HUD, dialogos
-│   └── utils/                # helpers, extensions
+│   └── autoloads/            # singletons globales (EventBus, managers)
+├── scenes/                   # escenas (.tscn)
+│   ├── levels/               # niveles
+│   ├── characters/           # player, enemies, NPCs
+│   ├── ui/                   # menus, HUD
+│   └── prefabs/              # componentes de escena reutilizables
 ├── assets/                   # recursos del juego
 │   ├── sprites/              # sprite sheets (characters, enemies, items)
 │   ├── tiles/                # tilesets (terrain, buildings, decorations)
@@ -180,11 +183,17 @@ project-root/
 ├── design/                   # documentacion de diseno
 │   ├── gdd/                  # game design documents
 │   │   └── game-concept.md   (creado por /game-concept)
-│   ├── levels/               # level briefs
+│   ├── levels/               # level briefs (/level-brief)
+│   ├── sprites/              # specs de sprites (/sprite-spec)
+│   ├── tilesets/             # specs de tilesets (/tileset-spec)
+│   ├── audio/                # briefs de audio (/sound-brief)
+│   ├── scenes/               # scene designs (/scene-design)
 │   └── art-bible.md          (creado por /art-bible)
 ├── production/               # project management
-│   └── sprints/              # sprints y tasks
-│       └── sprint-1.md
+│   ├── sprints/              # sprints y tasks
+│   │   └── sprint-1.md
+│   ├── stories/              # user stories (/story)
+│   └── playtests/            # reportes de playtest (/playtest)
 └── tests/                    # tests unitarios (GDScript o C#)
     └── test_*.gd / test_*.cs
 ```
@@ -192,10 +201,11 @@ project-root/
 Ejecutar:
 
 ```bash
-mkdir -p src/{core,entities,systems,ui,utils}
+mkdir -p src/{core,gameplay,ui,autoloads}
+mkdir -p scenes/{levels,characters,ui,prefabs}
 mkdir -p assets/{sprites,tiles,audio/{music,sfx},data,fonts}
-mkdir -p design/{gdd,levels}
-mkdir -p production/sprints
+mkdir -p design/{gdd,levels,sprites,tilesets,audio,scenes}
+mkdir -p production/{sprints,stories,playtests}
 mkdir -p tests
 ```
 
@@ -324,9 +334,10 @@ Genero: [RPG | Platformer | Roguelike | <custom>]
 
 Estructura creada:
   ✓ src/           (codigo fuente organizado por responsabilidad)
+  ✓ scenes/        (levels, characters, ui, prefabs)
   ✓ assets/        (sprites, tiles, audio, data, fonts)
-  ✓ design/        (GDDs y level briefs)
-  ✓ production/    (sprints)
+  ✓ design/        (GDDs, level briefs, specs de arte y audio)
+  ✓ production/    (sprints, stories, playtests)
   ✓ tests/         (tests unitarios)
   ✓ .gitignore     (Godot 4 + Mono + OS)
   ✓ project.godot  (pixel art settings)
@@ -400,4 +411,4 @@ ANTI-PATRON: No configurar pixel-perfect settings
   Solucion: texture_filter=0, stretch mode canvas_items
 ```
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

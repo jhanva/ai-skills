@@ -12,7 +12,6 @@ allowed-tools:
   - Grep
   - Glob
   - Write
-agent: producer
 ---
 
 # Sprint Planning
@@ -98,7 +97,7 @@ Sprint 4 rollover:
 
 Si NO hay sprint anterior:
 - Es el sprint 1
-- Velocity default: 2S + 1M por semana
+- Velocity default: 3S + 1M por semana
 - No hay rollover
 
 ## FASE 3: Listar stories candidatas
@@ -168,8 +167,8 @@ Agregar columna Size a la tabla de candidatas.
 ### 5.1 Calcular capacity disponible
 
 Duracion del sprint (default 2 semanas):
-- Capacity = 4S + 2M por semana
-- 2 semanas = 8S + 4M
+- Capacity = 3S + 1M por semana (igual a velocity default)
+- 2 semanas = 6S + 2M
 
 Ajustar por experiencia:
 - Si velocity del sprint anterior < capacity default, usar velocity real
@@ -289,9 +288,9 @@ Crear `production/sprints/sprint-{N}.md`:
 |--------|-------|
 | Total stories | 3 |
 | Total size | 2S + 1M |
-| Capacity used | 6h (2S) + 4h (1M) = 10h |
-| Capacity available | 40h (2 semanas) |
-| Utilization | 25% |
+| Capacity used | 2S + 1M ≈ 8h (estimando S≈2h, M≈4h) |
+| Capacity available | 6S + 2M ≈ 20h (2 semanas) |
+| Utilization | 40% |
 
 ## Rollover from Sprint {N-1}
 
@@ -346,7 +345,7 @@ Archivo generado: production/sprints/sprint-{N}.md
 Error: "No se encontro design/gdd/game-concept.md. Debes crear el game concept primero."
 
 ### Sin GDDs
-Warning: "No hay GDDs en design/gdd/. Considera usar `/brainstorm` para diseñar sistemas antes de planear sprints."
+Warning: "No hay GDDs en design/gdd/. Considera usar `/design-system` (GDD por sistema) o `/rpg-design` antes de planear sprints."
 
 ### Sin stories
 Error: "No hay stories en production/stories/. Usa `/story` para crear stories primero."

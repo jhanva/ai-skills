@@ -3,9 +3,7 @@ name: parallel
 description: >
   Despacha multiples subagentes simultaneos para resolver problemas independientes.
   Solo cuando los problemas no se afectan entre si.
-when_to_use: >
-  Cuando hay 3+ tests fallando con causas diferentes, multiples subsistemas
-  rotos independientemente, o tareas de investigacion que no se solapan.
+  Usar cuando: hay 3+ tests fallando con causas diferentes, subsistemas rotos de forma independiente, o investigaciones que no se solapan.
 argument-hint: "[descripcion de problemas o 'auto' para analizar tests]"
 disable-model-invocation: true
 ---
@@ -92,4 +90,4 @@ Agent(dominio_C, prompt_C)
 | Output vago | Pedir estructura: causa, fix, evidencia |
 | Confiar en reportes | SIEMPRE verificar con suite completa |
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

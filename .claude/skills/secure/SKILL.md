@@ -4,8 +4,7 @@ description: >
   Analisis de seguridad para proyectos locales. Detecta vulnerabilidades en codigo,
   secrets expuestos, dependencias inseguras, configuraciones de infra, y patrones
   de auth/crypto debiles. Dos modos: quick (solo archivos cambiados) y full (proyecto completo).
-when_to_use: >
-  Cuando el usuario dice "security audit", "vulnerabilidades", "escanear seguridad",
+  Usar cuando: el usuario dice "security audit", "vulnerabilidades", "escanear seguridad",
   "security check", "buscar secrets", "revisar seguridad", "secure", o antes de deploy/release.
 argument-hint: "[quick|full] [ruta al proyecto]"
 disable-model-invocation: true
@@ -14,16 +13,18 @@ allowed-tools:
   - Grep
   - Glob
   - Agent
-  - Bash(python3 *)
-  - Bash(git diff *)
-  - Bash(git log *)
-  - Bash(git ls-files *)
-  - Bash(find *)
-  - Bash(wc *)
-  - Bash(which *)
-  - Bash(npm audit *)
-  - Bash(pip-audit *)
-  - Bash(cargo audit *)
+  - Bash(python:*)
+  - Bash(python3:*)
+  - Bash(py:*)
+  - Bash(git diff:*)
+  - Bash(git log:*)
+  - Bash(git ls-files:*)
+  - Bash(find:*)
+  - Bash(wc:*)
+  - Bash(which:*)
+  - Bash(npm audit:*)
+  - Bash(pip-audit:*)
+  - Bash(cargo audit:*)
 ---
 
 # Secure — Analisis de seguridad
@@ -36,6 +37,7 @@ allowed-tools:
 - Nunca ejecutar codigo del proyecto (`npm start`, `python app.py`)
 - Nunca instalar/actualizar paquetes en el target
 - Nunca ejecutar `npm audit --fix` o equivalentes
+- Python se permite UNICAMENTE para ejecutar los scripts de esta skill (`scan-secrets.py`); nunca para correr codigo del proyecto ni scripts ad-hoc
 - Tu unico output son hallazgos reportados inline
 
 ## Resolver target
@@ -48,14 +50,18 @@ allowed-tools:
 
 ### Modo QUICK (default)
 
-Escanea **solo archivos cambiados** respecto a la branch base. Ideal para usar durante desarrollo, antes de commit o PR. No usa subagentes.
+Escanea **solo archivos con cambios sin commitear respecto a HEAD**. Ideal para usar durante desarrollo, antes de commit o PR. No usa subagentes.
 
 ```bash
-# Archivos con cambios staged + unstaged
+# Archivos con cambios staged + unstaged respecto a HEAD
 git diff --name-only HEAD
 # Si no hay cambios, archivos del ultimo commit
 git diff --name-only HEAD~1
 ```
+
+Notas:
+- Si se quiere comparar contra la branch base (todo lo de la rama actual), usar `git diff --name-only main...HEAD`
+- `HEAD~1` falla en repos con un solo commit — en ese caso usar `git ls-files`
 
 Solo aplica las verificaciones relevantes a los archivos cambiados.
 
@@ -105,12 +111,14 @@ find TARGET -type f -not -path '*/node_modules/*' -not -path '*/.git/*' -not -pa
 
 ### 1.3 Cargar referencias segun stack
 
-Leer SOLO los archivos de referencia relevantes de `${CLAUDE_SKILL_DIR}/references/`:
+Leer SOLO los archivos de referencia relevantes de `.claude/skills/secure/references/` (ruta relativa a la raiz del proyecto):
+
+`code-patterns.md` se organiza por categoria de vulnerabilidad (Injection, Auth & AuthZ, Crypto, Error Handling, Datos sensibles) mas una seccion final "Notas por lenguaje" (JavaScript/TypeScript, Python).
 
 - **Siempre:** `secrets-patterns.md`
-- **Si JS/TS:** `code-patterns.md` seccion JavaScript
-- **Si Python:** `code-patterns.md` seccion Python
-- **Si web app:** `code-patterns.md` secciones injection + auth + crypto
+- **Si JS/TS:** `code-patterns.md` — categorias relevantes al stack + "Notas por lenguaje" (JavaScript/TypeScript)
+- **Si Python:** `code-patterns.md` — categorias relevantes al stack + "Notas por lenguaje" (Python)
+- **Si web app:** `code-patterns.md` — secciones Injection + Auth & AuthZ + Crypto
 - **Si Docker/CI:** `infra-patterns.md`
 
 ### 1.4 Verificar herramientas externas (opcionales)
@@ -125,16 +133,16 @@ Usarlas si existen. Si no, analisis nativo con Grep + patterns de los archivos d
 
 ## FASE 2: Scan de secrets (siempre, primera prioridad)
 
-Ejecutar el script de deteccion:
+Ejecutar el script de deteccion (ejecutar desde la raiz del proyecto; `python` puede ser `python3` o `py` segun la maquina):
 
 ```bash
-python3 ${CLAUDE_SKILL_DIR}/scripts/scan-secrets.py TARGET_DIR
+python .claude/skills/secure/scripts/scan-secrets.py TARGET_DIR
 ```
 
 En modo quick, pasar solo los archivos cambiados:
 
 ```bash
-git diff --name-only HEAD | python3 ${CLAUDE_SKILL_DIR}/scripts/scan-secrets.py --stdin TARGET_DIR
+git diff --name-only HEAD | python .claude/skills/secure/scripts/scan-secrets.py --stdin TARGET_DIR
 ```
 
 Si el script no esta disponible, usar Grep con patterns de `secrets-patterns.md`.
@@ -184,22 +192,22 @@ Output inline con formato navegable. NO generar archivo de reporte.
 
 ### CRITICO (arreglar antes de deploy)
 - `src/api/users.ts:45` — SQL injection: input de usuario concatenado directamente en query
-  CWE-89 | OWASP A03:2025
+  CWE-89 | OWASP A03:2021
   Fix: usar parameterized queries
 
 ### ALTO
 - `.env.production:3` — API key de Stripe expuesta en repo
-  CWE-798 | OWASP A07:2025
+  CWE-798 | OWASP A07:2021
   Fix: mover a variables de entorno del hosting, agregar a .gitignore
 
 ### MEDIO
 - `Dockerfile:1` — Imagen base sin tag fijo (`node:latest`)
-  CWE-1395 | OWASP A06:2025
+  CWE-1395 | OWASP A06:2021
   Fix: usar tag especifico (`node:20-alpine`)
 
 ### BAJO
 - `src/utils/logger.ts:12` — Email de usuario en logs de debug
-  CWE-532 | OWASP A09:2025
+  CWE-532 | OWASP A09:2021
   Fix: redactar PII antes de loggear
 
 ### Resumen
@@ -216,9 +224,9 @@ Modo: [quick|full] | Stack: [detectado] | Archivos escaneados: N
 Cada hallazgo DEBE tener:
 - `archivo:linea` — referencia navegable
 - CWE ID — clasificacion de debilidad
-- Categoria OWASP 2025
+- Categoria OWASP Top 10 2021
 - Fix concreto con ejemplo de codigo cuando aplique
 
 Si no hay hallazgos: "Scan completo. No se encontraron vulnerabilidades en [N archivos escaneados]."
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

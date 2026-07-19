@@ -7,7 +7,6 @@ description: >
   para produccion de audio.
 argument-hint: "<sistema o zona> (ej: combat, forest, menu)"
 disable-model-invocation: true
-agent: sound-designer
 allowed-tools:
   - Read
   - Grep
@@ -30,9 +29,9 @@ Define specs completas de audio para sistemas de juego o zonas: SFX list con tri
    - Target audience (kids, adults, core gamers)
    - Art style (pixel art, realistic, cartoon)
 3. Buscar documentacion del sistema especifico:
-   - Para "combat": `design/combat-system.md`
-   - Para "forest": `design/levels/forest.md` o `design/world/forest.md`
-   - Para "menu": `design/ui-flow.md`
+   - Para "combat": `design/gdd/combat-system.md`
+   - Para "forest": `design/levels/forest.md`
+   - Para "menu": `design/gdd/ui-flow.md`
 4. Identificar eventos audiovisuales clave del sistema
 
 **Validaciones**:
@@ -476,7 +475,7 @@ MusicManager.play_track("combat_theme")
 **System**: Combat
 **Genre**: Action RPG
 **Mood**: Tense, energetic
-**Date**: 2026-04-17
+**Date**: YYYY-MM-DD
 
 ## SFX List
 

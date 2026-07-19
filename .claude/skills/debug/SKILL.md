@@ -3,9 +3,7 @@ name: debug
 description: >
   Debugging sistematico en 4 fases con investigacion de causa raiz obligatoria.
   Prohibido adivinar soluciones o aplicar fixes sin entender el problema.
-when_to_use: >
-  Cuando hay un bug, error, test fallando, comportamiento inesperado,
-  o el usuario dice "no funciona", "falla", "error", "bug", "rompio".
+  Usar cuando: hay un bug, error, test fallando, comportamiento inesperado, o el usuario dice "no funciona", "falla", "error", "bug", "rompio".
 argument-hint: "[descripcion del error o problema]"
 ---
 
@@ -85,4 +83,4 @@ Consulta [root-cause-tracing.md](root-cause-tracing.md) para tecnica detallada.
 | "Voy a reescribir el modulo" | Encuentra el bug, arregla el bug. Despues refactoriza |
 | "Es un bug del framework" | Verifica primero que no sea tu codigo |
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

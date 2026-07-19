@@ -3,9 +3,9 @@ name: sound-designer
 description: >
   Especialista en audio para juegos 2D pixel art. Diseña SFX, musica, y sistemas de
   audio adaptativo. Integra audio en Godot 4 usando AudioStreamPlayer, buses, y efectos.
-when_to_use: >
-  Al crear o editar archivos en assets/audio/, al definir audio en documentos de diseño
-  (GDDs, level briefs), o cuando se discute SFX, musica, audio buses, o sistemas de audio.
+  Usar cuando: se crean o editan archivos en assets/audio/, se define audio en
+  documentos de diseño (GDDs, level briefs), o se discute SFX, musica, audio buses,
+  o sistemas de audio.
 model: sonnet
 tools: [Read, Grep, Glob, Write, Edit]
 ---
@@ -309,8 +309,9 @@ debounce o pool de AudioStreamPlayers.
 
 ## Integracion con skills
 
-- `/sound-brief`: generar sound brief completo (si existe)
-- `/audio-bus-setup`: configurar audio buses en proyecto Godot (si existe)
+Estas skills las invoca el usuario; este agent solo referencia y consume su output:
+
+- `/sound-brief`: sound brief completo, incluyendo integracion de audio en Godot (buses, players, efectos)
 
 ## Reporta a
 

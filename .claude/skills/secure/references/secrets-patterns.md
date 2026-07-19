@@ -1,5 +1,7 @@
 # Patrones de deteccion de secrets
 
+El script `scripts/scan-secrets.py` es la fuente canonica; esta tabla es fallback para Grep manual.
+
 Regex patterns para detectar secrets expuestos en codigo fuente. Cada pattern incluye el tipo de secret, la regex, y la tasa de falsos positivos esperada.
 
 ## Alta confianza (casi nunca falso positivo)
@@ -15,14 +17,14 @@ Regex patterns para detectar secrets expuestos en codigo fuente. Cada pattern in
 | Slack Bot Token | `xoxb-[0-9]{10,13}-[0-9]{10,13}-[A-Za-z0-9]{24}` | |
 | Slack Webhook | `https://hooks\.slack\.com/services/T[A-Z0-9]{8,}/B[A-Z0-9]{8,}/[A-Za-z0-9]{24}` | |
 | Stripe Secret Key | `sk_live_[A-Za-z0-9]{24,}` | |
-| Stripe Publishable | `pk_live_[A-Za-z0-9]{24,}` | |
+| Stripe Publishable | `pk_live_[A-Za-z0-9]{24,}` | Publica por diseno — severidad baja |
 | Twilio API Key | `SK[0-9a-fA-F]{32}` | |
 | SendGrid API Key | `SG\.[A-Za-z0-9\-_]{22}\.[A-Za-z0-9\-_]{43}` | |
 | Google API Key | `AIza[0-9A-Za-z\-_]{35}` | |
 | Firebase (no prefix) | `(?i)(firebase|firebaseio).*['\"][A-Za-z0-9\-_]{30,}['\"]` | |
 | Heroku API Key | `(?i)heroku.*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}` | |
 | npm Token | `npm_[A-Za-z0-9]{36}` | |
-| PyPI Token | `pypi-[A-Za-z0-9]{50,}` | |
+| PyPI Token | `pypi-[A-Za-z0-9_\-]{50,}` | |
 
 ## Confianza media (verificar contexto)
 

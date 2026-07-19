@@ -4,10 +4,7 @@ description: >
   Guia la integracion de modelos ML on-device en Android. Cubre seleccion
   de framework (MediaPipe/MLKit/TFLite/ONNX), preprocessing, postprocessing,
   GPU/CPU fallback, lifecycle del modelo, thread safety, y testing.
-when_to_use: >
-  Cuando el usuario quiere integrar un modelo ML en una app Android.
-  Tambien cuando dice "ml-ondevice", "agregar modelo", "MediaPipe", "TFLite",
-  "ML Kit", "ONNX", "inferencia", "embedding", "deteccion", "clasificacion on-device".
+  Usar cuando: se quiere integrar un modelo ML on-device en Android (MediaPipe, TFLite, ML Kit, ONNX, inferencia, embedding).
 argument-hint: "[descripcion del modelo o tarea ML]"
 disable-model-invocation: true
 allowed-tools:
@@ -15,8 +12,8 @@ allowed-tools:
   - Grep
   - Glob
   - Agent
-  - Bash(find *)
-  - Bash(wc *)
+  - Bash(find:*)
+  - Bash(wc:*)
   - WebFetch
   - WebSearch
 ---
@@ -307,4 +304,4 @@ Producir documento con:
 
 Transicion: "Usa `/image-pipeline` si el modelo es parte de un pipeline multi-paso, o `/plan` para implementar directamente."
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

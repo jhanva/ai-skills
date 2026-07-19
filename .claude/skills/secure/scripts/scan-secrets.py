@@ -2,20 +2,19 @@
 """
 scan-secrets.py — Escanea archivos en busca de secrets expuestos.
 
-Uso:
-  python3 scan-secrets.py TARGET_DIR                    # Escanea todo el directorio
-  git diff --name-only HEAD | python3 scan-secrets.py --stdin TARGET_DIR  # Solo archivos del stdin
+Uso (python puede ser python3 o py segun la maquina):
+  python scan-secrets.py TARGET_DIR                    # Escanea todo el directorio
+  git diff --name-only HEAD | python scan-secrets.py --stdin TARGET_DIR  # Solo archivos del stdin
 
 Output: JSON a stdout con hallazgos.
 Exit codes:
-  0 = limpio (sin hallazgos)
+  0 = limpio (sin hallazgos) o --help
   1 = hallazgos encontrados
   2 = error de uso / argumentos invalidos
   3 = error inesperado en runtime (bug o IO)
 """
 
 import json
-import os
 import re
 import sys
 from pathlib import Path
@@ -31,7 +30,9 @@ PATTERNS = [
     ("Slack Bot Token", r"xoxb-[0-9]{10,13}-[0-9]{10,13}-[A-Za-z0-9]{24}", "high"),
     ("Slack Webhook", r"https://hooks\.slack\.com/services/T[A-Z0-9]{8,}/B[A-Z0-9]{8,}/[A-Za-z0-9]{24}", "high"),
     ("Stripe Secret Key", r"sk_live_[A-Za-z0-9]{24,}", "high"),
-    ("Stripe Publishable Key", r"pk_live_[A-Za-z0-9]{24,}", "high"),
+    # pk_live_ es la publishable key de Stripe: publica por diseno (va en el
+    # frontend). Se reporta como "low" solo para visibilidad, no es un leak.
+    ("Stripe Publishable Key", r"pk_live_[A-Za-z0-9]{24,}", "low"),
     ("SendGrid API Key", r"SG\.[A-Za-z0-9\-_]{22}\.[A-Za-z0-9\-_]{43}", "high"),
     ("Google API Key", r"AIza[0-9A-Za-z\-_]{35}", "high"),
     ("npm Token", r"npm_[A-Za-z0-9]{36}", "high"),
@@ -40,7 +41,7 @@ PATTERNS = [
     # Confianza media
     ("Private Key", r"-----BEGIN (RSA|DSA|EC|OPENSSH|PGP) PRIVATE KEY-----", "medium"),
     ("Generic Password", r'(?i)(password|passwd|pwd)\s*[:=]\s*["\'][^"\']{8,}["\']', "medium"),
-    ("Generic Secret", r'(?i)(secret|api_key|apikey|access_key)\s*[:=]\s*["\'][^"\']{8,}["\']', "medium"),
+    ("Generic Secret", r'(?i)(secret|token|api_key|apikey|access_key)\s*[:=]\s*["\'][^"\']{8,}["\']', "medium"),
     ("Connection String", r"(?i)(mongodb|postgres|mysql|redis)://[^:]+:[^@]+@", "medium"),
     ("JWT Hardcoded", r"eyJ[A-Za-z0-9\-_]+\.eyJ[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+", "medium"),
 ]
@@ -51,10 +52,14 @@ IGNORE_DIRS = {
 }
 
 IGNORE_EXTENSIONS = {
-    ".lock", ".min.js", ".min.css", ".map", ".woff", ".woff2", ".ttf",
+    ".lock", ".map", ".woff", ".woff2", ".ttf",
     ".eot", ".ico", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp",
     ".mp3", ".mp4", ".pdf", ".zip", ".tar", ".gz", ".jar", ".class",
 }
+
+# Sufijos compuestos: Path.suffix solo devuelve la ultima extension
+# ("app.min.js" -> ".js"), asi que se chequean con str.endswith aparte.
+IGNORE_COMPOUND_SUFFIXES = (".min.js", ".min.css")
 
 IGNORE_FILENAMES = {
     "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "Cargo.lock",
@@ -77,6 +82,8 @@ def should_scan(filepath: Path) -> bool:
         return False
     if filepath.suffix.lower() in IGNORE_EXTENSIONS:
         return False
+    if filepath.name.lower().endswith(IGNORE_COMPOUND_SUFFIXES):
+        return False
     if filepath.name in IGNORE_FILENAMES:
         return False
     # Skip test files for medium-confidence patterns (handled in scan)
@@ -92,7 +99,6 @@ def is_test_file(filepath: Path) -> bool:
                           "_test.py", "_test.go", ".test.jsx", ".test.tsx",
                           ".example", ".sample", ".template"))
         or name.startswith(("test_", "spec_"))
-        or name in (".env.example", ".env.sample", ".env.template")
     )
 
 
@@ -124,13 +130,26 @@ def scan_file(filepath: Path) -> list:
     return findings
 
 
+USAGE = "Usage: scan-secrets.py [--stdin] TARGET_DIR"
+
+
 def main():
-    if len(sys.argv) < 2 or sys.argv[-1] in ("-h", "--help"):
-        print("Usage: scan-secrets.py [--stdin] TARGET_DIR", file=sys.stderr)
+    args = sys.argv[1:]
+
+    # -h/--help en cualquier posicion: mostrar ayuda y salir OK
+    if "-h" in args or "--help" in args:
+        print(USAGE)
+        sys.exit(0)
+
+    # --stdin en cualquier posicion; el resto son posicionales
+    use_stdin = "--stdin" in args
+    positional = [a for a in args if a != "--stdin"]
+
+    if len(positional) != 1:
+        print(USAGE, file=sys.stderr)
         sys.exit(2)
 
-    use_stdin = "--stdin" in sys.argv
-    target_dir = Path(sys.argv[-1]).resolve()
+    target_dir = Path(positional[0]).resolve()
 
     if not target_dir.is_dir():
         print(f"Error: {target_dir} is not a directory", file=sys.stderr)
@@ -163,7 +182,7 @@ def main():
         "files_scanned": len(files),
         "findings_count": len(all_findings),
         "findings": sorted(all_findings, key=lambda x: (
-            0 if x["confidence"] == "high" else 1,
+            {"high": 0, "medium": 1, "low": 2}.get(x["confidence"], 3),
             x["file"],
             x["line"],
         )),

@@ -5,9 +5,7 @@ description: >
   detectables (vocabulario, estructura, ritmo, tono) y los transforma para
   producir texto con voz natural. Dos modos: review (diagnóstico) y rewrite
   (transformación). Soporte nativo de español con marcadores específicos.
-when_to_use: >
-  Cuando el usuario dice "humanizar", "humanize", "suena a IA", "suena artificial",
-  "suena falso", "hazlo más natural", "reescribir como humano", "quitar tono de IA",
+  Usar cuando: el usuario dice "humanizar", "suena a IA", "hazlo mas natural",
   o pide revisar/mejorar texto que parece generado por IA.
 argument-hint: "[review|rewrite] [archivo o texto]"
 disable-model-invocation: true
@@ -18,7 +16,7 @@ allowed-tools:
   - Edit
   - Write
   - Agent
-  - Bash(wc *)
+  - Bash(wc:*)
 ---
 
 # Humanize — Texto con voz real
@@ -232,7 +230,7 @@ DESPUÉS: "Pero hay un problema."
 |---|---|---|
 | Párrafos uniformes | Todos entre 60-120 palabras | Medir longitud de cada párrafo |
 | Listas simétricas | Siempre 3 o 5 items, estructura paralela perfecta | Contar items, verificar paralelismo |
-| Restamiento del tema | Primer párrafo repite la pregunta o el título | Leer apertura |
+| Reformulacion del tema | Primer párrafo repite la pregunta o el título | Leer apertura |
 | Transiciones predecibles | "Asimismo", "No obstante", "En este sentido" en cada párrafo | Contar transiciones formulaicas |
 | Cierre tipo resumen | Último párrafo empieza con "En conclusión", "En definitiva" | Leer cierre |
 | Headers genéricos | "Introducción", "Desarrollo", "Conclusiones" | Evaluar headers |
@@ -570,4 +568,4 @@ Después de reescribir, verificar:
 
 Si alguna verificación falla, ajustar antes de entregar.
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

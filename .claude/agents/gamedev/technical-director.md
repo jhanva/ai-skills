@@ -84,10 +84,10 @@ Valores de gameplay deben vivir en **Resources o JSON**, no hardcodeados.
 
 **BIEN:**
 ```gdscript
-# En weapon_data.tres (Resource)
-export var damage = 10
-export var fire_rate = 0.5
-export var ammo_capacity = 30
+# En weapon_data.gd (Resource, instanciado como weapon_data.tres)
+@export var damage := 10
+@export var fire_rate := 0.5
+@export var ammo_capacity := 30
 
 # En weapon.gd
 @export var data: WeaponData
@@ -136,11 +136,11 @@ func add_item(item: Item) -> bool:
     items.append(item)
     return true
 
-# inventory_test.gd (GUT framework)
+# inventory_test.gd (GDUnit4 framework)
 func test_add_item_success():
     var inv = Inventory.new()
     var item = Item.new()
-    assert_true(inv.add_item(item))
+    assert_that(inv.add_item(item)).is_true()
 ```
 
 **MAL:**

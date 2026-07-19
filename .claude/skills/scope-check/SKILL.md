@@ -5,16 +5,12 @@ description: >
   y stories (completadas vs pendientes), calcula velocity de sprints, proyecta tiempo
   restante, identifica riesgos (sistemas sin GDD, dependencies). Veredicto: ON TRACK,
   AT RISK, OVER-SCOPED. Si over-scoped, recomienda que mover de MVP a NICE.
-when_to_use: >
-  Cuando hay muchas features planeadas, el usuario dice "es mucho?", "llegamos?",
-  "scope", o antes de planear un sprint. Auto-invoke si detectas que el backlog crece
-  mas rapido que la velocity.
+  Usar cuando: hay muchas features planeadas, el usuario dice "es mucho?", "llegamos?", "scope", o antes de planear un sprint. Auto-invoke si el backlog crece mas rapido que la velocity.
 argument-hint: "[no arguments]"
 allowed-tools:
   - Read
   - Grep
   - Glob
-agent: producer
 ---
 
 # Scope Check

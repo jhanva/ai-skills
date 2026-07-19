@@ -4,10 +4,7 @@ description: >
   Disenar un sistema de juego especifico: inventario, dialogo, crafting,
   movement, abilities, etc. Produce spec con data model, formulas, edge cases,
   y acceptance criteria. Mismo rigor que /rpg-design.
-when_to_use: >
-  Cuando el usuario quiere disenar un sistema especifico del juego (no combate,
-  para eso usar /rpg-design), o cuando dice "design-system", "inventario",
-  "dialogo", "crafting", "movement", "abilities", "sistema de X".
+  Usar cuando: se quiere disenar un sistema especifico del juego (inventario, dialogo, crafting, movement, abilities; para combate usar /rpg-design).
 argument-hint: "<nombre del sistema>"
 disable-model-invocation: true
 allowed-tools:
@@ -16,7 +13,6 @@ allowed-tools:
   - Glob
   - Write
   - Agent
-agent: game-designer
 ---
 
 # Design System — Disenar sistemas de juego
@@ -569,4 +565,4 @@ ANTI-PATRON: Disenar sin considerar dependencias
   Solucion: declarar dependencias en FASE 2, implementar stubs si faltan
 ```
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

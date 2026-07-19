@@ -4,12 +4,7 @@ description: >
   Pipeline de assets pixel art: sprite sheets, animaciones, tilesets,
   palette swapping, import en Godot 4, Aseprite workflow. Disenar el
   flujo completo de Aseprite a Godot para juegos 2D.
-when_to_use: >
-  Cuando el usuario quiere disenar el pipeline de assets para un juego
-  pixel art, organizar sprites, configurar animaciones, o integrar
-  tilesets. Tambien cuando dice "pixel-pipeline", "sprite sheet",
-  "tileset", "palette swap", "texture atlas", "Aseprite", "pixel art",
-  "animaciones de sprites".
+  Usar cuando: se quiere disenar el pipeline de assets pixel art (sprite sheets, animaciones, tilesets, palette swap, Aseprite a Godot).
 argument-hint: "[aspecto del pipeline o problema especifico]"
 disable-model-invocation: true
 allowed-tools:
@@ -17,8 +12,8 @@ allowed-tools:
   - Grep
   - Glob
   - Agent
-  - Bash(find *)
-  - Bash(wc *)
+  - Bash(find:*)
+  - Bash(wc:*)
   - WebFetch
   - WebSearch
 ---
@@ -590,4 +585,4 @@ Producir documento con:
 
 Transicion: "Usa `/plan` para convertir este pipeline en tareas."
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

@@ -12,7 +12,6 @@ allowed-tools:
   - Grep
   - Glob
   - Bash
-agent: qa-analyst
 ---
 
 # Smoke Test

@@ -4,9 +4,7 @@ description: >
   Audita pipelines de procesamiento de imagenes en Android. Detecta riesgos de OOM
   por bitmaps sin samplear, EXIF ignorado, leaks de memoria, error handling silencioso,
   procesamiento en Main thread, y configuracion de Coil/Glide.
-when_to_use: >
-  Cuando el usuario dice "bitmap", "imagen", "image pipeline", "OOM", "memory",
-  "bitmap-safety", "image processing", o en proyectos que procesan imagenes.
+  Usar cuando: el usuario dice "bitmap", "imagen", "image pipeline", "OOM", "memory", "bitmap-safety", o en proyectos que procesan imagenes.
 argument-hint: "[ruta al proyecto Android]"
 disable-model-invocation: true
 allowed-tools:
@@ -14,9 +12,9 @@ allowed-tools:
   - Grep
   - Glob
   - Agent
-  - Bash(find *)
-  - Bash(wc *)
-  - Bash(git diff *)
+  - Bash(find:*)
+  - Bash(wc:*)
+  - Bash(git diff:*)
 ---
 
 # Bitmap Safety — Auditoria de pipelines de imagen
@@ -235,4 +233,4 @@ Libraries detectadas: [Coil 2.5.0, MediaPipe 0.10.9, etc.]
 Archivos de imagen escaneados: N
 ```
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

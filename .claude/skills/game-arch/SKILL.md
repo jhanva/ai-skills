@@ -4,11 +4,7 @@ description: >
   Arquitectura de juegos: game loop, composicion, state machines,
   command queue, scene stack, save system, rendering 2D.
   Validacion de patrones para juegos 2D con Godot 4/GDScript.
-when_to_use: >
-  Cuando el usuario quiere disenar la arquitectura de un juego,
-  validar patrones de gamedev, o estructurar un proyecto de juego.
-  Tambien cuando dice "game-arch", "game architecture", "game loop",
-  "state machine", "scene management", "save system", "ECS".
+  Usar cuando: se quiere disenar la arquitectura de un juego, validar patrones de gamedev, estructurar un proyecto, o el usuario dice "game loop", "state machine", "save system", "ECS".
 argument-hint: "[aspecto de arquitectura a disenar o validar]"
 disable-model-invocation: true
 allowed-tools:
@@ -16,8 +12,8 @@ allowed-tools:
   - Grep
   - Glob
   - Agent
-  - Bash(find *)
-  - Bash(wc *)
+  - Bash(find:*)
+  - Bash(wc:*)
   - WebFetch
   - WebSearch
 ---
@@ -655,4 +651,4 @@ Producir reporte con:
 
 Transicion: "Usa `/plan` para convertir esta arquitectura en tareas."
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

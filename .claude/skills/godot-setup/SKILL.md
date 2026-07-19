@@ -6,7 +6,6 @@ description: >
   actions, display settings, y export presets. Output: checklist de
   configuracion con valores concretos para project.godot y folder tree.
 disable-model-invocation: true
-agent: godot-architect
 allowed-tools:
   - Read
   - Grep
@@ -97,10 +96,16 @@ project_root/
 │   ├─ data/                # JSON, CSV, resource files
 │   └─ shaders/             # Custom shaders
 ├─ design/                  # Design documents (opcional, si estan en repo)
+│   ├─ gdd/                 # Game concept y GDDs por sistema
+│   ├─ levels/
 │   ├─ sprites/
 │   ├─ tilesets/
 │   ├─ audio/
-│   └─ levels/
+│   └─ scenes/              # Scene designs (/scene-design)
+├─ production/              # Sprints, stories, playtests
+│   ├─ sprints/
+│   ├─ stories/
+│   └─ playtests/
 ├─ tests/                   # Unit tests (GUT framework)
 └─ builds/                  # Export output (gitignored)
     ├─ windows/
@@ -135,9 +140,11 @@ mono_crash.*.json
 **Accion**: Crear directorios si no existen.
 
 ```bash
-mkdir -p src/{gameplay,core,ui,autoloads}
+mkdir -p src/{core,gameplay,ui,autoloads}
 mkdir -p scenes/{levels,characters,ui,prefabs}
 mkdir -p assets/{sprites,tiles,audio/{sfx,music,ambience},fonts,data,shaders}
+mkdir -p design/{gdd,levels,sprites,tilesets,audio,scenes}
+mkdir -p production/{sprints,stories,playtests}
 mkdir -p tests
 mkdir -p builds
 ```
@@ -611,13 +618,15 @@ progressive_web_app/enabled=false
 **Project**: [nombre del juego]
 **Engine**: Godot 4.x
 **Language**: GDScript
-**Date**: 2026-04-17
+**Date**: YYYY-MM-DD
 
 ## 1. Folder Structure
 
-- [ ] Crear directorios: src/{gameplay,core,ui,autoloads}
+- [ ] Crear directorios: src/{core,gameplay,ui,autoloads}
 - [ ] Crear directorios: scenes/{levels,characters,ui,prefabs}
 - [ ] Crear directorios: assets/{sprites,tiles,audio,fonts,data,shaders}
+- [ ] Crear directorios: design/{gdd,levels,sprites,tilesets,audio,scenes}
+- [ ] Crear directorios: production/{sprints,stories,playtests}
 - [ ] Crear directorios: tests, builds
 - [ ] Crear .gitignore con reglas de Godot
 

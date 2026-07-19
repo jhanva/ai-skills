@@ -48,6 +48,6 @@ Si el equipo o la politica del OS no permite symlinks reales:
 
 Hay al menos un caso real de symlink de archivo en:
 
-- `.claude/skills/secure/scripts/scan-secrets.py`
+- `.agents/skills/secure/scripts/scan-secrets.py`
 
 Si Windows no puede materializarlo como symlink real, el fallback portable es un archivo real, no un junction.

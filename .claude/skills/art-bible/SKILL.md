@@ -4,10 +4,7 @@ description: >
   Definir art bible para pixel art: resolucion, tile/character size,
   paleta (16-32 colores), estilo de sprites, reglas de animacion,
   UI style. Produce art-bible.md.
-when_to_use: >
-  Cuando el usuario quiere definir la estetica de un juego pixel art,
-  o cuando dice "art-bible", "paleta", "estilo visual", "pixel art",
-  "resolucion", "sprites", "definir arte".
+  Usar cuando: se quiere definir la estetica visual de un juego pixel art o el usuario dice "art-bible", "paleta", "estilo visual".
 argument-hint: "[estilo o referencia visual]"
 disable-model-invocation: true
 allowed-tools:
@@ -15,7 +12,6 @@ allowed-tools:
   - Grep
   - Glob
   - Write
-agent: pixel-artist
 ---
 
 # Art Bible — Definir estetica pixel art
@@ -639,4 +635,4 @@ ANTI-PATRON: Linear filtering "por defecto"
   Solucion: texture filter Nearest en settings globales
 ```
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

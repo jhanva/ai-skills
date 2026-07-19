@@ -12,7 +12,6 @@ allowed-tools:
   - Grep
   - Glob
   - Write
-agent: producer
 ---
 
 # Story Detailing
@@ -57,7 +56,7 @@ Ejemplo para /story combat/damage-formula:
 ```
 
 Si no existe:
-- Error: "GDD no encontrado para {system}. Usa `/brainstorm {system}` para crear el GDD primero."
+- Error: "GDD no encontrado para {system}. Usa `/design-system {system}` (GDD por sistema) o `/rpg-design` para crear el GDD primero."
 
 ### 1.2 Extraer contenido de la seccion
 
@@ -186,23 +185,25 @@ Types: Script, Scene, Resource, Asset, Config
 ### 4.3 Validar project structure
 
 Si detectas que los archivos rompen convenciones de Godot:
-- Warning: "src/combat/ no existe. Estructura recomendada: src/systems/combat/"
+- Warning: "src/combat/ no existe. Estructura recomendada: src/gameplay/combat/"
 - Sugerir estructura
 
-Estructura recomendada:
+Estructura recomendada (misma convencion que /godot-setup):
 ```
 src/
-  systems/         (game systems: combat, inventory, etc.)
-  entities/        (player, enemies, items)
+  core/            (state machine, resource pool, helpers compartidos)
+  gameplay/        (player, enemies, items, sistemas: combat, inventory)
   ui/              (HUD, menus, damage numbers)
-  utils/           (helpers, extensions)
+  autoloads/       (singletons: EventBus, managers)
 assets/
   sprites/
-  animations/
+  audio/
   data/
 scenes/
   levels/
+  characters/
   ui/
+  prefabs/
 ```
 
 ## FASE 5: Definir acceptance criteria
@@ -465,7 +466,7 @@ Archivo generado: production/stories/{system}-{feature}.md
 
 ### Seccion del GDD vacia o muy vaga
 Si la seccion del GDD es < 5 lineas o no tiene detalles:
-- Error: "Seccion {system}/{feature} muy vaga. Usa `/brainstorm {system}` para expandir el GDD primero."
+- Error: "Seccion {system}/{feature} muy vaga. Usa `/design-system {system}` para expandir el GDD primero."
 
 ### Story demasiado grande (score > 15)
 Warning: "Esta story es muy grande (score {X}). Dividir en sub-stories?"

@@ -3,11 +3,9 @@ name: game-designer
 description: >
   Especialista en diseño de sistemas de juego. Define mecanicas, balance matematico,
   progression systems, y game feel. Aplica MDA framework y systems thinking. Todo
-  data-driven, nada hardcoded.
-when_to_use: >
-  Al escribir o editar GDDs en design/, discutir mecanicas de gameplay, balance de
-  stats, sistemas RPG (combat, progression, items), formulas de damage/scaling, o
-  cualquier aspecto de game design.
+  data-driven, nada hardcoded. Usar cuando: se escriben o editan GDDs en design/, o
+  se discuten mecanicas de gameplay, balance de stats, sistemas RPG (combat,
+  progression, items), formulas de damage/scaling, o cualquier aspecto de game design.
 model: sonnet
 tools: [Read, Grep, Glob, Write, Edit, Agent]
 ---
@@ -326,6 +324,8 @@ Formula compleja sin explicacion es imposible de balancear. Documentar cada vari
 proveer ejemplos, generar validation tables.
 
 ## Integracion con skills
+
+Estas skills las invoca el usuario; este agent solo referencia y consume su output:
 
 - `/rpg-design`: diseño completo de sistema RPG (stats, combat, progression)
 - `/design-system`: diseño de sistema arbitrario con MDA framework

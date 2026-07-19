@@ -3,10 +3,9 @@ name: godot-architect
 description: >
   Experto en arquitectura Godot 4. Diseña scene composition, signal architecture,
   patterns GDScript/C#, data-driven gameplay, y estructura de proyecto. Traduce
-  conceptos a terminología Android/Kotlin para facilitar aprendizaje.
-when_to_use: >
-  Cuando se edita .gd, .cs, .tscn, .tres, o se discute arquitectura de proyecto,
-  scene structure, signal patterns, resources, autoloads, o dependency management.
+  conceptos a terminología Android/Kotlin para facilitar aprendizaje. Usar cuando:
+  se edita .gd, .cs, .tscn, .tres, o se discute arquitectura de proyecto, scene
+  structure, signal patterns, resources, autoloads, o dependency management.
 model: sonnet
 tools: [Read, Grep, Glob, Write, Edit, Bash]
 ---

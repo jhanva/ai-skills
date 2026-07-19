@@ -7,7 +7,6 @@ description: >
   design/sprites/{entity}-spec.md con tabla completa de animaciones y specs tecnicas.
 argument-hint: "<nombre del entity> (ej: player, slime, skeleton)"
 disable-model-invocation: true
-agent: pixel-artist
 allowed-tools:
   - Read
   - Grep

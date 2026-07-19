@@ -5,11 +5,9 @@ description: >
   Cubre hashing, similarity, clustering, quality scoring, y deteccion.
   Incluye edge cases especificos de imagen, metricas de accuracy,
   y analisis de complejidad on-device.
-when_to_use: >
-  Cuando el usuario quiere disenar un algoritmo de imagen nuevo: similarity,
-  hashing, clustering, quality scoring, deteccion, clasificacion.
-  Tambien cuando dice "image-algo", "algoritmo de imagen", "como comparo imagenes",
-  "como detecto duplicados", "como mido calidad".
+  Usar cuando: se quiere disenar un algoritmo de imagen nuevo (similarity,
+  hashing, clustering, quality scoring, deteccion) o el usuario pregunta
+  como comparar imagenes, detectar duplicados o medir calidad.
 argument-hint: "[descripcion del problema]"
 disable-model-invocation: true
 allowed-tools:
@@ -17,8 +15,8 @@ allowed-tools:
   - Grep
   - Glob
   - Agent
-  - Bash(find *)
-  - Bash(wc *)
+  - Bash(find:*)
+  - Bash(wc:*)
   - WebFetch
   - WebSearch
 ---
@@ -94,7 +92,7 @@ Proponer 2-3 approaches con tradeoffs claros. Para cada uno:
 **Hybrid:**
 - Combinar approaches para balancear velocidad y accuracy
 - Ejemplo: pre-filtro rapido (pHash) + validacion fina (ML embedding)
-- Ejemplo: centroid similarity + topK scoring (como ImageSorter)
+- Ejemplo: centroid similarity + topK scoring
 
 ### Tabla comparativa por approach
 
@@ -224,4 +222,4 @@ Cuando el usuario aprueba la spec:
 - Si requiere pipeline multi-paso: "Usa `/image-pipeline` para disenar la arquitectura del pipeline"
 - Si esta listo para implementar: "Usa `/plan` para convertir esto en tareas"
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS
