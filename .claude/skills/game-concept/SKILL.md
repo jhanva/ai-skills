@@ -245,7 +245,7 @@ Definir plataforma, audiencia, y session length.
 ### Plataforma
 a) PC (Steam, itch.io)
 b) Mobile (Android/iOS)
-c) Web (navegador, HTML5 export)
+c) Web (navegador, export Web de Godot)
 d) Consola (Switch, PlayStation, Xbox — requiere devkit)
 
 ¿Plataforma target?

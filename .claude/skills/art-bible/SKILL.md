@@ -282,7 +282,7 @@ Estas reglas son OBLIGATORIAS para mantener pixel art limpio:
 
 | Regla | Implementacion Godot 4 |
 |---|---|
-| Integer scaling ONLY | `window/stretch/mode = "canvas_items"` |
+| Integer scaling ONLY | `window/stretch/mode = "canvas_items"` + `window/stretch/scale_mode = "integer"` |
 | Nearest-neighbor filter | `rendering/textures/canvas_textures/default_texture_filter = 0` |
 | No rotaciones sub-pixel | Sprites solo 0°/90°/180°/270° o pre-render rotaciones |
 | Camera snap to pixel grid | `camera.position = camera.position.round()` cada frame |

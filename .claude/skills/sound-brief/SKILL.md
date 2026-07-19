@@ -23,7 +23,7 @@ Define specs completas de audio para sistemas de juego o zonas: SFX list con tri
 
 **Objetivo**: Cargar informacion del sistema/zona para definir audio apropiado.
 
-1. Buscar y leer `design/game-concept.md` o `design/GDD.md`
+1. Buscar y leer `design/gdd/game-concept.md` o `design/GDD.md`
 2. Extraer datos criticos:
    - Genero del juego (RPG, platformer, action, puzzle)
    - Mood general (dark, cheerful, tense, relaxing)

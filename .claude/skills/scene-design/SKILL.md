@@ -100,7 +100,7 @@ Node2D (root)
   ├─ TileMap (ground layer)
   ├─ TileMap (objects layer)
   ├─ TileMap (above layer)
-  ├─ YSort (for entities con depth sorting)
+  ├─ Entities (Node2D, y_sort_enabled = true para depth sorting)
   │   ├─ Player (instanced scene)
   │   ├─ Enemy1 (instanced scene)
   │   └─ Enemy2 (instanced scene)
@@ -133,7 +133,7 @@ Area2D (root)
    - Area2D: Triggers, hitboxes, hurtboxes
    - Control: UI elements
    - Node2D: Generic containers, levels
-2. **Visual nodes**: Children directos del root (o de YSort si hay depth)
+2. **Visual nodes**: Children directos del root (o de un Node2D con y_sort_enabled si hay depth)
    - Sprite2D: Static sprites
    - AnimatedSprite2D: Animated sprites (multiple states)
 3. **Collision nodes**: Siempre children del physics node (CharacterBody2D, Area2D)

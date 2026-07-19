@@ -2,8 +2,8 @@
 name: pixel-pipeline
 description: >
   Pipeline de assets pixel art: sprite sheets, animaciones, tilesets,
-  palette swapping, texture atlases, Aseprite workflow. Disenar el
-  flujo completo de arte a codigo para juegos 2D.
+  palette swapping, import en Godot 4, Aseprite workflow. Disenar el
+  flujo completo de Aseprite a Godot para juegos 2D.
 when_to_use: >
   Cuando el usuario quiere disenar el pipeline de assets para un juego
   pixel art, organizar sprites, configurar animaciones, o integrar
@@ -27,10 +27,10 @@ allowed-tools:
 
 ## Objetivo
 
-Disenar el flujo completo desde arte pixel art hasta juego funcional:
-resolucion, sprite sheets, animaciones, tilesets, palette management,
-y atlas packing. El output es una spec de pipeline y convenciones
-lista para el equipo de arte y desarrollo.
+Disenar el flujo completo desde Aseprite hasta juego funcional en
+Godot 4: resolucion, sprite sheets, animaciones, tilesets, palette
+management, y organizacion e import de sheets. El output es una spec
+de pipeline y convenciones lista para el equipo de arte y desarrollo.
 
 ---
 
@@ -103,7 +103,8 @@ Ejemplos:
   slime_hurt_0.png
 ```
 
-Este naming permite que TexturePacker agrupe automaticamente por entity+animation.
+Este naming permite agrupar frames por entity+animation al construir
+el SpriteFrames o al slicear el sheet en Godot.
 
 ### 2.2 Animation states standard
 
@@ -164,37 +165,45 @@ Definir set minimo de animaciones por tipo de entity:
 }
 ```
 
-### 2.4 Animation controller
+### 2.4 Animation controller (Godot 4)
 
-```kotlin
-class AnimationController(private val animations: Map<String, AnimationData>) {
-    private var current: String = "idle"
-    private var stateTime: Float = 0f
-    private var onComplete: (() -> Unit)? = null
+En Godot el playback lo maneja `AnimatedSprite2D` + `SpriteFrames`.
+Para mantener el sistema data-driven, construir el SpriteFrames desde
+el JSON de 2.3 (regiones del sheet via AtlasTexture):
 
-    fun play(name: String, onComplete: (() -> Unit)? = null) {
-        if (name == current) return
-        current = name
-        stateTime = 0f
-        this.onComplete = onComplete
-    }
+```gdscript
+# src/core/animation_builder.gd
+static func build_frames(sheet: Texture2D, data: Dictionary,
+        regions: Dictionary) -> SpriteFrames:
+    var frames := SpriteFrames.new()
+    for anim_name in data:
+        var anim: Dictionary = data[anim_name]
+        frames.add_animation(anim_name)
+        frames.set_animation_loop(anim_name, anim["loop"])
+        frames.set_animation_speed(anim_name, 1.0 / anim["frameDuration"])
+        for frame_name in anim["frames"]:
+            var tex := AtlasTexture.new()
+            tex.atlas = sheet
+            tex.region = regions[frame_name]  # Rect2 del JSON de Aseprite
+            frames.add_frame(anim_name, tex)
+    return frames
+```
 
-    fun update(delta: Float): TextureRegion {
-        stateTime += delta
-        val anim = animations[current]!!
-        val frame = anim.getFrame(stateTime)
+```gdscript
+# src/core/animation_controller.gd
+class_name AnimationController
+extends AnimatedSprite2D
 
-        if (!anim.loop && anim.isFinished(stateTime)) {
-            onComplete?.invoke()
-            onComplete = null
-        }
+func play_anim(anim_name: String, on_complete: Callable = Callable()) -> void:
+    if animation == anim_name and is_playing():
+        return
+    play(anim_name)
+    if on_complete.is_valid() and not sprite_frames.get_animation_loop(anim_name):
+        animation_finished.connect(on_complete, CONNECT_ONE_SHOT)
 
-        return frame
-    }
-
-    val isPlaying: Boolean
-        get() = animations[current]?.let { !it.loop && !it.isFinished(stateTime) } ?: false
-}
+var is_playing_one_shot: bool:
+    get:
+        return is_playing() and not sprite_frames.get_animation_loop(animation)
 ```
 
 ---
@@ -230,35 +239,49 @@ Bitmask 8-bit (completo, 47 tiles):
 
 Recomendacion: empezar con 4-bit (16 tiles), migrar a 8-bit si el juego lo necesita.
 
-### 3.3 Tiled editor integration
+### 3.3 Integracion en Godot (TileSet + TileMapLayer)
 
 ```
 Workflow:
   1. Crear tileset en Aseprite (exportar como PNG)
-  2. Importar PNG en Tiled, definir tile properties
-  3. Pintar mapa con layers:
-     - ground     (z=0, siempre debajo)
-     - objects    (z=1, arboles, rocas)
-     - above      (z=2, techos, copas de arboles — sobre player)
-     - collision  (invisible, marca tiles no-walkable)
-     - events     (invisible, triggers: spawn, door, dialog)
-  4. Exportar como TMX
-  5. LibGDX carga TMX con TmxMapLoader
+  2. Importar PNG en Godot y crear un TileSet resource:
+     - Atlas source apuntando al PNG (tile size = grid del proyecto)
+     - Physics layer para colision (polygon por tile solido)
+     - Terrain sets para autotile (bitmask 4-bit o 8-bit de 3.2)
+     - Custom data layers para metadata (ej: "blocked", "damage")
+  3. Pintar el mapa con nodos TileMapLayer (uno por capa visual):
+     - Ground     (z_index=0, siempre debajo)
+     - Objects    (z_index=1, arboles, rocas)
+     - Above      (z_index=2, techos, copas de arboles — sobre player)
+  4. Colision: NO usar un layer invisible de tiles — la physics layer
+     del TileSet colisiona automaticamente con CharacterBody2D
+  5. Events (spawn, door, dialog): nodos Area2D/Marker2D en la escena
+     del nivel, o custom data en tiles + query desde codigo
 ```
 
-### 3.4 Collision layer
+### 3.4 Walkability y pathfinding
 
-```kotlin
-fun isWalkable(tileX: Int, tileY: Int): Boolean {
-    val collisionLayer = map.layers["collision"] as TiledMapTileLayer
-    return collisionLayer.getCell(tileX, tileY) == null  // null = walkable
-}
+```gdscript
+@onready var ground: TileMapLayer = $Ground
 
-// Pathfinding: A* sobre grid de tiles
-fun findPath(start: TilePos, end: TilePos): List<TilePos> {
-    // A* con isWalkable como constraint
-    // Heuristic: Manhattan distance (4-way) o Chebyshev (8-way)
-}
+func is_walkable(tile_pos: Vector2i) -> bool:
+    var data: TileData = ground.get_cell_tile_data(tile_pos)
+    return data != null and not data.get_custom_data("blocked")
+
+# Pathfinding: AStarGrid2D (A* sobre grid, built-in en Godot 4)
+var astar := AStarGrid2D.new()
+
+func _setup_pathfinding() -> void:
+    astar.region = ground.get_used_rect()
+    astar.cell_size = Vector2(16, 16)
+    astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER  # 4-way
+    astar.update()
+    for cell in ground.get_used_cells():
+        if not is_walkable(cell):
+            astar.set_point_solid(cell, true)
+
+func find_path(start: Vector2i, end: Vector2i) -> Array[Vector2i]:
+    return astar.get_id_path(start, end)
 ```
 
 ---
@@ -286,21 +309,27 @@ Paleta base (ejemplo 16 colores):
 Recolorear sprites en runtime sin duplicar arte:
 
 ```glsl
-// Fragment shader
-uniform sampler2D u_texture;      // sprite original
-uniform sampler2D u_palette;      // lookup texture (1xN)
-uniform float u_paletteRow;       // cual paleta usar (0.0 = base, 0.5 = alt)
+// palette_swap.gdshader (canvas_item shader de Godot 4)
+shader_type canvas_item;
 
-void main() {
-    vec4 color = texture2D(u_texture, v_texCoord);
+uniform sampler2D u_palette : filter_nearest;  // lookup texture (Nx filas)
+uniform float u_palette_row = 0.0;             // cual paleta usar (0.0 = base)
+
+void fragment() {
+    vec4 color = texture(TEXTURE, UV);
 
     // Usar canal rojo como indice en la lookup texture
     float index = color.r;
-    vec4 swapped = texture2D(u_palette, vec2(index, u_paletteRow));
+    vec4 swapped = texture(u_palette, vec2(index, u_palette_row));
 
-    gl_FragColor = vec4(swapped.rgb, color.a);
+    COLOR = vec4(swapped.rgb, color.a);
 }
 ```
+
+Aplicar via ShaderMaterial en el Sprite2D/AnimatedSprite2D. Para
+variantes por instancia sin duplicar material, usar
+`material.set_shader_parameter("u_palette_row", row)` sobre un
+material unico por variante (o instance uniforms).
 
 ### 4.3 Uso de palette swap
 
@@ -324,7 +353,7 @@ void main() {
 
 ---
 
-## FASE 5: TextureAtlas y packing
+## FASE 5: Sprite sheets e import en Godot
 
 ### 5.1 Aseprite export workflow
 
@@ -338,77 +367,101 @@ Aseprite → File → Export Sprite Sheet
   Split tags: SI (cada tag = una animacion)
 ```
 
-### 5.2 LibGDX TexturePacker
+### 5.2 Import en Godot 4 (sin packer externo)
+
+Godot 4 NO necesita un paso de atlas packing con herramienta externa.
+El editor importa los PNG directamente (genera `*.import` + cache en
+`.godot/`) y el renderer 2D batchea draw calls automaticamente. La
+unidad de trabajo es el sprite sheet por entity que exporta Aseprite.
 
 ```
-Directorio de input:
-  raw/
-    player/
-      player_idle_0.png
-      player_idle_1.png
-      player_walk_down_0.png
-      ...
-    slime/
-      slime_idle_0.png
-      ...
+Directorio de assets (Godot lo importa tal cual):
+  assets/
+    sprites/
+      player.png        ← sheet exportado de Aseprite (5.1)
+      player.json       ← metadata de frames (Aseprite)
+      slime.png
+      slime.json
     tiles/
-      grass.png
-      water_0.png
-      ...
+      terrain.png
+      buildings.png
+    ui/
+      ui.png
 
-Comando:
-  java -cp gdx-tools.jar com.badlogic.gdx.tools.texturepacker.TexturePacker
-       raw/ assets/ game
+Como se consume cada tipo:
+  Sprite sheets → SpriteFrames (AnimatedSprite2D), regiones via
+                  AtlasTexture (ver 2.4)
+  Tilesets      → TileSet resource con atlas source al PNG (ver 3.3)
+  UI            → AtlasTexture por icono, NinePatchRect para panels
 
-Output:
-  assets/game.atlas   (metadata)
-  assets/game.png     (packed texture)
+Cuando SI consolidar:
+  - Cientos de PNG sueltos de 1 frame → consolidar en un sheet por
+    entity (menos archivos .import, menos texture switches)
+  - NO hace falta un atlas global del juego: agrupar por contexto
+    (5.4) es suficiente
 ```
 
-### 5.3 Pack settings
+### 5.3 Import settings (pixel art)
 
-```json
-{
-  "pot": true,
-  "paddingX": 2,
-  "paddingY": 2,
-  "edgePadding": true,
-  "duplicatePadding": true,
-  "bleed": true,
-  "maxWidth": 2048,
-  "maxHeight": 2048,
-  "filterMin": "Nearest",
-  "filterMag": "Nearest",
-  "stripWhitespaceX": false,
-  "stripWhitespaceY": false
-}
+Filtering en Godot 4 es global (project setting) con override por
+nodo, NO una opcion de import por textura:
+
+```ini
+# project.godot (igual que /godot-setup y /art-bible)
+[rendering]
+textures/canvas_textures/default_texture_filter=0  # Nearest
+2d/snap/snap_2d_transforms_to_pixel=true  # Pixel snap (Godot 4)
+```
+
+En el dock Import, por textura:
+
+```
+Compress > Mode: Lossless
+Mipmaps > Generate: Off
+Detect 3D: Disabled
 ```
 
 | Setting | Valor | Por que |
 |---|---|---|
-| filterMin/Mag | Nearest | Pixel art, nunca Linear |
-| paddingX/Y | 2 | Evita bleeding entre sprites |
-| bleed | true | Repite edge pixels para evitar seams |
-| maxWidth/Height | 2048 | Soporte universal en mobile |
-| stripWhitespace | false | Mantener posicion de sprites para alignment |
+| default_texture_filter | 0 (Nearest) | Pixel art, nunca Linear |
+| Compress Mode | Lossless | Compresion VRAM (S3TC/ETC) destruye pixel art |
+| Mipmaps | Off | Innecesarios en 2D, causan blur al escalar |
+| Padding en sheets | 2px entre frames | Evita bleeding al recortar AtlasTexture |
+| Sheet size | <= 2048x2048 | Soporte universal en mobile |
 
-### 5.4 Atlas por contexto
+Si un nodo especifico necesita otro filtering, usar
+`CanvasItem.texture_filter = TEXTURE_FILTER_NEAREST` — nunca cambiar
+el default global a Linear.
 
-No empaquetar TODO en un solo atlas. Separar por uso:
+### 5.4 Sheets por contexto
+
+No consolidar TODO en un solo sheet. Separar por uso y cargar por
+contexto:
 
 ```
-characters.atlas  → player, party, NPCs (siempre cargados en explore)
-enemies.atlas     → sprites de enemigos (cargados en batalla)
-tiles.atlas       → tilesets (cargados por zona/mapa)
-ui.atlas          → iconos, frames, fonts (siempre cargados)
-effects.atlas     → particulas, spell effects (cargados en batalla)
+characters.png  → player, party, NPCs (siempre cargados en explore)
+enemies.png     → sprites de enemigos (cargados en batalla)
+tiles/*.png     → tilesets (cargados por zona/mapa)
+ui.png          → iconos, frames, fonts (siempre cargados)
+effects.png     → particulas, spell effects (cargados en batalla)
+```
+
+```gdscript
+# Siempre cargados: preload (resuelto en compile/parse time)
+const UI_SHEET := preload("res://assets/ui/ui.png")
+
+# Por zona/contexto: load al entrar, soltar referencias al salir
+var zone_tiles: Texture2D = load("res://assets/tiles/%s.png" % zone_name)
+
+# Zonas pesadas: carga en background sin frame hitch
+ResourceLoader.load_threaded_request("res://scenes/levels/zone_2.tscn")
 ```
 
 ### 5.5 Memory budget
 
 ```
-Atlas 2048x2048 RGBA = 16MB en VRAM
-Atlas 1024x1024 RGBA = 4MB en VRAM
+Sheet 2048x2048 RGBA = 16MB en VRAM
+Sheet 1024x1024 RGBA = 4MB en VRAM
 
 Budget para mobile:
   Characters: 1x 1024x1024 = 4MB
@@ -418,7 +471,7 @@ Budget para mobile:
   Effects:    1x 512x512   = 1MB
   TOTAL: ~29MB VRAM en peak (batalla)
 
-Regla: total atlas VRAM < 64MB en mobile
+Regla: total sheets VRAM < 64MB en mobile
 ```
 
 ---
@@ -436,20 +489,24 @@ Crear 9-patch en Aseprite:
     → Los bordes se repiten/estiran
     → El centro se llena
 
-En LibGDX:
-  NinePatch(atlas.findRegion("dialog_box"), 3, 3, 3, 3)
+En Godot:
+  NinePatchRect con texture = dialog_box (o region del sheet de UI)
+  patch_margin_left/top/right/bottom = 3
+  axis_stretch_horizontal/vertical = Stretch o Tile (segun el borde)
 ```
 
 ### 6.2 Pixel font
 
 ```
 Opciones:
-  1. Bitmap font generado con BMFont/Hiero
+  1. Bitmap font generado con BMFont (o exportado de Aseprite)
      → Export como .fnt + .png
-     → Asegurar Nearest filtering
+     → Godot lo importa directo como FontFile
+     → Nearest filtering via default_texture_filter global
 
   2. Pixel font sprite sheet
-     → Cada caracter como region en atlas
+     → Cada caracter como celda del sheet
+     → En Godot: FontFile creado desde imagen (image font)
      → Alineado a grid (monospace recomendado para pixel)
 
 Regla: tamano de font = multiplo del pixel size base
@@ -475,25 +532,28 @@ Regla: tamano de font = multiplo del pixel size base
 ### 7.2 Validacion tecnica
 
 ```
-[ ] TextureAtlas usado (no texturas sueltas en produccion)
-[ ] Atlas size <= 2048x2048 (compatibilidad mobile)
-[ ] Padding >= 2 en atlas packing
+[ ] Sheets por entity/contexto (no cientos de PNG de 1 frame en produccion)
+[ ] Sheet size <= 2048x2048 (compatibilidad mobile)
+[ ] Padding >= 2 entre frames dentro del sheet
 [ ] Todos los sprites en la misma pixels-per-unit
 [ ] Camera snapping a pixel grid implementado
-[ ] Dispose de texturas en Screen.dispose()
-[ ] No se cargan atlas innecesarios (por zona/contexto)
+[ ] Import: Compress Lossless + Mipmaps Off en todas las texturas
+[ ] No se cargan sheets innecesarios (load por zona/contexto,
+    soltar referencias al salir para que Godot libere VRAM)
 ```
 
 ### 7.3 Anti-patrones
 
 ```
-ANTI-PATRON: Texturas sueltas en assets/
-  → Cada textura = 1 draw call = performance muerte
-  Solucion: empaquetar en TextureAtlas
+ANTI-PATRON: Un PNG suelto por frame en produccion
+  → Cientos de archivos .import, texture switches innecesarios
+  → (Godot batchea draw calls, pero el desorden y los switches quedan)
+  Solucion: sheet por entity + SpriteFrames/AtlasTexture
 
 ANTI-PATRON: Linear filtering en pixel art
   → Sprites borrosos, bleeding entre frames
-  Solucion: Nearest en atlas settings Y en codigo
+  Solucion: default_texture_filter=0 en project.godot, sin
+  overrides Linear en texture_filter de nodos
 
 ANTI-PATRON: Rotacion con angulos arbitrarios
   → Pixels deformados, apariencia inconsistente
@@ -520,12 +580,13 @@ Producir documento con:
 
 1. **Convenciones:** resolucion, grid, paleta, render resolution
 2. **Sprite list:** tabla de entities con animaciones y frame counts
-3. **Tileset plan:** tilesets necesarios, autotile type, layer structure
-4. **Atlas strategy:** atlas por contexto con memory budget
+3. **Tileset plan:** tilesets necesarios, autotile type (terrain sets), TileMapLayers
+4. **Sheet strategy:** sheets por contexto con memory budget
 5. **Animation data format:** JSON schema para animaciones
 6. **Palette system:** paleta base + variantes + shader approach
 7. **Aseprite workflow:** export settings, naming convention, batch export
-8. **Integration:** como se cargan los assets en LibGDX (code snippets)
+8. **Integration:** como se importan y cargan los assets en Godot 4
+   (import settings, SpriteFrames, TileSet, code snippets)
 
 Transicion: "Usa `/plan` para convertir este pipeline en tareas."
 

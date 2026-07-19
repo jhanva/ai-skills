@@ -43,7 +43,7 @@ Si no se proporciona numero, calcular automaticamente: ultimo sprint + 1
 
 ### 1.1 Leer game concept
 
-Leer `design/game-concept.md`:
+Leer `design/gdd/game-concept.md`:
 - MVP mechanics: cuales son las mecanicas core que deben funcionar?
 - Scope: que esta dentro del MVP vs NICE?
 - Milestone actual: donde estamos en el desarrollo?
@@ -343,7 +343,7 @@ Archivo generado: production/sprints/sprint-{N}.md
 ## Edge cases
 
 ### Sin game-concept.md
-Error: "No se encontro design/game-concept.md. Debes crear el game concept primero."
+Error: "No se encontro design/gdd/game-concept.md. Debes crear el game concept primero."
 
 ### Sin GDDs
 Warning: "No hay GDDs en design/gdd/. Considera usar `/brainstorm` para diseñar sistemas antes de planear sprints."

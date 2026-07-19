@@ -470,7 +470,7 @@ window/stretch/scale_mode="integer"
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0  # Nearest neighbor (no blur)
-2d/snapping/use_gpu_pixel_snap=true  # Pixel snap enabled
+2d/snap/snap_2d_transforms_to_pixel=true  # Pixel snap enabled (Godot 4)
 ```
 
 ### Aspect ratio y scaling
@@ -511,7 +511,7 @@ textures/canvas_textures/default_texture_filter=0  # Nearest neighbor (no blur)
 |----------|-------------|----------|-------|
 | Windows Desktop | game.exe | DirectX/Vulkan, gamepad | Mas facil para testing |
 | Linux/X11 | game.x86_64 | Vulkan, gamepad | Universal compatibility |
-| HTML5 (Web) | index.html | WebGL 2, touch/mouse | Itch.io, Newgrounds |
+| Web | index.html | WebGL 2, touch/mouse | Itch.io, Newgrounds |
 | macOS | game.app | Metal, gamepad | Requiere certificado (opcional) |
 
 ### Export preset: Windows
@@ -527,7 +527,7 @@ textures/canvas_textures/default_texture_filter=0  # Nearest neighbor (no blur)
 **Custom Resources**: Excluir archivos innecesarios
 - Excluir: `design/*`, `tests/*`, `*.md`, `.git`
 
-### Export preset: HTML5
+### Export preset: Web
 
 **Settings**:
 - Export Path: `builds/web/index.html`
@@ -572,8 +572,8 @@ binary_format/embed_pck=true
 
 [preset.1]
 
-name="HTML5"
-platform="HTML5"
+name="Web"
+platform="Web"
 runnable=true
 export_filter="all_resources"
 exclude_filter="design/*, tests/*, *.md, .git*"
@@ -657,10 +657,10 @@ progressive_web_app/enabled=false
 ## 6. Export Presets
 
 - [ ] Configurar Windows Desktop export
-- [ ] Configurar HTML5 export (opcional)
+- [ ] Configurar Web export (opcional)
 - [ ] Set exclude filters (design/*, tests/*, .git*)
 - [ ] Testear build Windows
-- [ ] Testear build HTML5
+- [ ] Testear build Web
 
 ## 7. Testing
 
@@ -699,7 +699,7 @@ interact={...}
 
 [rendering]
 textures/canvas_textures/default_texture_filter=0
-2d/snapping/use_gpu_pixel_snap=true
+2d/snap/snap_2d_transforms_to_pixel=true
 ```
 
 **.gitignore**:

@@ -238,16 +238,34 @@ Ejemplos:
 
 ### Integracion en Godot
 
-**AnimatedSprite2D setup**:
-```gdscript
-# Si usa sprite sheet:
-sprite_frames = preload("res://assets/sprites/player_spritesheet.png")
-hframes = 10  # columnas
-vframes = 5   # filas
+**AnimatedSprite2D setup** (Godot 4):
 
-# Si usa frames individuales:
-# Godot auto-detecta secuencia player_idle_*.png
+`AnimatedSprite2D.sprite_frames` espera un recurso `SpriteFrames`, NO una
+textura. Opcion recomendada: crear `player_frames.tres` en el editor (panel
+SpriteFrames: New Animation + Add frames from sprite sheet) y asignarlo al
+nodo. Equivalente via codigo, recortando el sheet con AtlasTexture:
+
+```gdscript
+var frames := SpriteFrames.new()
+frames.add_animation("idle")
+frames.set_animation_speed("idle", 8.0)  # FPS de la tabla de FASE 3
+var sheet := preload("res://assets/sprites/player_spritesheet.png")
+for i in 6:  # 6 frames de idle en la fila 0, frame size 32x32
+    var atlas := AtlasTexture.new()
+    atlas.atlas = sheet
+    atlas.region = Rect2(i * 32, 0, 32, 32)
+    frames.add_frame("idle", atlas)
+$AnimatedSprite2D.sprite_frames = frames
+$AnimatedSprite2D.play("idle")
 ```
+
+Alternativa: `Sprite2D` con `hframes`/`vframes` (esas propiedades son de
+Sprite2D, no de AnimatedSprite2D) + un `AnimationPlayer` que anime la
+propiedad `frame`. Util cuando se necesitan tracks sincronizados (SFX,
+hitboxes) junto a la animacion.
+
+Nota: Godot NO auto-detecta secuencias tipo `player_idle_*.png`; los frames
+individuales se agregan uno a uno al SpriteFrames (editor o `add_frame`).
 
 **Metadata adicional**:
 - Crear archivo `{entity}.tres` (SpriteFrames resource) con todas las animaciones configuradas

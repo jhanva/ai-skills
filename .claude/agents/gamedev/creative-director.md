@@ -5,7 +5,7 @@ description: >
   arbitraje entre arte y diseno. Invocar para conflictos cross-dominio creativos,
   review de concepto, validacion de art bible, o cuando arte y mecanicas no se alinean.
 model: opus
-tools: [Read, Grep, Glob]
+tools: [Read, Grep, Glob, Write, Edit, Agent]
 color: purple
 ---
 

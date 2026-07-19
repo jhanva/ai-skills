@@ -199,11 +199,9 @@ mkdir -p production/sprints
 mkdir -p tests
 ```
 
-Si `LANGUAGE == "csharp"`, tambien crear:
-
-```bash
-mkdir -p src/.csproj  # placeholder para proyecto C#
-```
+Si `LANGUAGE == "csharp"`, NO crear el `.csproj` a mano: es un archivo XML
+que Godot genera automaticamente al crear la solucion C#
+(Project > Tools > C# > Create C# Solution) o al agregar el primer script C#.
 
 ---
 
@@ -282,7 +280,7 @@ Explicar configuracion:
 | Setting | Valor | Por que |
 |---|---|---|
 | viewport_width/height | 1280x720 | Base resolution (16:9) |
-| mode | 2 | Fullscreen |
+| mode | 2 | Maximized (fullscreen = 3, exclusive fullscreen = 4) |
 | stretch/mode | canvas_items | Mantener pixel art sin blur |
 | texture_filter | 0 | Nearest (critico para pixel art) |
 
@@ -343,7 +341,7 @@ Archivos listos para git:
   - Directory structure for code, assets, design, and production
   - Godot 4 project with pixel-perfect settings
 
-  Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
+  Co-Authored-By: Claude <noreply@anthropic.com>"
 ```
 
 ---

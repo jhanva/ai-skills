@@ -4,7 +4,9 @@
 #
 # Orden de preferencia:
 #   1. jq (parser robusto, si esta disponible)
-#   2. python3 (disponible en macOS y la mayoria de distros)
+#   2. python / python3 / py (el primero que ejecute de verdad; en Windows
+#      "python3" puede ser el alias stub de Microsoft Store, que command -v
+#      encuentra pero falla al ejecutar — por eso se valida con una ejecucion real)
 #   3. error: aborta con mensaje a stderr y devuelve empty
 #
 # NO se usa regex-over-string como fallback: un parser "naive" no distingue
@@ -32,6 +34,20 @@ else:
     print(node)
 '
 
+_PARSE_PYTHON=""
+
+_parse_find_python() {
+  [ -n "$_PARSE_PYTHON" ] && return 0
+  local cmd
+  for cmd in python python3 py; do
+    if command -v "$cmd" >/dev/null 2>&1 && "$cmd" -c "import json" >/dev/null 2>&1; then
+      _PARSE_PYTHON="$cmd"
+      return 0
+    fi
+  done
+  return 1
+}
+
 _parse_path() {
   local input="$1" path="$2"
   # Validate path contains only safe characters (alphanumeric, dots, underscores)
@@ -41,10 +57,10 @@ _parse_path() {
   fi
   if command -v jq >/dev/null 2>&1; then
     printf '%s' "$input" | jq -r ".${path} // empty" 2>/dev/null
-  elif command -v python3 >/dev/null 2>&1; then
-    printf '%s' "$input" | python3 -c "$_PARSE_PY" "$path" 2>/dev/null
+  elif _parse_find_python; then
+    printf '%s' "$input" | "$_PARSE_PYTHON" -c "$_PARSE_PY" "$path" 2>/dev/null
   else
-    echo "hooks/_parse.sh: requires jq or python3 to parse JSON" >&2
+    echo "hooks/_parse.sh: requires jq or python (python/python3/py) to parse JSON" >&2
     return 1
   fi
 }

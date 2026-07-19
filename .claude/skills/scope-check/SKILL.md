@@ -47,14 +47,14 @@ Sin argumentos. Auto-invocable cuando detectas señales de scope creep.
 
 ### 1.1 Localizar game concept
 
-Buscar `design/game-concept.md`:
+Buscar `design/gdd/game-concept.md`:
 
 ```
-Read: design/game-concept.md
+Read: design/gdd/game-concept.md
 ```
 
 Si no existe:
-- Error: "No se encontro design/game-concept.md. Debes definir el MVP primero."
+- Error: "No se encontro design/gdd/game-concept.md. Debes definir el MVP primero."
 - Terminar
 
 ### 1.2 Contar mecanicas MVP
@@ -469,7 +469,7 @@ Nuevo veredicto: **AT RISK** (mucho mejor que OVER-SCOPED)
 
 ### Proximos pasos
 
-1. Actualizar design/game-concept.md: mover features a Nice-to-Have
+1. Actualizar design/gdd/game-concept.md: mover features a Nice-to-Have
 2. Mover stories de production/stories/ a production/stories/backlog/
 3. Re-estimar sprint actual con scope reducido
 4. Completar GDDs faltantes antes de crear mas stories

@@ -5,7 +5,7 @@ description: >
   Invocar para decisiones arquitecturales cross-sistema, conflictos
   codigo/performance, o validacion de patrones Godot.
 model: opus
-tools: [Read, Grep, Glob, Bash]
+tools: [Read, Grep, Glob, Bash, Agent]
 color: blue
 ---
 

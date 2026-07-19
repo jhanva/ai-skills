@@ -4,9 +4,9 @@
 
 Convierte un repositorio en un stack de desarrollo asistido por IA con skills, agentes y reglas reutilizables.
 
-**40 skills. 13 agentes de Codex. 5 hooks de Claude. Dos runtimes, un mismo workflow.**
+**43 skills. 13 agentes de Codex. 5 hooks de Claude. Dos runtimes, un mismo workflow.**
 
-[![Skills](https://img.shields.io/badge/skills-40-84cc16?style=for-the-badge)](#skills)
+[![Skills](https://img.shields.io/badge/skills-43-84cc16?style=for-the-badge)](#skills)
 [![Codex Agents](https://img.shields.io/badge/codex%20agents-13-8b5cf6?style=for-the-badge)](#agentes)
 [![Claude Hooks](https://img.shields.io/badge/claude%20hooks-5-f97316?style=for-the-badge)](#hooks-game-dev-capa-claude)
 [![Runtimes](https://img.shields.io/badge/runtimes-2-0ea5e9?style=for-the-badge)](#compatibilidad-por-runtime)
@@ -51,7 +51,7 @@ En este README, las tablas se enfocan primero en la capacidad que aporta cada sk
 
 | Categoria | Cantidad | Descripcion |
 |---|---:|---|
-| Skills | 40 | Workflows para desarrollo general, Android, imagen, game dev, browser automation, texto y operaciones de repo |
+| Skills | 43 | Workflows para desarrollo general, Android, imagen, game dev, browser automation, herramientas MCP (Aseprite, Godot, PixelLab), texto y operaciones de repo |
 | Agentes Codex | 13 | Especialistas para implementacion, review, seguridad, prompt design y game development |
 | Plugins Codex | 3 | Integraciones instalables para Aseprite, Godot y PixelLab via plugin + MCP |
 | Hooks Claude | 5 | Validaciones automaticas para codigo, assets y contexto de sesion |

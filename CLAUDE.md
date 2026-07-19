@@ -68,9 +68,6 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
   git-identity/SKILL.md            — Identidades Git separadas (4 capas, audit/setup)
   git-identity/references/setup.md — Referencia para modo setup
 
-.claude/commands/
-  git-identity.md                  — Auditoria y setup de cuentas git separadas
-
 .claude/agents/
   prompt-artist.md                 — Agent: prompts para generacion de imagen
   prompt-artist/domains.md         — 9 perfiles de dominio con pesos

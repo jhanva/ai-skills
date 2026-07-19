@@ -62,7 +62,7 @@ Los pins de modelo se centralizan en `.codex/config.toml` y se propagan con
 
 ## Comandos migrados
 
-- El comando de Claude `.claude/commands/git-identity.md` se integró en Codex como la skill explícita `$git-identity` dentro de `.agents/skills/git-identity/`.
+- La skill de Claude `.claude/skills/git-identity/` se integró en Codex como la skill explícita `$git-identity` dentro de `.agents/skills/git-identity/`. (El antiguo comando `.claude/commands/git-identity.md` se eliminó por duplicar la skill.)
 - La adaptación de `$git-identity` cubre tanto hosts diferentes como mismo host con aliases SSH y auto-switch de `gh` por directorio.
 - En esta adaptación, los comandos explícitos de Claude se traducen preferentemente a skills explícitas de Codex en vez de depender de una capa separada de slash-commands.
 
