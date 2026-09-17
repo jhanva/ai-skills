@@ -162,21 +162,19 @@ Para cada archivo cambiado, verificar con Grep:
 
 ### Modo full — subagentes paralelos (si proyecto mediano+)
 
-Despachar 3 subagentes con Agent tool en un solo mensaje:
+Despachar 3 subagentes con Agent tool en un solo mensaje, usando el agente `security-auditor` del plugin (`subagent_type: "core:security-auditor"`; `security-auditor` si el plugin se carga con `--plugin-dir`). El agente ya sabe que referencia cargar segun el area: en el prompt basta con indicar el alcance.
 
-**Subagente 1: Code Security**
+**Subagente 1: Code Security** — alcance: rutas/handlers, auth, crypto, error handling
 - Injection patterns en rutas/handlers
 - Auth middleware coverage
 - Crypto debil
 - Error handling peligroso
-- Incluir contenido de `code-patterns.md` en el prompt
 
-**Subagente 2: Infra & Config**
+**Subagente 2: Infra & Config** — alcance: Dockerfiles, compose, CI/CD
 - Docker: usuario root, secrets en build args, imagenes sin tag fijo
 - CI/CD: secrets en logs, permisos excesivos, actions de terceros sin pin
-- Incluir contenido de `infra-patterns.md` en el prompt
 
-**Subagente 3: Dependencies**
+**Subagente 3: Dependencies** — alcance: manifests y lockfiles
 - `npm audit` / `pip-audit` / `cargo audit`
 - Lockfile integrity
 - Dependencias desactualizadas con CVEs conocidos
