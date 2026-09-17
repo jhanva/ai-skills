@@ -1,0 +1,17 @@
+{
+  "name": "core",
+  "description": "Flujo de desarrollo disciplinado: brainstorm, plan, tdd, debug, verify, execute, review, parallel, secure, codegraph, humanize y el agente prompt-artist",
+  "version": "1.0.0",
+  "author": {
+    "name": "jhanva"
+  },
+  "repository": "https://github.com/jhanva/ai-skills",
+  "keywords": [
+    "workflow",
+    "tdd",
+    "debug",
+    "review",
+    "security",
+    "codegraph"
+  ]
+}

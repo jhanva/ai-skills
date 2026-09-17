@@ -1,0 +1,7 @@
+interface:
+  display_name: "Codegraph"
+  short_description: "Knowledge graph del proyecto"
+  default_prompt: "Usa $codegraph para construir o consultar el grafo de conocimiento del proyecto."
+
+policy:
+  allow_implicit_invocation: true

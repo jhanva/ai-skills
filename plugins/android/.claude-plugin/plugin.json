@@ -1,0 +1,15 @@
+{
+  "name": "android",
+  "description": "Auditorias y diseno para Android: Clean Architecture, seguridad de bitmaps, Room y ML on-device",
+  "version": "1.0.0",
+  "author": {
+    "name": "jhanva"
+  },
+  "repository": "https://github.com/jhanva/ai-skills",
+  "keywords": [
+    "android",
+    "clean-architecture",
+    "room",
+    "ml"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "image",
+  "description": "Diseno de algoritmos y pipelines de procesamiento de imagen",
+  "version": "1.0.0",
+  "author": {
+    "name": "jhanva"
+  },
+  "repository": "https://github.com/jhanva/ai-skills",
+  "keywords": [
+    "image",
+    "pipeline",
+    "hashing"
+  ]
+}
