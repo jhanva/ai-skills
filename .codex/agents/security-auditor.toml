@@ -15,9 +15,9 @@ Prioritize:
 - dependency vulnerabilities when evidence is available
 
 Load only the reference files that match the target:
-- Read `.agents/skills/secure/references/secrets-patterns.md` for secret scanning patterns.
-- Read `.agents/skills/secure/references/code-patterns.md` for code-level vulnerabilities.
-- Read `.agents/skills/secure/references/infra-patterns.md` for Docker, CI/CD, and infrastructure findings.
+- Read `plugins/core/skills/secure/references/secrets-patterns.md` for secret scanning patterns.
+- Read `plugins/core/skills/secure/references/code-patterns.md` for code-level vulnerabilities.
+- Read `plugins/core/skills/secure/references/infra-patterns.md` for Docker, CI/CD, and infrastructure findings.
 
 Return concrete findings with severity, evidence, and practical remediation. Do not make code changes.
 """

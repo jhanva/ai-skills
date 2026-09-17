@@ -1,0 +1,15 @@
+{
+  "name": "repo-ops",
+  "description": "Operaciones de repositorio y entorno: identidades git, symlinks en Windows y control de browser via CDP",
+  "version": "1.0.0",
+  "author": {
+    "name": "jhanva"
+  },
+  "repository": "https://github.com/jhanva/ai-skills",
+  "keywords": [
+    "git",
+    "windows",
+    "browser",
+    "cdp"
+  ]
+}

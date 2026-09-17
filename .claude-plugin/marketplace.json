@@ -1,0 +1,33 @@
+{
+  "name": "ai-skills",
+  "description": "Skills, agentes y hooks para desarrollo asistido por IA: flujo TDD/debug/verify, auditorias Android, pipelines de imagen y operaciones de repo",
+  "owner": {
+    "name": "jhanva"
+  },
+  "plugins": [
+    {
+      "name": "core",
+      "source": "./plugins/core",
+      "description": "Flujo de desarrollo disciplinado: brainstorm, plan, tdd, debug, verify, execute, review, parallel, secure, codegraph, humanize y el agente prompt-artist",
+      "version": "1.0.0"
+    },
+    {
+      "name": "android",
+      "source": "./plugins/android",
+      "description": "Auditorias y diseno para Android: Clean Architecture, seguridad de bitmaps, Room y ML on-device",
+      "version": "1.0.0"
+    },
+    {
+      "name": "image",
+      "source": "./plugins/image",
+      "description": "Diseno de algoritmos y pipelines de procesamiento de imagen",
+      "version": "1.0.0"
+    },
+    {
+      "name": "repo-ops",
+      "source": "./plugins/repo-ops",
+      "description": "Operaciones de repositorio y entorno: identidades git, symlinks en Windows y control de browser via CDP",
+      "version": "1.0.0"
+    }
+  ]
+}

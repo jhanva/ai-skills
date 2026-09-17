@@ -13,11 +13,14 @@ tanto desde Claude Code como desde Codex.
 - El dominio de game development (Godot 4, pixel art, produccion de juegos) vive en el
   repositorio hermano `gamedev-skills`. No anadir aqui skills, agentes ni hooks de ese dominio;
   ambos repos se usan juntos en un proyecto de juego.
-- El repo mantiene dos capas paralelas de la misma capacidad:
-  - `.claude/` es la implementacion original para Claude Code (`/skill`).
-  - `.agents/skills/`, `.codex/agents/`, `.codex/config.toml`, `.codex/hooks.json` y
-    `.codex/hooks/` son la adaptacion nativa para Codex (`$skill`).
-  - Un cambio de comportamiento en una skill, agente o hook se replica en ambas capas dentro del
+- El repo es un marketplace de plugins con una sola copia de cada skill:
+  - `plugins/<plugin>/skills/<skill>/` contiene el `SKILL.md` (frontmatter de Claude Code) y
+    `agents/openai.yaml` (politica de invocacion de Codex). Ambos runtimes leen el mismo directorio.
+  - `.claude-plugin/marketplace.json` (Claude Code) y `.agents/plugins/marketplace.json` (Codex)
+    listan los mismos plugins con la misma `version` que su `plugin.json`.
+  - `.codex/agents/`, `.codex/config.toml`, `.codex/hooks.json` y `.codex/hooks/` son la capa
+    nativa de Codex para agentes y hooks; `plugins/core/agents/` y `plugins/core/hooks/` son la de
+    Claude Code. Un cambio de comportamiento en un agente o hook se replica en ambas dentro del
     mismo PR, salvo que el usuario pida lo contrario de forma explicita.
 - El contenido se presenta como propio. No mencionar repos, librerias ni proyectos de terceros
   como origen o inspiracion en skills, agentes ni documentacion.
@@ -204,15 +207,21 @@ no se negocian al tocar cualquiera de las tres capas:
 
 - Cada skill es un directorio con `SKILL.md` como punto de entrada y frontmatter valido.
   `SKILL.md` se mantiene por debajo de 500 lineas; ejemplos, plantillas y anexos van a
-  `references/`, scripts a `scripts/`.
+  `references/`, scripts a `scripts/`. Las rutas a archivos propios del plugin se escriben con
+  `${CLAUDE_PLUGIN_ROOT}/...`, nunca con `.claude/` ni `.agents/`.
+- Una skill pertenece a un solo plugin (`core`, `android`, `image`, `repo-ops`). Anadir, mover o
+  renombrar una skill implica actualizar los dos `marketplace.json`, subir `version` en el
+  `plugin.json` afectado (ambos manifests) y pasar `claude plugin validate .`.
+- `plugins/*/agents/` solo contiene definiciones de agente (`.md` con frontmatter); Claude Code
+  carga todo lo que hay ahi. Los anexos de un agente van a `plugins/*/references/`.
 - Modo de invocacion explicito en el frontmatter: `user-invocable: false` para skills siempre
   activas, `disable-model-invocation: true` para las que solo invoca el usuario. En Codex el
   equivalente es `agents/openai.yaml` con `allow_implicit_invocation`.
 - Los agentes de Codex (`.codex/agents/*.toml`) llevan `name`, `description`,
   `developer_instructions` y un pin de modelo real. El conocimiento extendido va en su playbook
   local dentro de `.codex/agents/<agent>/`.
-- Todo cambio en `.codex/hooks/codex_hooks.py` o en la configuracion de agentes lleva prueba en
-  `tests/`.
+- Todo cambio en `.codex/hooks/codex_hooks.py`, en la configuracion de agentes o en los manifests
+  de plugins lleva prueba en `tests/`.
 - Los hooks deben funcionar en Windows, macOS y Linux. No asumir un binario fijo de Python:
   `.codex/hooks.json` define `command` y `commandWindows` por separado.
 - Antes de un commit: `python -m unittest discover -s tests`. No declarar exito sin leer el
@@ -220,7 +229,8 @@ no se negocian al tocar cualquiera de las tres capas:
 
 ### Reglas especificas para Codex
 
-- La invocacion explicita de skills es con `$skill`, no con `/skill`.
+- La invocacion explicita de skills es con `$skill`, no con `/skill`. Codex no sustituye
+  `${CLAUDE_PLUGIN_ROOT}`: se resuelve como la raiz del plugin (`plugins/<plugin>/`).
 - Si una instruccion heredada de `.claude/` menciona herramientas de Claude, se traduce asi:
   - `Read` / `Grep` / `Glob` / `Bash` → `rg`, `rg --files`, `find`, `sed -n`, shell puntual
   - `Agent` → agentes built-in (`worker`, `explorer`) o agentes custom en `.codex/agents/`

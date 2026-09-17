@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "android",
+  "version": "1.0.0",
+  "description": "Auditorias y diseno para Android: Clean Architecture, seguridad de bitmaps, Room y ML on-device"
+}

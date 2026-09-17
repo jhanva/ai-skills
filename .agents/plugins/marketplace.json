@@ -1,0 +1,52 @@
+{
+  "name": "ai-skills",
+  "interface": {
+    "displayName": "AI Skills"
+  },
+  "plugins": [
+    {
+      "name": "core",
+      "source": {
+        "source": "local",
+        "path": "./plugins/core"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "android",
+      "source": {
+        "source": "local",
+        "path": "./plugins/android"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "image",
+      "source": {
+        "source": "local",
+        "path": "./plugins/image"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "repo-ops",
+      "source": {
+        "source": "local",
+        "path": "./plugins/repo-ops"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

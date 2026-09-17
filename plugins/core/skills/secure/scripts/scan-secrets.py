@@ -1,0 +1,218 @@
+#!/usr/bin/env python3
+"""
+scan-secrets.py — Escanea archivos en busca de secrets expuestos.
+
+Uso (python puede ser python3 o py segun la maquina):
+  python scan-secrets.py TARGET_DIR                    # Escanea todo el directorio
+  git diff --name-only HEAD | python scan-secrets.py --stdin TARGET_DIR  # Solo archivos del stdin
+
+Output: JSON a stdout con hallazgos.
+Exit codes:
+  0 = limpio (sin hallazgos) o --help
+  1 = hallazgos encontrados
+  2 = error de uso / argumentos invalidos
+  3 = error inesperado en runtime (bug o IO)
+"""
+
+import json
+import re
+import sys
+from pathlib import Path
+
+PATTERNS = [
+    # Alta confianza
+    ("AWS Access Key", r"AKIA[0-9A-Z]{16}", "high"),
+    ("AWS Secret Key", r"(?i)aws_secret_access_key\s*=\s*[A-Za-z0-9/+=]{40}", "high"),
+    ("GitHub Token (classic)", r"ghp_[A-Za-z0-9]{36}", "high"),
+    ("GitHub Token (fine-grained)", r"github_pat_[A-Za-z0-9_]{82}", "high"),
+    ("GitHub OAuth Token", r"gho_[A-Za-z0-9]{36}", "high"),
+    ("GitLab Token", r"glpat-[A-Za-z0-9\-]{20}", "high"),
+    ("Slack Bot Token", r"xoxb-[0-9]{10,13}-[0-9]{10,13}-[A-Za-z0-9]{24}", "high"),
+    ("Slack Webhook", r"https://hooks\.slack\.com/services/T[A-Z0-9]{8,}/B[A-Z0-9]{8,}/[A-Za-z0-9]{24}", "high"),
+    ("Stripe Secret Key", r"sk_live_[A-Za-z0-9]{24,}", "high"),
+    # pk_live_ es la publishable key de Stripe: publica por diseno (va en el
+    # frontend). Se reporta como "low" solo para visibilidad, no es un leak.
+    ("Stripe Publishable Key", r"pk_live_[A-Za-z0-9]{24,}", "low"),
+    ("SendGrid API Key", r"SG\.[A-Za-z0-9\-_]{22}\.[A-Za-z0-9\-_]{43}", "high"),
+    ("Google API Key", r"AIza[0-9A-Za-z\-_]{35}", "high"),
+    ("npm Token", r"npm_[A-Za-z0-9]{36}", "high"),
+    ("PyPI Token", r"pypi-[A-Za-z0-9_\-]{50,}", "high"),
+    ("Twilio API Key", r"SK[0-9a-fA-F]{32}", "high"),
+    # Confianza media
+    ("Private Key", r"-----BEGIN (RSA|DSA|EC|OPENSSH|PGP) PRIVATE KEY-----", "medium"),
+    ("Generic Password", r'(?i)(password|passwd|pwd)\s*[:=]\s*["\'][^"\']{8,}["\']', "medium"),
+    ("Generic Secret", r'(?i)(secret|token|api_key|apikey|access_key)\s*[:=]\s*["\'][^"\']{8,}["\']', "medium"),
+    ("Connection String", r"(?i)(mongodb|postgres|mysql|redis)://[^:]+:[^@]+@", "medium"),
+    ("JWT Hardcoded", r"eyJ[A-Za-z0-9\-_]+\.eyJ[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+", "medium"),
+]
+
+GENERIC_SECRET_TYPES = {"Generic Password", "Generic Secret"}
+
+IGNORE_DIRS = {
+    "node_modules", ".git", "vendor", "__pycache__", "dist", "build",
+    ".next", "target", ".venv", "venv", "env", ".tox", "coverage",
+}
+
+IGNORE_EXTENSIONS = {
+    ".lock", ".map", ".woff", ".woff2", ".ttf",
+    ".eot", ".ico", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp",
+    ".mp3", ".mp4", ".pdf", ".zip", ".tar", ".gz", ".jar", ".class",
+}
+
+# Sufijos compuestos: Path.suffix solo devuelve la ultima extension
+# ("app.min.js" -> ".js"), asi que se chequean con str.endswith aparte.
+IGNORE_COMPOUND_SUFFIXES = (".min.js", ".min.css")
+
+IGNORE_FILENAMES = {
+    "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "Cargo.lock",
+    "Pipfile.lock", "poetry.lock", "composer.lock", "go.sum",
+}
+
+# Nombres de directorios (componentes exactos del path) que indican codigo de
+# ejemplo/test y desactivan patrones de confianza media. NO usar como substring:
+# un proyecto en "sample-app/" no es todo test.
+TEST_PATH_COMPONENTS = {
+    "test", "tests", "spec", "specs", "__tests__",
+    "fixture", "fixtures", "mock", "mocks", "fake", "fakes",
+    "example", "examples", "sample", "samples", "template", "templates",
+}
+
+
+def should_scan(filepath: Path) -> bool:
+    parts = filepath.parts
+    if any(d in IGNORE_DIRS for d in parts):
+        return False
+    if filepath.suffix.lower() in IGNORE_EXTENSIONS:
+        return False
+    if filepath.name.lower().endswith(IGNORE_COMPOUND_SUFFIXES):
+        return False
+    if filepath.name in IGNORE_FILENAMES:
+        return False
+    # Skip test files for medium-confidence patterns (handled in scan)
+    return True
+
+
+def is_test_file(filepath: Path) -> bool:
+    name = filepath.name.lower()
+    parts_lower = {p.lower() for p in filepath.parts}
+    return (
+        bool(parts_lower & TEST_PATH_COMPONENTS)
+        or name.endswith((".test.js", ".test.ts", ".spec.js", ".spec.ts",
+                          "_test.py", "_test.go", ".test.jsx", ".test.tsx",
+                          ".example", ".sample", ".template"))
+        or name.startswith(("test_", "spec_"))
+    )
+
+
+def scan_file(filepath: Path) -> list:
+    findings = []
+    try:
+        content = filepath.read_text(errors="ignore")
+    except (PermissionError, OSError):
+        return findings
+
+    lines = content.splitlines()
+    test_file = is_test_file(filepath)
+
+    for line_num, line in enumerate(lines, 1):
+        if len(line) > 2000:  # skip minified lines
+            continue
+        line_matches = []
+        for name, pattern, confidence in PATTERNS:
+            # Skip medium-confidence in test files
+            if confidence == "medium" and test_file:
+                continue
+            if re.search(pattern, line):
+                line_matches.append((name, confidence))
+
+        # Un patron especifico (ghp_, AKIA...) ya explica la linea: no duplicar
+        # el hallazgo como "Generic Secret"/"Generic Password".
+        if any(name not in GENERIC_SECRET_TYPES for name, _ in line_matches):
+            line_matches = [m for m in line_matches if m[0] not in GENERIC_SECRET_TYPES]
+
+        for name, confidence in line_matches:
+            findings.append({
+                "file": str(filepath),
+                "line": line_num,
+                "type": name,
+                "confidence": confidence,
+                "content": line.strip()[:120],  # truncate for safety
+            })
+    return findings
+
+
+USAGE = "Usage: scan-secrets.py [--stdin] TARGET_DIR"
+
+
+def main():
+    args = sys.argv[1:]
+
+    # -h/--help en cualquier posicion: mostrar ayuda y salir OK
+    if "-h" in args or "--help" in args:
+        print(USAGE)
+        sys.exit(0)
+
+    # --stdin en cualquier posicion; el resto son posicionales
+    use_stdin = "--stdin" in args
+    positional = [a for a in args if a != "--stdin"]
+
+    if len(positional) != 1:
+        print(USAGE, file=sys.stderr)
+        sys.exit(2)
+
+    target_dir = Path(positional[0]).resolve()
+
+    if not target_dir.is_dir():
+        print(f"Error: {target_dir} is not a directory", file=sys.stderr)
+        sys.exit(2)
+
+    if use_stdin:
+        # Read file list from stdin
+        files = []
+        for line in sys.stdin:
+            fp = target_dir / line.strip()
+            if fp.is_file() and should_scan(fp):
+                files.append(fp)
+    else:
+        # Scan all files
+        files = [f for f in target_dir.rglob("*") if f.is_file() and should_scan(f)]
+
+    all_findings = []
+    for f in files:
+        all_findings.extend(scan_file(f))
+
+    # Make paths relative to target
+    for finding in all_findings:
+        try:
+            finding["file"] = str(Path(finding["file"]).relative_to(target_dir))
+        except ValueError:
+            pass
+
+    output = {
+        "target": str(target_dir),
+        "files_scanned": len(files),
+        "findings_count": len(all_findings),
+        "findings": sorted(all_findings, key=lambda x: (
+            {"high": 0, "medium": 1, "low": 2}.get(x["confidence"], 3),
+            x["file"],
+            x["line"],
+        )),
+    }
+
+    json.dump(output, sys.stdout, indent=2)
+    sys.exit(1 if all_findings else 0)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except SystemExit:
+        raise
+    except KeyboardInterrupt:
+        print("scan-secrets.py: interrupted", file=sys.stderr)
+        sys.exit(3)
+    except Exception as exc:
+        # Exit 3 reserved for unexpected runtime errors so CI consumers can
+        # distinguish them from "findings" (1) and "usage error" (2).
+        print(f"scan-secrets.py: unexpected error: {exc}", file=sys.stderr)
+        sys.exit(3)
