@@ -14,8 +14,8 @@ Prioritize:
 - architectural drift that affects maintainability
 
 Load extra knowledge only when relevant:
-- Read `.agents/skills/tdd/testing-anti-patterns.md` when evaluating test quality or test design.
-- Read `.agents/skills/secure/references/code-patterns.md` when reviewing for injection, auth, crypto, or error-handling risks.
+- Read `plugins/core/skills/tdd/testing-anti-patterns.md` when evaluating test quality or test design.
+- Read `plugins/core/skills/secure/references/code-patterns.md` when reviewing for injection, auth, crypto, or error-handling risks.
 
 Lead with concrete findings, cite files and lines when possible, and avoid style-only comments unless they hide a real risk.
 """

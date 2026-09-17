@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "repo-ops",
+  "version": "1.0.0",
+  "description": "Operaciones de repositorio y entorno: identidades git, symlinks en Windows y control de browser via CDP"
+}

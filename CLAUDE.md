@@ -7,67 +7,38 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
 Las skills, agentes y hooks de game development (Godot 4, pixel art, produccion de juegos) viven en el repositorio hermano `gamedev-skills` (https://github.com/jhanva/gamedev-skills) y se usan junto con este.
 ## Estructura
 
-```
-.claude/skills/
-  optimize/SKILL.md                — Optimizacion de tokens (siempre activa)
-  brainstorm/SKILL.md              — Diseno antes de implementar
-  plan/SKILL.md                    — Spec -> plan de implementacion
-  tdd/SKILL.md                     — Test-driven development estricto
-  tdd/testing-anti-patterns.md     — Anti-patrones de testing (referencia)
-  debug/SKILL.md                   — Debugging sistematico en 4 fases
-  debug/root-cause-tracing.md      — Rastreo de causa raiz (referencia)
-  verify/SKILL.md                  — Verificacion antes de completar
-  execute/SKILL.md                 — Ejecucion con subagentes + review
-  execute/model-selection.md       — Guia de seleccion de modelo (referencia)
-  review/SKILL.md                  — Code review estructurado
-  parallel/SKILL.md                — Agentes paralelos independientes
-  secure/SKILL.md                  — Analisis de seguridad (quick/full)
-  secure/references/secrets-patterns.md  — Patrones de deteccion de secrets
-  secure/references/code-patterns.md     — Patrones de seguridad en codigo
-  secure/references/infra-patterns.md    — Patrones de seguridad en infra
-  secure/scripts/scan-secrets.py         — Scanner de secrets (Python, zero deps)
-  android-arch/SKILL.md            — Validacion de Clean Architecture Android
-  bitmap-safety/SKILL.md           — Auditoria de pipelines de imagen
-  room-audit/SKILL.md              — Auditoria de seguridad de datos Room
-  image-algo/SKILL.md              — Diseno de algoritmos de imagen
-  ml-ondevice/SKILL.md             — Integracion de ML on-device Android
-  image-pipeline/SKILL.md          — Diseno de pipelines de imagen
-  humanize/SKILL.md                — Humanizar texto generado por IA
-  windows-symlink/SKILL.md         — Soporte de symlinks en Windows (audit, setup, repair)
-  windows-symlink/references/windows-requirements.md  — Prerequisitos y permisos Windows
-  windows-symlink/references/git-recovery.md           — Recuperacion de symlinks rotos en Git
-  windows-symlink/scripts/audit-windows-symlink.ps1    — Script de auditoria PowerShell
-  windows-symlink/scripts/setup-windows-symlink.ps1    — Script de setup PowerShell
-  browser-control/SKILL.md          — Control de browser via CDP (navegacion, screenshots, input, tabs)
-  browser-control/references/cdp_helpers.py       — Libreria Python CDP autocontenida
-  browser-control/references/connection-guide.md  — Setup y troubleshooting de conexion al browser
-  browser-control/references/interaction-patterns.md — Patrones para mecanicas web complejas
-  codegraph/SKILL.md               — Knowledge graph consultable de proyectos (build, query, comunidades)
-  codegraph/references/query-guide.md          — Expansion de vocabulario y flujo de consultas
-  codegraph/references/semantic-extraction.md  — Pase semantico opcional con subagentes
-  codegraph/references/graph-format.md         — Schema de graph.json y rubrica de confianza
-  codegraph/scripts/codegraph.py               — CLI zero-deps (pipeline completo en un comando)
-  codegraph/scripts/cg_extract.py              — Extractores por lenguaje (ast + regex)
-  codegraph/scripts/cg_analyze.py              — Clustering Louvain, god nodes, reporte
-  codegraph/scripts/cg_query.py                — Query/path/explain con scoring IDF
-  codegraph/scripts/cg_html.py                 — Visualizacion HTML autocontenida
-  git-identity/SKILL.md            — Identidades Git separadas (4 capas, audit/setup)
-  git-identity/references/setup.md — Referencia para modo setup
+El repo es un marketplace de plugins. Cada skill vive una sola vez en `plugins/<plugin>/skills/<skill>/` (con `SKILL.md`, `references/`, `scripts/` y `agents/openai.yaml` para Codex).
 
-.claude/agents/
-  prompt-artist.md                 — Agent: prompts para generacion de imagen
-  prompt-artist/domains.md         — 9 perfiles de dominio con pesos
-  prompt-artist/techniques.md      — Catalogo de tecnicas visuales
-  prompt-artist/platforms.md       — Adaptacion Gemini/MJ/DALL-E/SD
-  prompt-artist/text-safety.md     — Texto en imagenes y safety filters
-
-.claude/hooks/
-  _parse.sh                        — Biblioteca compartida (JSON parsing)
-  block-env-access.sh              — Bloquea acceso a archivos .env
-  session-context.sh               — Contexto del repositorio al iniciar sesion
 ```
+.claude-plugin/marketplace.json    — Catalogo para Claude Code
+.agents/plugins/marketplace.json   — Catalogo para Codex
+plugins/core/                      — Flujo de desarrollo (12 skills, agente prompt-artist, hooks)
+  skills/optimize                  — Optimizacion de tokens (siempre activa)
+  skills/brainstorm                — Diseno antes de implementar
+  skills/plan                      — Spec -> plan de implementacion
+  skills/tdd                       — Test-driven development estricto (+ testing-anti-patterns.md)
+  skills/debug                     — Debugging sistematico en 4 fases (+ root-cause-tracing.md)
+  skills/verify                    — Verificacion antes de completar
+  skills/execute                   — Ejecucion con subagentes + review (+ model-selection.md)
+  skills/review                    — Code review estructurado
+  skills/parallel                  — Agentes paralelos independientes
+  skills/secure                    — Analisis de seguridad (references/, scripts/scan-secrets.py)
+  skills/codegraph                 — Knowledge graph consultable (references/, scripts/)
+  skills/humanize                  — Humanizar texto generado por IA (references/)
+  agents/prompt-artist.md          — Agent: prompts para generacion de imagen
+  references/prompt-artist/        — domains, techniques, platforms, text-safety
+  hooks/hooks.json                 — SessionStart (session-context.sh) y PreToolUse (block-env-access.sh)
+plugins/android/                   — android-arch, bitmap-safety, room-audit, ml-ondevice
+plugins/image/                     — image-algo, image-pipeline
+plugins/repo-ops/                  — git-identity, windows-symlink, browser-control
+.codex/                            — Agentes custom, config y hooks nativos de Codex
+```
+
+Cada plugin lleva `.claude-plugin/plugin.json` (Claude Code) y `plugin.json` (formato portable Agent Plugins) con el mismo `name`, `version` y `description`.
 
 ## Skills disponibles
+
+Instaladas desde el marketplace, las skills se invocan con prefijo de plugin: `/core:tdd`, `/android:room-audit`, `/image:image-algo`, `/repo-ops:git-identity`. La tabla usa el nombre corto.
 
 | Skill | Invocacion | Proposito |
 |---|---|---|
@@ -94,6 +65,8 @@ Las skills, agentes y hooks de game development (Godot 4, pixel art, produccion 
 | `/git-identity` | Solo usuario | Identidades Git separadas: audit y setup de 4 capas |
 
 "Siempre activa" = `user-invocable: false` (Claude la carga automaticamente, no aparece en menu `/`)
+
+Instalacion: `/plugin marketplace add jhanva/ai-skills` y `/plugin install core@ai-skills` (idem `android`, `image`, `repo-ops`). Desarrollo local: `claude --plugin-dir ./plugins/core`.
 "Solo usuario" = `disable-model-invocation: true` (se invoca manualmente con `/nombre`)
 "Auto + usuario" = Claude puede invocarlo automaticamente cuando detecta el contexto relevante
 
@@ -181,3 +154,5 @@ La skill `optimize` se carga automaticamente y aplica estas reglas en toda inter
 - Filtrar output de comandos con pipes antes de que entre al contexto
 - Delegar a subagentes solo cuando output esperado > 50 lineas
 - Seleccion de modelo para subagentes (haiku/sonnet/opus)
+
+Al anadir o mover una skill: actualizar el `marketplace.json` de ambos runtimes, el `plugin.json` del plugin (subir `version`) y correr `claude plugin validate .`.

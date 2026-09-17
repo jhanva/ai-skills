@@ -1,0 +1,7 @@
+interface:
+  display_name: "Browser Control"
+  short_description: "Control de browser via CDP"
+  default_prompt: "Usa $browser-control para navegar, capturar e interactuar con el browser real."
+
+policy:
+  allow_implicit_invocation: false

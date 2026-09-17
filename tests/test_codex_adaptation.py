@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 HOOK_SCRIPT = ROOT / ".codex" / "hooks" / "codex_hooks.py"
-SECRET_SCANNER = ROOT / ".agents" / "skills" / "secure" / "scripts" / "scan_secrets.py"
+SECRET_SCANNER = ROOT / "plugins" / "core" / "skills" / "secure" / "scripts" / "scan-secrets.py"
 
 
 def read(path: str) -> str:
@@ -92,13 +92,14 @@ class SkillRegressionTests(unittest.TestCase):
     def test_secure_scanner_is_native_and_has_fixed_classification(self) -> None:
         self.assertTrue(SECRET_SCANNER.is_file())
         scanner = SECRET_SCANNER.read_text(encoding="utf-8")
-        secure = read(".agents/skills/secure/SKILL.md")
+        secure = read("plugins/core/skills/secure/SKILL.md")
 
         self.assertNotIn(".claude/skills", scanner)
+        self.assertNotIn(".agents/skills", scanner)
         self.assertIn('"Stripe Publishable Key", r"pk_live_', scanner)
         self.assertIn('"low"', scanner)
         self.assertIn("OWASP A03:2021", secure)
-        self.assertIn("scan_secrets.py", secure)
+        self.assertIn("${CLAUDE_PLUGIN_ROOT}/skills/secure/scripts/scan-secrets.py", secure)
 
     def test_secure_scanner_detects_a_token_and_help_is_successful(self) -> None:
         help_result = subprocess.run(
@@ -122,18 +123,22 @@ class SkillRegressionTests(unittest.TestCase):
         self.assertEqual(0, help_result.returncode, help_result.stderr)
         self.assertEqual(1, scan_result.returncode, scan_result.stderr)
         report = json.loads(scan_result.stdout)
+        # Un token especifico no se duplica como "Generic Secret" en la misma linea.
         self.assertEqual(1, report["findings_count"])
-        self.assertEqual("GitHub Token", report["findings"][0]["type"])
+        self.assertEqual("GitHub Token (classic)", report["findings"][0]["type"])
 
-    def test_readme_points_to_native_browser_skill_and_codex_hooks(self) -> None:
+    def test_readme_points_to_plugin_skills_and_codex_hooks(self) -> None:
         readme = read("README.md")
 
-        self.assertIn("./.agents/skills/browser-control/SKILL.md", readme)
+        self.assertIn("./plugins/repo-ops/skills/browser-control/SKILL.md", readme)
         self.assertIn(".codex/hooks.json", readme)
+        self.assertIn("/plugin marketplace add jhanva/ai-skills", readme)
+        self.assertNotIn("./.agents/skills/", readme)
+        self.assertNotIn("./.claude/skills/", readme)
 
     def test_browser_helpers_include_cross_platform_fixes(self) -> None:
-        skill = read(".agents/skills/browser-control/SKILL.md")
-        helper = read(".agents/skills/browser-control/references/cdp_helpers.py")
+        skill = read("plugins/repo-ops/skills/browser-control/SKILL.md")
+        helper = read("plugins/repo-ops/skills/browser-control/references/cdp_helpers.py")
 
         self.assertIn("tempfile", helper)
         self.assertIn("ord(key.upper()[0])", helper)
