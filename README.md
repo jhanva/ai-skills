@@ -2,268 +2,22 @@
 
 # ai-skills
 
-Convierte un repositorio en un stack de desarrollo asistido por IA con skills, agentes y reglas reutilizables.
+Marketplace de plugins para desarrollo asistido por IA: skills, agentes y hooks que imponen flujos disciplinados (diseno antes de codear, TDD, debugging con causa raiz, verificacion con evidencia).
 
-**21 skills en 4 plugins. 4 agentes de Codex. Hooks nativos en Codex y Claude. Un marketplace, dos runtimes.**
+**21 skills en 4 plugins. Un catalogo, dos runtimes: Claude Code y Codex.**
 
+[![Plugins](https://img.shields.io/badge/plugins-4-0ea5e9?style=for-the-badge)](#plugins)
 [![Skills](https://img.shields.io/badge/skills-21-84cc16?style=for-the-badge)](#skills)
 [![Codex Agents](https://img.shields.io/badge/codex%20agents-4-8b5cf6?style=for-the-badge)](#agentes)
 [![Hooks](https://img.shields.io/badge/hooks-codex%20%2B%20claude-f97316?style=for-the-badge)](#hooks)
-[![Plugins](https://img.shields.io/badge/plugins-4-0ea5e9?style=for-the-badge)](#instalacion)
 
-[Ver skills](#skills) • [Ver agentes](#agentes) • [Ver flujos](#flujos-de-trabajo) • [Ver compatibilidad](#compatibilidad-por-runtime)
+[Inicio rapido](#inicio-rapido) • [Plugins](#plugins) • [Instalacion](#instalacion) • [Skills](#skills) • [Flujos](#flujos-de-trabajo) • [Contribuir](#contribuir)
 
 </div>
 
-Skills y agentes especializados para imponer flujos de desarrollo disciplinados: TDD, debugging sistematico, diseno antes de implementacion, seguridad y verificacion con evidencia.
+## Inicio rapido
 
-El repositorio es un **marketplace de plugins**: cada skill vive una sola vez en `plugins/<plugin>/skills/` y se instala en Claude Code o Codex con dos comandos (ver [Instalacion](#instalacion)).
-
-- `plugins/` contiene los cuatro plugins (`core`, `android`, `image`, `repo-ops`) con skills, agentes y hooks
-- `.claude-plugin/marketplace.json` y `.agents/plugins/marketplace.json` son el catalogo para Claude Code y Codex
-- `.codex/` conserva los agentes custom y hooks nativos de Codex
-
-Invocacion explicita por runtime:
-
-- Codex: `$skill`
-- Claude Code: `/skill`
-
-En este README, las tablas se enfocan primero en la capacidad que aporta cada skill. Los detalles de runtime aparecen solo cuando cambian la invocacion o la integracion.
-
-## Navegacion rapida
-
-- [Que incluye](#que-incluye)
-- [Skills Core](#core-desarrollo-general)
-- [Skills Android](#android)
-- [Skills Windows / Repo Ops](#windows--repo-ops)
-- [Skills de Imagen](#imagen)
-- [Browser Automation](#browser-automation)
-- [Knowledge Graph](#knowledge-graph)
-- [Agentes](#agentes)
-- [Flujos de trabajo](#flujos-de-trabajo)
-- [Compatibilidad por runtime](#compatibilidad-por-runtime)
-- [Instalacion](#instalacion)
-- [Estructura](#estructura)
-- [Repos relacionados](#repos-relacionados)
-
-## Que incluye
-
-| Categoria | Cantidad | Descripcion |
-|---|---:|---|
-| Skills | 21 | Workflows para desarrollo general, Android, imagen, browser automation, knowledge graphs, texto y operaciones de repo |
-| Agentes Codex | 4 | Implementacion, review, seguridad y prompt design |
-| Hooks Codex | 2 handlers | Politica pre-tool y contexto de sesion |
-| Hooks Claude | 2 | Incluidos en el plugin `core` |
-| Plugins | 4 | `core`, `android`, `image`, `repo-ops` — se instalan por separado |
-
-## Skills
-
-### Core (desarrollo general)
-
-| Skill | Activacion | Proposito |
-|---|---|---|
-| [`optimize`](./plugins/core/skills/optimize/SKILL.md) | Base del repo | Filtrado de output, umbral de delegacion y seleccion de modelo; complementa las reglas globales de eficiencia |
-| [`brainstorm`](./plugins/core/skills/brainstorm/SKILL.md) | Explicita | Diseno antes de implementar. Dialogo socratico, multiples enfoques, spec escrita |
-| [`plan`](./plugins/core/skills/plan/SKILL.md) | Explicita | Convertir spec aprobada en plan de implementacion con tareas de 2-5 min |
-| [`tdd`](./plugins/core/skills/tdd/SKILL.md) | Contextual + explicita | Test-driven development estricto. Ciclo RED-GREEN-REFACTOR obligatorio |
-| [`debug`](./plugins/core/skills/debug/SKILL.md) | Contextual + explicita | Debugging sistematico en 4 fases con investigacion de causa raiz |
-| [`verify`](./plugins/core/skills/verify/SKILL.md) | Contextual + explicita | Verificacion con evidencia antes de cualquier claim de exito |
-| [`execute`](./plugins/core/skills/execute/SKILL.md) | Explicita | Ejecucion de plan con revision de 2 etapas; delegacion solo cuando aplica |
-| [`review`](./plugins/core/skills/review/SKILL.md) | Explicita | Code review estructurado con severidades |
-| [`parallel`](./plugins/core/skills/parallel/SKILL.md) | Explicita | Despachar agentes paralelos para problemas independientes |
-| [`secure`](./plugins/core/skills/secure/SKILL.md) | Explicita | Analisis de seguridad: secrets, injection, auth, crypto, infra. Modo quick o full |
-
-### Android
-
-| Skill | Activacion | Proposito |
-|---|---|---|
-| [`android-arch`](./plugins/android/skills/android-arch/SKILL.md) | Explicita | Validacion de boundaries de Clean Architecture Android |
-| [`bitmap-safety`](./plugins/android/skills/bitmap-safety/SKILL.md) | Explicita | Auditoria de pipelines de procesamiento de imagen (memory, threading, errors) |
-| [`room-audit`](./plugins/android/skills/room-audit/SKILL.md) | Explicita | Auditoria de seguridad de datos con Room (migraciones, schema, data safety) |
-
-### Windows / Repo Ops
-
-| Skill | Activacion | Proposito |
-|---|---|---|
-| [`windows-symlink`](./plugins/repo-ops/skills/windows-symlink/SKILL.md) | Explicita | Audita, habilita y repara soporte de symlinks en Windows para Git y checkouts del repo |
-
-### Imagen
-
-| Skill | Activacion | Proposito |
-|---|---|---|
-| [`image-algo`](./plugins/image/skills/image-algo/SKILL.md) | Explicita | Diseno de algoritmos de imagen (hashing, similarity, clustering) |
-| [`ml-ondevice`](./plugins/android/skills/ml-ondevice/SKILL.md) | Explicita | Integracion de modelos ML on-device en Android |
-| [`image-pipeline`](./plugins/image/skills/image-pipeline/SKILL.md) | Explicita | Diseno de pipelines de procesamiento de imagen multi-paso |
-
-### Browser automation
-
-| Skill | Activacion | Proposito |
-|---|---|---|
-| [`browser-control`](./plugins/repo-ops/skills/browser-control/SKILL.md) | Explicita | Control directo del browser via CDP (Chrome DevTools Protocol). Conecta al Chrome real del usuario y ejecuta navegacion, screenshots, clicks por coordenadas, input de teclado, evaluacion JS y manejo de tabs. Sin frameworks intermedios — un WebSocket al browser, scripts Python inline con libreria de helpers autocontenida |
-
-Incluye libreria Python CDP (`cdp_helpers.py`, ~370 lineas) con auto-discovery de Chrome, guia de conexion (Way 1: checkbox en chrome://inspect, Way 2: flag de linea de comandos) y referencia de patrones para mecanicas web complejas (dialogs, iframes, shadow DOM, uploads, dropdowns).
-
-### Knowledge graph
-
-| Skill | Activacion | Proposito |
-|---|---|---|
-| [`codegraph`](./plugins/core/skills/codegraph/SKILL.md) | Contextual + explicita | Convierte cualquier proyecto (codigo, SQL, docs, configs) en un knowledge graph persistente y consultable. Extraccion deterministica (Python via ast nativo, 16 lenguajes via regex), clustering de comunidades por modularidad, tags de confianza EXTRACTED/INFERRED/AMBIGUOUS, y comandos query/path/explain que responden desde el grafo sin releer el codigo |
-
-Disponible en ambos runtimes: `$codegraph` en Codex y `/codegraph` en Claude Code. Zero dependencias (solo stdlib de Python 3.10+, sin pip install), pipeline completo en un comando, builds incrementales por hash de contenido. Outputs: `graph.json` (node-link, compatible d3/GraphRAG), `GRAPH_REPORT.md` (god nodes, conexiones sorprendentes, preguntas sugeridas) y `graph.html` (visualizacion interactiva offline). El directorio `codegraph-out/` es committeable: el equipo comparte un solo grafo.
-
-### Texto
-
-| Skill | Activacion | Proposito |
-|---|---|---|
-| [`humanize`](./plugins/core/skills/humanize/SKILL.md) | Explicita | Humanizar texto generado por IA: diagnostico (`review`) y reescritura (`rewrite`) |
-
-**Base del repo** = principios globales que el runtime carga como contexto base; algunas capas ademas ofrecen una skill complementaria de referencia.
-**Explicita** = se invoca por nombre cuando el usuario la necesita.
-**Contextual + explicita** = puede activarse por el tipo de tarea y tambien invocarse directamente.
-
-## Agentes
-
-### Generales
-
-| Agente | Proposito |
-|---|---|
-| [`prompt-artist`](./.codex/agents/prompt-artist.toml) | Transforma ideas en prompts narrativos optimizados para generacion de imagenes (Gemini, DALL-E, Midjourney, Stable Diffusion). Formula de 7 componentes con pesos por dominio |
-
-## Hooks
-
-Codex carga [`hooks.json`](./.codex/hooks.json) desde la capa confiable del
-proyecto. Los handlers multiplataforma viven en
-[`codex_hooks.py`](./.codex/hooks/codex_hooks.py) y consumen el JSON nativo de
-`PreToolUse` y `SessionStart`.
-
-| Handler Codex | Evento | Que valida |
-|---|---|---|
-| `pre-tool-policy` | PreToolUse (Bash/apply_patch) | Bloquea `.env`, comandos destructivos y edits protegidos |
-| `session-context` | SessionStart | Branch, commits y archivos modificados |
-
-El plugin `core` incluye los hooks equivalentes para Claude Code en [`hooks.json`](./plugins/core/hooks/hooks.json); los scripts comparten la biblioteca `_parse.sh` para parsing JSON.
-
-| Hook | Evento | Que valida |
-|---|---|---|
-| [`block-env-access.sh`](./plugins/core/hooks/block-env-access.sh) | PreToolUse (Bash) | Bloquea lectura/escritura/source de archivos `.env` (permite `.env.example`, `.env.sample`, `.env.template`) |
-| [`session-context.sh`](./plugins/core/hooks/session-context.sh) | SessionStart | Muestra branch, commits recientes y archivos modificados sin commit |
-
-## Comandos
-
-| Comando | Proposito |
-|---|---|
-| [`git-identity`](./plugins/repo-ops/skills/git-identity/SKILL.md) | Auditoria de cuentas git (4 capas: includeIf, shell guards, pre-commit hook, SSH keys) |
-| [`git-identity setup`](./plugins/repo-ops/skills/git-identity/SKILL.md) | Configurar separacion de cuentas (macOS/Linux/Windows, mismo host o hosts diferentes) |
-
-## Flujos de trabajo
-
-### Desarrollo general
-
-```
-brainstorm  -->  plan  -->  execute (usa tdd internamente)
-                                  |
-                              review  -->  verify  -->  merge
-```
-
-### Debugging
-
-```
-debug  -->  tdd (para el fix)  -->  verify
-```
-
-### Features de imagen
-
-```
-image-algo     -->  image-pipeline  -->  plan  -->  execute
-  (algoritmo)       (arquitectura)       (tareas)    (implementar)
-
-ml-ondevice    -->  image-pipeline  -->  plan  -->  execute
-  (modelo ML)       (arquitectura)       (tareas)    (implementar)
-```
-
-### Auditorias
-
-```
-android-arch    (boundaries de Clean Architecture)
-bitmap-safety   (memory, threading, error handling de imagen)
-room-audit      (migraciones, schema, data safety)
-secure quick    (solo archivos cambiados, antes de commit/PR)
-secure full     (proyecto completo, antes de deploy/release)
-```
-
-### Texto
-
-```
-humanize review [archivo]    (diagnostico sin modificar)
-humanize rewrite [archivo]   (reescritura completa)
-```
-
-### Browser automation
-
-```
-browser-control [tarea]     (conecta al browser y ejecuta la tarea)
-```
-
-### Knowledge graph
-
-```
-codegraph build [ruta]           (construye/actualiza el grafo, incremental)
-codegraph query [ruta] "..."     (responde desde el grafo, BFS o --dfs)
-codegraph path [ruta] "A" "B"    (camino mas corto entre dos conceptos)
-codegraph explain [ruta] "X"     (un nodo y todas sus conexiones)
-```
-
-### Multiples problemas independientes
-
-```
-parallel  -->  verify
-```
-
-## Compatibilidad por runtime
-
-- Claude Code: instala los plugins desde el marketplace (o carga `plugins/<nombre>` con `--plugin-dir`). Las skills quedan namespaced: `/core:tdd`, `/android:room-audit`. Las rutas internas usan `${CLAUDE_PLUGIN_ROOT}`, que Claude Code sustituye al cargar.
-- Codex: lee el mismo catalogo (`.agents/plugins/marketplace.json`) y cada skill lleva su `agents/openai.yaml` con la politica de invocacion. La invocacion explicita es `$skill`. Los agentes custom y hooks viven en `.codex/`.
-- Las tablas y flujos de este README describen la capacidad funcional; la sintaxis exacta depende del runtime.
-
-## Estructura
-
-```
-.claude-plugin/marketplace.json        # catalogo para Claude Code
-.agents/plugins/marketplace.json       # catalogo para Codex
-plugins/
-  core/                                # brainstorm, plan, tdd, debug, verify, execute, review,
-    .claude-plugin/plugin.json         #   parallel, optimize, secure, codegraph, humanize
-    plugin.json                        # manifest portable (Agent Plugins)
-    skills/<skill>/SKILL.md            # una skill = un directorio (+ agents/openai.yaml para Codex)
-    agents/prompt-artist.md            # agente de Claude Code
-    hooks/hooks.json                   # hooks de Claude Code + scripts
-  android/                             # android-arch, bitmap-safety, room-audit, ml-ondevice
-  image/                               # image-algo, image-pipeline
-  repo-ops/                            # git-identity, windows-symlink, browser-control
-.codex/agents/                         # agentes custom para Codex
-.codex/config.toml                     # configuracion de proyecto para Codex
-.codex/hooks.json                      # registro de hooks nativos de Codex
-.codex/hooks/codex_hooks.py            # handlers Python multiplataforma
-AGENTS.md                              # reglas globales del repo para Codex
-```
-
-Cada skill es un directorio con `SKILL.md` como punto de entrada y archivos de soporte opcionales (`references/`, `scripts/`, `assets/`) que se cargan on-demand.
-
-## Repos relacionados
-
-Las skills, agentes, hooks y plugins de **game development** (Godot 4, pixel art, Aseprite, PixelLab, produccion por sprints) se movieron a [`gamedev-skills`](https://github.com/jhanva/gamedev-skills). Si usabas `/game-concept`, `/rpg-design`, `/godot-setup`, `/sprite-spec`, `/sprint`, la jerarquia de agentes de estudio o los plugins MCP desde este repo, clona el nuevo y carga ambos:
-
-```bash
-claude --add-dir /ruta/a/gamedev-skills
-```
-
-(con los plugins de `ai-skills` ya instalados desde el marketplace).
-
-Los flujos de juego siguen usando `/brainstorm`, `/plan`, `/tdd`, `/execute`, `/review` y `/verify` de este repo.
-
-## Instalacion
-
-**Claude Code** (desde cualquier proyecto):
+Desde cualquier proyecto abierto en Claude Code:
 
 ```bash
 /plugin marketplace add jhanva/ai-skills
@@ -273,28 +27,384 @@ Los flujos de juego siguen usando `/brainstorm`, `/plan`, `/tdd`, `/execute`, `/
 /plugin install core@ai-skills
 ```
 
-Repite `install` con `android`, `image` o `repo-ops` segun el proyecto. Actualiza con `/plugin marketplace update` y `/plugin update core@ai-skills`.
+Listo. Ya tienes `/core:brainstorm`, `/core:plan`, `/core:tdd`, `/core:debug`, `/core:verify` y el resto del plugin `core`, mas el agente `prompt-artist` y los hooks de proteccion de `.env`. Instala `android`, `image` o `repo-ops` solo si el proyecto los necesita.
 
-Para que un proyecto los active solo al abrirlo, en su `.claude/settings.json`:
+## Indice
+
+- [Como funciona](#como-funciona)
+- [Plugins](#plugins)
+- [Instalacion](#instalacion)
+  - [Claude Code](#claude-code)
+  - [Codex](#codex)
+  - [Otros agentes](#otros-agentes)
+  - [Actualizar y desinstalar](#actualizar-y-desinstalar)
+- [Skills](#skills)
+- [Agentes](#agentes)
+- [Hooks](#hooks)
+- [Flujos de trabajo](#flujos-de-trabajo)
+- [Estructura del repositorio](#estructura-del-repositorio)
+- [Contribuir](#contribuir)
+- [Solucion de problemas](#solucion-de-problemas)
+- [Repos relacionados](#repos-relacionados)
+- [Principios](#principios)
+- [Ahorro de tokens](#ahorro-de-tokens)
+
+## Como funciona
+
+El repositorio tiene tres piezas:
+
+| Pieza | Que es | Donde vive |
+|---|---|---|
+| **Skill** | Un directorio con `SKILL.md` (instrucciones + frontmatter) y opcionalmente `references/`, `scripts/` y `agents/openai.yaml` | `plugins/<plugin>/skills/<skill>/` |
+| **Plugin** | Un paquete instalable: un conjunto de skills, mas agentes y hooks si aplica, con un manifest que declara nombre y version | `plugins/<plugin>/` |
+| **Marketplace** | El catalogo que lista los plugins y de donde obtenerlos | `.claude-plugin/marketplace.json` (Claude Code) y `.agents/plugins/marketplace.json` (Codex) |
+
+Cada skill existe **una sola vez** y sirve a ambos runtimes:
+
+- Claude Code lee el frontmatter de `SKILL.md` (`description`, `disable-model-invocation`, `argument-hint`, `allowed-tools`).
+- Codex lee el mismo `SKILL.md` y toma la politica de invocacion de `agents/openai.yaml` (`allow_implicit_invocation`).
+- Las rutas a archivos del propio plugin se escriben como `${CLAUDE_PLUGIN_ROOT}/...`. Claude Code la sustituye al cargar; en Codex equivale a `plugins/<plugin>/`.
+
+Al instalar un plugin, sus skills quedan **namespaced** con el nombre del plugin para evitar colisiones con otros plugins: la skill `tdd` del plugin `core` se invoca como `/core:tdd`. Las skills marcadas como contextuales (`tdd`, `debug`, `verify`, `codegraph`, `optimize`) se activan solas cuando la tarea lo amerita, sin necesidad de escribir el comando.
+
+Cada plugin declara una `version`. Solo recibes cambios cuando esa version sube en `main`, asi que una actualizacion nunca te cambia el comportamiento sin que lo pidas con `/plugin update`.
+
+## Plugins
+
+| Plugin | Para que | Skills | Extras |
+|---|---|---|---|
+| **`core`** | Cualquier proyecto. El flujo completo de desarrollo | `optimize`, `brainstorm`, `plan`, `tdd`, `debug`, `verify`, `execute`, `review`, `parallel`, `secure`, `codegraph`, `humanize` | Agente `prompt-artist`; hooks `session-context` y `block-env-access` |
+| **`android`** | Apps Android con Clean Architecture, Room o ML on-device | `android-arch`, `bitmap-safety`, `room-audit`, `ml-ondevice` | — |
+| **`image`** | Features de procesamiento de imagen (hashing, similitud, pipelines) | `image-algo`, `image-pipeline` | — |
+| **`repo-ops`** | Operaciones de entorno y repositorio | `git-identity`, `windows-symlink`, `browser-control` | — |
+
+Instala `core` siempre; el resto segun el proyecto. Los plugins son independientes entre si: `android` no requiere `image`, aunque `ml-ondevice` suele encadenarse con `image-pipeline`.
+
+## Instalacion
+
+### Claude Code
+
+**1. Registrar el marketplace** (una vez por maquina):
+
+```bash
+/plugin marketplace add jhanva/ai-skills
+```
+
+**2. Instalar los plugins que necesites:**
+
+```bash
+/plugin install core@ai-skills
+```
+
+```bash
+/plugin install android@ai-skills
+```
+
+```bash
+/plugin install image@ai-skills
+```
+
+```bash
+/plugin install repo-ops@ai-skills
+```
+
+**3. Comprobar:** `/help` muestra las skills bajo su namespace (`core:tdd`, `android:room-audit`...). Tambien puedes abrir `/plugin` para ver el estado de cada plugin y sus errores de carga, si los hubiera.
+
+#### Activacion automatica por proyecto
+
+Para que un proyecto instale y active los plugins solo con abrirlo (util para equipos), anade a su `.claude/settings.json`:
 
 ```json
 {
   "extraKnownMarketplaces": {
-    "ai-skills": { "source": { "source": "github", "repo": "jhanva/ai-skills" } }
+    "ai-skills": {
+      "source": { "source": "github", "repo": "jhanva/ai-skills" }
+    }
   },
-  "enabledPlugins": { "core@ai-skills": true }
+  "enabledPlugins": {
+    "core@ai-skills": true,
+    "android@ai-skills": true
+  }
 }
 ```
 
-Desarrollo local sin instalar (una bandera por plugin; cargar la carpeta `plugins/` completa requiere Claude Code 2.1.265+):
+Cuando alguien abre el proyecto y confia en la carpeta, Claude Code registra el marketplace e instala lo que aparece en `enabledPlugins`. Es la forma recomendada de fijar que plugins usa un repo.
+
+#### Desarrollo local sin instalar
+
+Para probar cambios en este repo o cargar los plugins desde un clon local:
 
 ```bash
 claude --plugin-dir ./plugins/core --plugin-dir ./plugins/android
 ```
 
-**Codex**: el catalogo esta en `.agents/plugins/marketplace.json`. Instala desde `/plugins` dentro de la CLI, o copia `plugins/<nombre>/skills/` a `.agents/skills/` del proyecto destino junto con `.codex/` y `AGENTS.md`.
+Una bandera por plugin. Tras editar una skill, `/reload-plugins` recarga sin reiniciar. Cargar la carpeta `plugins/` completa con una sola bandera requiere Claude Code 2.1.265 o superior.
 
-**Cualquier otro agente** (Cursor, Copilot, OpenCode...): `npx skills add jhanva/ai-skills` detecta los directorios `skills/` e instala solo las skills.
+Si un plugin local tiene el mismo nombre que uno instalado desde el marketplace, el local gana durante esa sesion.
+
+### Codex
+
+Codex lee el catalogo desde `.agents/plugins/marketplace.json` (formato nativo) y tambien reconoce `.claude-plugin/marketplace.json`. Dentro de la CLI:
+
+```
+codex
+/plugins
+```
+
+Busca `ai-skills`, instala el plugin que necesites y abre una sesion nueva. Las skills se invocan con `$skill` (por ejemplo `$tdd`, `$brainstorm`).
+
+Alternativa manual, sin marketplace: copia `plugins/<plugin>/skills/` a `.agents/skills/` del proyecto destino y lleva `.codex/` y `AGENTS.md` si quieres tambien los agentes custom y hooks nativos.
+
+### Otros agentes
+
+Para Cursor, Copilot, OpenCode, Cline, Windsurf y demas agentes compatibles con el formato Agent Skills:
+
+```bash
+npx skills add jhanva/ai-skills
+```
+
+El instalador detecta los directorios `skills/` de cada plugin y enlaza las skills en los agentes que tengas instalados. Solo instala skills (no agentes ni hooks). Usa `--copy` si tu sistema no permite symlinks y `-g` para instalarlas globalmente en lugar de por proyecto.
+
+### Actualizar y desinstalar
+
+```bash
+/plugin marketplace update
+```
+
+Refresca el catalogo. Despues:
+
+```bash
+/plugin update core@ai-skills
+```
+
+Solo llega una version nueva cuando `version` sube en el `plugin.json` correspondiente.
+
+```bash
+/plugin uninstall core@ai-skills
+```
+
+```bash
+/plugin marketplace remove ai-skills
+```
+
+## Skills
+
+Los nombres de las tablas son los cortos; con el plugin instalado se invocan como `/<plugin>:<skill>` en Claude Code y `$<skill>` en Codex.
+
+**Activacion:**
+
+- **Contextual + explicita** — el runtime la activa solo cuando detecta la situacion (un bug, codigo nuevo, una afirmacion de exito), y ademas se puede invocar a mano.
+- **Explicita** — solo se ejecuta cuando la invocas por nombre.
+- **Siempre activa** — se carga como contexto base; no aparece en el menu.
+
+### `core` — desarrollo general
+
+| Skill | Activacion | Proposito |
+|---|---|---|
+| [`optimize`](./plugins/core/skills/optimize/SKILL.md) | Siempre activa | Filtrado de output de comandos, umbral para delegar a subagentes y seleccion de modelo (haiku/sonnet/opus) |
+| [`brainstorm`](./plugins/core/skills/brainstorm/SKILL.md) | Explicita | Diseno antes de implementar: preguntas una a una, 2-3 enfoques con tradeoffs, spec escrita y auto-revisada |
+| [`plan`](./plugins/core/skills/plan/SKILL.md) | Explicita | Convierte una spec aprobada en tareas de 2-5 minutos con codigo real, comandos y output esperado. Cero placeholders |
+| [`tdd`](./plugins/core/skills/tdd/SKILL.md) | Contextual + explicita | RED-GREEN-REFACTOR estricto: prohibido codigo de produccion sin un test que falle primero |
+| [`debug`](./plugins/core/skills/debug/SKILL.md) | Contextual + explicita | Debugging en 4 fases con rastreo de causa raiz; regla de los 3 intentos |
+| [`verify`](./plugins/core/skills/verify/SKILL.md) | Contextual + explicita | Ninguna afirmacion de exito sin ejecutar la verificacion y leer el output |
+| [`execute`](./plugins/core/skills/execute/SKILL.md) | Explicita | Ejecuta un plan tarea por tarea con subagente fresco y revision de 2 etapas (spec y calidad) |
+| [`review`](./plugins/core/skills/review/SKILL.md) | Explicita | Code review con severidades (critico / importante / menor) y manejo de feedback sin sycophancy |
+| [`parallel`](./plugins/core/skills/parallel/SKILL.md) | Explicita | Despacha agentes en paralelo para problemas independientes entre si |
+| [`secure`](./plugins/core/skills/secure/SKILL.md) | Explicita | Analisis de seguridad: secrets, injection, auth, crypto, infra. Modo `quick` (solo diff) o `full` (proyecto). Incluye `scan-secrets.py` sin dependencias |
+| [`codegraph`](./plugins/core/skills/codegraph/SKILL.md) | Contextual + explicita | Knowledge graph del proyecto: extraccion deterministica (Python via `ast`, 16 lenguajes via regex), comunidades, tags de confianza, y `query`/`path`/`explain` sin releer codigo. Zero deps, incremental, `codegraph-out/` committeable |
+| [`humanize`](./plugins/core/skills/humanize/SKILL.md) | Explicita | Diagnostico (`review`) y reescritura (`rewrite`) de texto generado por IA, en espanol e ingles |
+
+### `android`
+
+| Skill | Activacion | Proposito |
+|---|---|---|
+| [`android-arch`](./plugins/android/skills/android-arch/SKILL.md) | Explicita | Valida boundaries de Clean Architecture (domain / data / presentation) |
+| [`bitmap-safety`](./plugins/android/skills/bitmap-safety/SKILL.md) | Explicita | Audita pipelines de imagen: memoria, threading, manejo de errores |
+| [`room-audit`](./plugins/android/skills/room-audit/SKILL.md) | Explicita | Audita seguridad de datos con Room: migraciones, schema, data safety |
+| [`ml-ondevice`](./plugins/android/skills/ml-ondevice/SKILL.md) | Explicita | Integracion de modelos ML on-device: seleccion de framework y runtime |
+
+### `image`
+
+| Skill | Activacion | Proposito |
+|---|---|---|
+| [`image-algo`](./plugins/image/skills/image-algo/SKILL.md) | Explicita | Diseno de algoritmos de imagen: hashing perceptual, similitud, clustering |
+| [`image-pipeline`](./plugins/image/skills/image-pipeline/SKILL.md) | Explicita | Arquitectura de pipelines multi-paso: stages, memoria, concurrencia, errores, cache |
+
+### `repo-ops`
+
+| Skill | Activacion | Proposito |
+|---|---|---|
+| [`git-identity`](./plugins/repo-ops/skills/git-identity/SKILL.md) | Explicita | Auditoria y setup de identidades git separadas (4 capas: `includeIf`, shell guards, pre-commit, SSH). Soporta mismo host con aliases SSH |
+| [`windows-symlink`](./plugins/repo-ops/skills/windows-symlink/SKILL.md) | Explicita | Audita, habilita y repara soporte de symlinks en Windows (Developer Mode, `core.symlinks`, recuperacion de checkouts) |
+| [`browser-control`](./plugins/repo-ops/skills/browser-control/SKILL.md) | Explicita | Control del Chrome real del usuario via CDP: navegacion, screenshots, clicks, teclado, JS, tabs. Un WebSocket, sin frameworks; helpers Python autocontenidos |
+
+## Agentes
+
+| Agente | Runtime | Proposito |
+|---|---|---|
+| [`prompt-artist`](./plugins/core/agents/prompt-artist.md) | Claude Code (plugin `core`) | Transforma ideas en prompts narrativos para generacion de imagenes (Gemini, DALL-E, Midjourney, Stable Diffusion). Formula de 7 componentes con pesos por dominio; anexos en [`references/prompt-artist/`](./plugins/core/references/prompt-artist/) |
+| [`prompt_artist`](./.codex/agents/prompt-artist.toml) | Codex | Misma capacidad, definido como agente custom de Codex |
+| [`task_implementer`](./.codex/agents/task-implementer.toml) | Codex | Backend de `$execute`: implementa una tarea del plan con TDD |
+| [`reviewer`](./.codex/agents/reviewer.toml) | Codex | Backend de `$review` |
+| [`security_auditor`](./.codex/agents/security-auditor.toml) | Codex | Backend de `$secure` |
+
+En Claude Code, `execute`, `review` y `secure` despachan subagentes con la herramienta `Agent` directamente desde la skill, por eso no necesitan agentes custom.
+
+## Hooks
+
+Los hooks corren automaticamente en eventos del runtime. El plugin `core` los trae para Claude Code; `.codex/` los trae para Codex. Misma politica, dos implementaciones.
+
+| Evento | Claude Code (plugin `core`) | Codex (`.codex/hooks/codex_hooks.py`) | Que hace |
+|---|---|---|---|
+| SessionStart | [`session-context.sh`](./plugins/core/hooks/session-context.sh) | `session-context` | Muestra branch, ultimos commits y archivos sin commit al iniciar |
+| PreToolUse | [`block-env-access.sh`](./plugins/core/hooks/block-env-access.sh) | `pre-tool-policy` | Bloquea leer, escribir, redirigir, `source`, `cp`/`mv` sobre `.env*`. Permite `.env.example`, `.env.sample`, `.env.template`. En Codex ademas bloquea comandos destructivos de git |
+
+Los hooks de Claude Code se registran en [`plugins/core/hooks/hooks.json`](./plugins/core/hooks/hooks.json) y se suman a los que el proyecto ya tenga en su `settings.json`. Los de Codex se registran en [`.codex/hooks.json`](./.codex/hooks.json) con `command` y `commandWindows` separados para no asumir un binario fijo de Python.
+
+## Flujos de trabajo
+
+### Desarrollo general
+
+```
+/core:brainstorm  -->  /core:plan  -->  /core:execute (aplica tdd por tarea)
+                                              |
+                                        /core:review  -->  /core:verify  -->  merge
+```
+
+### Debugging
+
+```
+/core:debug  -->  tdd (test que reproduce el bug)  -->  /core:verify
+```
+
+### Features de imagen
+
+```
+/image:image-algo      -->  /image:image-pipeline  -->  /core:plan  -->  /core:execute
+/android:ml-ondevice   -->  /image:image-pipeline  -->  /core:plan  -->  /core:execute
+```
+
+### Auditorias
+
+```
+/android:android-arch     boundaries de Clean Architecture
+/android:bitmap-safety    memoria, threading y errores en pipelines de imagen
+/android:room-audit       migraciones, schema, data safety
+/core:secure quick        solo archivos cambiados (antes de commit/PR)
+/core:secure full         proyecto completo (antes de release)
+```
+
+### Texto
+
+```
+/core:humanize review [archivo o texto]     diagnostico sin modificar
+/core:humanize rewrite [archivo o texto]    reescritura completa
+```
+
+### Knowledge graph
+
+```
+/core:codegraph build [ruta]            construye o actualiza el grafo (incremental)
+/core:codegraph query [ruta] "..."      responde desde el grafo
+/core:codegraph path [ruta] "A" "B"     camino mas corto entre dos conceptos
+/core:codegraph explain [ruta] "X"      un nodo y todas sus conexiones
+```
+
+### Entorno
+
+```
+/repo-ops:git-identity           auditar cuentas git
+/repo-ops:git-identity setup     configurar separacion de cuentas
+/repo-ops:windows-symlink        auditar symlinks en Windows (setup | repair)
+/repo-ops:browser-control [tarea]
+```
+
+En Codex, sustituye `/<plugin>:` por `$`.
+
+## Estructura del repositorio
+
+```
+.claude-plugin/marketplace.json     catalogo para Claude Code
+.agents/plugins/marketplace.json    catalogo para Codex (mismos plugins, mismas versiones)
+plugins/
+  core/
+    .claude-plugin/plugin.json      manifest para Claude Code (name, version, description)
+    plugin.json                     manifest portable (estandar Agent Plugins), mismo contenido
+    skills/<skill>/
+      SKILL.md                      instrucciones + frontmatter
+      agents/openai.yaml            politica de invocacion para Codex
+      references/                   anexos que se cargan on-demand
+      scripts/                      scripts de la skill (Python sin deps, PowerShell)
+    agents/prompt-artist.md         agente de Claude Code
+    references/prompt-artist/       anexos del agente (fuera de agents/, que solo admite agentes)
+    hooks/hooks.json                registro de hooks + scripts .sh
+  android/  image/  repo-ops/       misma estructura, sin agentes ni hooks
+.codex/
+  agents/*.toml                     agentes custom de Codex (+ playbooks en subcarpetas)
+  config.toml                       settings de subagentes
+  hooks.json                        registro de hooks nativos
+  hooks/codex_hooks.py              handlers multiplataforma
+.claude/settings.json               dogfooding: este repo instala sus propios plugins
+tests/                              validacion de manifests, layout de skills, hooks y scanner
+docs/codex-adaptation.md            por que la capa Codex es como es
+AGENTS.md                           reglas de trabajo del repo (git, autorizaciones, convenciones)
+CLAUDE.md                           catalogo y flujo para Claude Code
+```
+
+## Contribuir
+
+Las reglas completas estan en [`AGENTS.md`](./AGENTS.md). Resumen operativo:
+
+### Anadir una skill
+
+1. Crear `plugins/<plugin>/skills/<nombre>/SKILL.md` con frontmatter:
+   - `name` igual al directorio, `description` que diga **cuando** usarla.
+   - `disable-model-invocation: true` si solo se invoca a mano; `user-invocable: false` si es siempre activa.
+2. Crear `agents/openai.yaml` en la skill con `allow_implicit_invocation` coherente con el frontmatter (`false` para las de invocacion manual).
+3. Mantener `SKILL.md` por debajo de 500 lineas; anexos a `references/`, scripts a `scripts/`.
+4. Referenciar archivos propios como `${CLAUDE_PLUGIN_ROOT}/skills/<nombre>/...`, nunca con rutas `.claude/` o `.agents/`.
+5. Subir `version` en `plugins/<plugin>/.claude-plugin/plugin.json`, `plugins/<plugin>/plugin.json` y en la entrada del plugin en **ambos** `marketplace.json`.
+6. Actualizar las tablas de este README y de `CLAUDE.md`.
+
+### Verificar antes de abrir PR
+
+```bash
+python -m unittest discover -s tests
+```
+
+```bash
+claude plugin validate .
+```
+
+```bash
+claude --plugin-dir ./plugins/<plugin>
+```
+
+Los tests comprueban que los dos marketplaces listan los mismos plugins con la misma version, que cada plugin tiene sus dos manifests en sync, que `agents/` solo contiene agentes, que los hooks apuntan a scripts existentes, que cada skill tiene `openai.yaml` coherente y que ningun `SKILL.md` supera las 500 lineas ni referencia capas antiguas.
+
+### Flujo git
+
+Gitflow con `main` (publicado) y `develop` (integracion). Ramas `feature/`, `fix/`, `docs/` desde `develop`; PR con squash hacia `develop`; publicacion con merge commit `develop → main`. Commits en Conventional Commits, en espanol, sin atribucion de asistentes. Un usuario solo recibe un plugin nuevo cuando llega a `main`, porque el marketplace apunta ahi.
+
+## Solucion de problemas
+
+| Sintoma | Causa probable | Solucion |
+|---|---|---|
+| `/plugin install core@ai-skills` no encuentra el plugin | El marketplace no esta registrado o esta desactualizado | `/plugin marketplace add jhanva/ai-skills` y luego `/plugin marketplace update` |
+| Instale el plugin pero no veo `/core:...` en `/help` | Los plugins se cargan al inicio de sesion | `/reload-plugins` o reiniciar Claude Code |
+| Hice `git pull` y no cambio nada | La version del plugin no subio, o no actualizaste | `/plugin update core@ai-skills`; si desarrollas, usa `--plugin-dir` |
+| `--plugin-dir ./plugins` carga cero plugins | Cargar una carpeta de plugins requiere 2.1.265+ | Una bandera por plugin: `--plugin-dir ./plugins/core` |
+| Una skill de Codex muestra `${CLAUDE_PLUGIN_ROOT}` literal | Codex no sustituye la variable | Interpretarla como `plugins/<plugin>/` |
+| Un hook de `.env` bloquea un comando legitimo | El patron cubre `.env*` salvo `.example`/`.sample`/`.template` | Renombrar el archivo a uno de los sufijos permitidos o ejecutar el comando fuera del agente |
+| Tengo mi propio `prompt-artist` en `.claude/agents/` | Los agentes del proyecto tienen prioridad sobre los del plugin | Borrar la copia local para usar la del plugin |
+
+## Repos relacionados
+
+Las skills, agentes y hooks de **game development** (Godot 4, pixel art, Aseprite, produccion por sprints) viven en [`gamedev-skills`](https://github.com/jhanva/gamedev-skills). Se usan junto con `core` de este repo:
+
+```bash
+claude --add-dir /ruta/a/gamedev-skills
+```
 
 ## Principios
 
@@ -303,26 +413,20 @@ claude --plugin-dir ./plugins/core --plugin-dir ./plugins/android
 3. **No adivinar fixes** — `debug` con causa raiz primero
 4. **No decir "listo" sin evidencia** — `verify` antes de reportar
 5. **No confiar en reportes de subagentes** — verificar independientemente
-6. **No referenciar origenes externos** — no mencionar repos o proyectos de terceros como inspiracion en documentacion
+6. **No referenciar origenes externos** — el contenido se presenta como propio
 
 ## Ahorro de tokens
 
-El repositorio aplica reglas base de eficiencia desde `AGENTS.md`. La skill `optimize` conserva la guia complementaria sobre delegacion y seleccion de modelo. Tecnicas de ahorro del proyecto:
+La skill `optimize` (siempre activa en `core`) y las reglas de `AGENTS.md` aplican estas tecnicas en toda interaccion:
 
 | Tecnica | Tokens ahorrados por uso |
 |---|---|
-| Filtrar output de comando | 500-3,000 |
+| Filtrar output de comando con pipes | 500-3,000 |
 | Subagente para tests vs inline | 1,000-5,000 en contexto principal |
 | Modelo ligero vs pesado en tarea mecanica | ~60% menos costo |
 | Limpiar contexto entre tareas | todo el contexto acumulado |
 
-Ademas:
-
-- **Subagentes frescos por tarea** — sin contaminacion de contexto previo
-- **Texto completo en prompt** — los subagentes no leen archivos del plan
-- **Skills on-demand** — solo se cargan cuando se invocan o el runtime detecta relevancia
-- **Archivos de referencia separados** — solo se cargan cuando la skill los necesita
-- **Review de 2 etapas** — atrapa problemas temprano, evita re-trabajo costoso
+Ademas: subagentes frescos por tarea, texto completo de la tarea en el prompt (el subagente no lee el plan), skills y `references/` cargados solo cuando hacen falta, y review de 2 etapas para evitar re-trabajo.
 
 ## Licencia
 
