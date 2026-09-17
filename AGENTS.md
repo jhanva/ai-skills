@@ -7,9 +7,12 @@ tanto desde Claude Code como desde Codex.
 
 - Trabajar en espanol. El texto del repositorio se escribe sin tildes ni enes, siguiendo la
   convencion existente en skills, agentes y documentacion.
-- Este repositorio contiene **skills, agentes, hooks y plugins** reutilizables para desarrollo
-  asistido por IA. No contiene aplicaciones ni proyectos finales: esos viven en otros repos y
-  consumen lo que aqui se define.
+- Este repositorio contiene **skills, agentes y hooks** reutilizables para desarrollo asistido
+  por IA. No contiene aplicaciones ni proyectos finales: esos viven en otros repos y consumen lo
+  que aqui se define.
+- El dominio de game development (Godot 4, pixel art, produccion de juegos) vive en el
+  repositorio hermano `gamedev-skills`. No anadir aqui skills, agentes ni hooks de ese dominio;
+  ambos repos se usan juntos en un proyecto de juego.
 - El repo mantiene dos capas paralelas de la misma capacidad:
   - `.claude/` es la implementacion original para Claude Code (`/skill`).
   - `.agents/skills/`, `.codex/agents/`, `.codex/config.toml`, `.codex/hooks.json` y
@@ -30,7 +33,7 @@ El agente tiene autonomia sobre el flujo de git completo dentro de las reglas de
 
 - Leer cualquier archivo del repositorio.
 - Crear y editar archivos del repositorio.
-- Correr la suite de pruebas (`python -m unittest discover -s tests`) y las pruebas de plugins.
+- Correr la suite de pruebas (`python -m unittest discover -s tests`).
 - Ejecutar hooks y scripts del repo en modo local para verificarlos.
 - Crear ramas de trabajo, hacer `git commit` y `git push` sobre ellas.
 - Abrir *pull requests* hacia `develop` (o hacia `main` desde `hotfix/` o desde `develop`).
@@ -47,10 +50,9 @@ Requiere permiso explicito, individual y para esa sola vez:
 - Cambiar la configuracion del repositorio en GitHub (proteccion de ramas, modos de merge,
   rama por defecto).
 - Cambiar los pins de modelo en `.codex/agents/*.toml` (via `scripts/bump-codex-model.sh`).
-- Anadir o cambiar dependencias, servidores MCP (`.mcp.json`, `plugins/*/.mcp.json`) o
-  claves/credenciales de cualquier tipo.
-- Borrar o renombrar una skill, agente, hook o plugin existente.
-- Cualquier accion sobre servicios externos (GitHub, PixelLab, marketplaces de plugins).
+- Anadir o cambiar dependencias, servidores MCP o claves/credenciales de cualquier tipo.
+- Borrar o renombrar una skill, agente o hook existente.
+- Cualquier accion sobre servicios externos (GitHub u otros).
 
 Antes de pedir permiso, explicar que se hara, sobre que archivos o sistemas y que consecuencias
 tiene. Una autorizacion no se extiende a acciones posteriores, similares ni derivadas.
@@ -131,11 +133,11 @@ en espanol:
 
 | Tipo | Cuando se usa |
 |---|---|
-| `feat` | Skill, agente, hook o plugin nuevo, o capacidad nueva en uno existente |
+| `feat` | Skill, agente o hook nuevo, o capacidad nueva en uno existente |
 | `fix` | Correccion de un comportamiento equivocado |
 | `refactor` | Reorganiza contenido sin cambiar comportamiento (slim, extraer `references/`) |
 | `perf` | Reduce tokens o tiempo sin cambiar comportamiento |
-| `test` | Anade o corrige pruebas en `tests/` o `plugins/*/tests/` |
+| `test` | Anade o corrige pruebas en `tests/` |
 | `docs` | Solo documentacion (README, `docs/`, `CLAUDE.md`, `AGENTS.md`) |
 | `build` | Dependencias, scripts de build, pins de modelo |
 | `ci` | Configuracion de integracion continua |
@@ -143,8 +145,7 @@ en espanol:
 | `revert` | Revierte un commit anterior |
 
 Alcances admitidos: el nombre de la skill o agente afectado (`secure`, `tdd`, `browser-control`,
-`prompt-artist`), o una capa del repo: `claude`, `codex`, `hooks`, `plugins`, `pets`, `docs`,
-`repo`, `tests`. Si el cambio cruza varias skills, se omite el alcance.
+`prompt-artist`), o una capa del repo: `claude`, `codex`, `hooks`, `docs`, `repo`, `tests`. Si el cambio cruza varias skills, se omite el alcance.
 
 Un cambio incompatible — cambiar el protocolo de un subagente, renombrar una skill, cambiar el
 formato que consumen los hooks — se marca con `!` tras el alcance y se explica en el pie con
@@ -167,7 +168,9 @@ BREAKING CHANGE: los subagentes reciben el texto de la tarea directamente
 en lugar de rutas de archivo.
 ```
 
-Los trailers `Co-Authored-By:` de asistentes van como pie del commit cuando aplique.
+**Sin atribucion de asistentes.** Los commits y PR se atribuyen unicamente a las personas del
+equipo: no se anaden trailers `Co-Authored-By` de asistentes, herramientas o modelos, ni lineas
+del tipo "Generated with".
 
 ### Pull requests
 
@@ -183,10 +186,10 @@ Lista de verificacion antes de integrar. Si algun punto falla, el PR se queda ab
 informa al usuario en lugar de mergear:
 
 1. La rama esta actualizada con su destino (`develop` o `main`) y no tiene conflictos.
-2. `python -m unittest discover -s tests` pasa, y la suite del plugin si se toco uno.
+2. `python -m unittest discover -s tests` pasa.
 3. `.claude/settings.local.json`, `__pycache__/`, `tmp/` y cualquier archivo con credenciales
    no aparecen en la lista de cambios.
-4. Si se anadio, renombro o elimino una skill, agente, hook o plugin, la documentacion esta
+4. Si se anadio, renombro o elimino una skill, agente o hook, la documentacion esta
    actualizada segun la seccion [Documentacion](#documentacion).
 5. Se usa el modo de integracion de la tabla de la seccion [Integracion](#integracion).
 
@@ -209,12 +212,11 @@ no se negocian al tocar cualquiera de las tres capas:
   `developer_instructions` y un pin de modelo real. El conocimiento extendido va en su playbook
   local dentro de `.codex/agents/<agent>/`.
 - Todo cambio en `.codex/hooks/codex_hooks.py` o en la configuracion de agentes lleva prueba en
-  `tests/`. Todo cambio en un plugin lleva prueba en `plugins/<plugin>/tests/`.
+  `tests/`.
 - Los hooks deben funcionar en Windows, macOS y Linux. No asumir un binario fijo de Python:
   `.codex/hooks.json` define `command` y `commandWindows` por separado.
-- Las skills de game dev apuntan a Godot 4. No introducir API de Godot 3.
-- Antes de pedir permiso para un commit: `python -m unittest discover -s tests` y, si cambio un
-  plugin, su suite en `plugins/<plugin>/tests/`. No declarar exito sin leer el output.
+- Antes de un commit: `python -m unittest discover -s tests`. No declarar exito sin leer el
+  output.
 
 ### Reglas especificas para Codex
 
@@ -230,7 +232,7 @@ no se negocian al tocar cualquiera de las tres capas:
 
 ## Documentacion
 
-- Un PR que anade, renombra o elimina una skill, agente, hook o plugin actualiza en el mismo PR:
+- Un PR que anade, renombra o elimina una skill, agente o hook actualiza en el mismo PR:
   la tabla y el arbol de `CLAUDE.md`, las tablas del README (incluidos los contadores del
   encabezado) y, si toca la capa Codex, `docs/codex-adaptation.md`.
 - La documentacion explica el **porque**; `SKILL.md`, los `.toml` y los hooks son la fuente de

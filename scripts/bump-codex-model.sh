@@ -12,15 +12,6 @@
 #   - .codex/agents/prompt-artist.toml
 #   - .codex/agents/reviewer.toml
 #   - .codex/agents/security-auditor.toml
-#   - .codex/agents/creative-director.toml
-#   - .codex/agents/technical-director.toml
-#   - .codex/agents/game-designer.toml
-#   - .codex/agents/level-designer.toml
-#   - .codex/agents/godot-architect.toml
-#   - .codex/agents/pixel-artist.toml
-#   - .codex/agents/sound-designer.toml
-#   - .codex/agents/qa-analyst.toml
-#   - .codex/agents/producer.toml
 #   - .codex/agents/task-implementer.toml  (usa implementer-model si se pasa)
 
 set -euo pipefail
@@ -57,15 +48,6 @@ default_agents = [
     ".codex/agents/prompt-artist.toml",
     ".codex/agents/reviewer.toml",
     ".codex/agents/security-auditor.toml",
-    ".codex/agents/creative-director.toml",
-    ".codex/agents/technical-director.toml",
-    ".codex/agents/game-designer.toml",
-    ".codex/agents/level-designer.toml",
-    ".codex/agents/godot-architect.toml",
-    ".codex/agents/pixel-artist.toml",
-    ".codex/agents/sound-designer.toml",
-    ".codex/agents/qa-analyst.toml",
-    ".codex/agents/producer.toml",
 ]
 impl_agents = [".codex/agents/task-implementer.toml"]
 

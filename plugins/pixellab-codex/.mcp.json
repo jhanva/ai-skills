@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "pixellab-codex": {
-      "url": "https://api.pixellab.ai/mcp",
-      "bearer_token_env_var": "PIXELLAB_API_TOKEN"
-    }
-  }
-}

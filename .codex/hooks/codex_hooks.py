@@ -33,11 +33,6 @@ DESTRUCTIVE_COMMANDS = (
 )
 PATCH_PATH_RE = re.compile(r"^\*\*\* (?:Add|Update|Delete) File:\s*(.+?)\s*$", re.MULTILINE)
 PATCH_MOVE_RE = re.compile(r"^\*\*\* Move to:\s*(.+?)\s*$", re.MULTILINE)
-HARDCODED_RE = re.compile(
-    r"(?i)(damage|health|speed|rate|chance|cost|duration|mana|stamina)\s*[:=]\s*\d"
-)
-MOTION_RE = re.compile(r"(?i)(position|velocity|rotation)\s*(?:[+*/-]=|=[^=])")
-UI_IMPORT_RE = re.compile(r"(?i)(?:from|import|preload|load).*?['\"].*?ui[/\\]")
 
 
 def load_payload() -> dict[str, Any]:
@@ -139,90 +134,15 @@ def run_git(cwd: Path, *args: str) -> str:
     return completed.stdout.strip() if completed.returncode == 0 else ""
 
 
-def validate_gameplay_code(payload: dict[str, Any]) -> None:
-    command = tool_command(payload)
-    if not re.search(r"(?i)(?:^|&&|;|\|)\s*git(?:\s+-C\s+\S+)?\s+commit\b", command):
-        return
-    cwd = Path(str(payload.get("cwd") or ".")).resolve()
-    staged = run_git(cwd, "diff", "--cached", "--name-only").splitlines()
-    warnings: list[str] = []
-    for relative in staged:
-        normalized = relative.replace("\\", "/")
-        path = cwd / relative
-        if not path.is_file() or path.suffix.lower() not in {".gd", ".cs"}:
-            continue
-        try:
-            content = path.read_text(encoding="utf-8")
-        except (OSError, UnicodeDecodeError):
-            continue
-        if normalized.startswith("src/gameplay/"):
-            if HARDCODED_RE.search(content):
-                warnings.append(f"HARDCODED: {normalized} has gameplay values that should be data-driven.")
-            if UI_IMPORT_RE.search(content):
-                warnings.append(f"LAYER: {normalized} imports UI directly; prefer signals.")
-        if MOTION_RE.search(content) and "delta" not in content:
-            warnings.append(f"DELTA: {normalized} changes motion without an explicit delta strategy.")
-    if warnings:
-        additional_context("PreToolUse", "Gameplay code warnings before commit:\n- " + "\n- ".join(warnings))
-
-
-def resolve_edited_path(cwd: Path, raw: str) -> Path | None:
-    candidate = Path(raw)
-    if not candidate.is_absolute():
-        candidate = cwd / candidate
-    try:
-        resolved = candidate.resolve()
-        resolved.relative_to(cwd)
-    except (OSError, ValueError):
-        return None
-    return resolved
-
-
-def post_edit_checks(payload: dict[str, Any]) -> None:
-    if payload.get("tool_name") != "apply_patch":
-        return
-    cwd = Path(str(payload.get("cwd") or ".")).resolve()
-    warnings: list[str] = []
-    for relative in patch_paths(tool_command(payload)):
-        normalized = relative.replace("\\", "/").lstrip("./")
-        path = resolve_edited_path(cwd, normalized)
-        if path is None:
-            continue
-        if normalized.startswith("assets/"):
-            if re.search(r"[A-Z\s-]", path.name):
-                warnings.append(f"NAMING: {normalized} must use lowercase_snake_case.")
-            if normalized.startswith("assets/data/") and path.suffix.lower() == ".json" and path.is_file():
-                try:
-                    json.loads(path.read_text(encoding="utf-8"))
-                except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-                    warnings.append(f"JSON: {normalized} is not valid JSON.")
-        match = re.match(r"src/gameplay/([^/]+)/", normalized)
-        if match:
-            system = match.group(1)
-            direct = cwd / "design" / "gdd" / f"{system}.md"
-            alternate = cwd / "design" / "gdd" / f"{system}-system.md"
-            if not direct.is_file() and not alternate.is_file():
-                warnings.append(
-                    f"DESIGN: {normalized} has no design/gdd/{system}.md. "
-                    f"Use $design-system {system} to define it."
-                )
-    if warnings:
-        additional_context("PostToolUse", "Edited-file warnings:\n- " + "\n- ".join(warnings))
-
-
 def session_context(payload: dict[str, Any]) -> None:
     cwd = Path(str(payload.get("cwd") or ".")).resolve()
-    lines = ["Game dev project context:"]
+    lines = ["Repository context:"]
     branch = run_git(cwd, "rev-parse", "--abbrev-ref", "HEAD")
     if branch:
         lines.append(f"Branch: {branch}")
     log = run_git(cwd, "log", "--oneline", "-5")
     if log:
         lines.append("Recent commits:\n" + log)
-    sprint_dir = cwd / "production" / "sprints"
-    sprints = sorted(sprint_dir.glob("sprint-*.md"), key=lambda path: path.stat().st_mtime, reverse=True)
-    if sprints:
-        lines.append(f"Active sprint: {sprints[0].stem}")
     modified = run_git(cwd, "diff", "--name-only")
     staged = run_git(cwd, "diff", "--cached", "--name-only")
     if staged:
@@ -234,8 +154,6 @@ def session_context(payload: dict[str, Any]) -> None:
 
 ACTIONS = {
     "pre-tool-policy": pre_tool_policy,
-    "validate-gameplay-code": validate_gameplay_code,
-    "post-edit-checks": post_edit_checks,
     "session-context": session_context,
 }
 
