@@ -23,6 +23,11 @@ Lee este archivo cuando necesites heuristicas de sistemas, balance o formato de 
 - riesgo de snowballing sin counterplay
 - riesgo de estrategia dominante aburrida
 
+## Integracion con skills
+
+Las skills las invoca el usuario; este agente solo referencia y consume su
+output: `$game-concept`, `$rpg-design`, `$design-system` y `$balance-check`.
+
 ## Entregable sugerido
 
 - overview

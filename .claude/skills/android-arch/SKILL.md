@@ -4,9 +4,7 @@ description: >
   Valida boundaries de Clean Architecture en proyectos Android/Kotlin.
   Detecta leaks de framework en domain, codigo muerto, bindings DI sin uso,
   y dependencias de modulos incorrectas.
-when_to_use: >
-  Cuando el usuario dice "revisar arquitectura", "arch check", "android-arch",
-  "clean architecture", "boundaries", o antes de refactors grandes.
+  Usar cuando: el usuario dice "revisar arquitectura", "arch check", "android-arch", "clean architecture", "boundaries", o antes de refactors grandes.
 argument-hint: "[ruta al proyecto Android]"
 disable-model-invocation: true
 allowed-tools:
@@ -14,10 +12,10 @@ allowed-tools:
   - Grep
   - Glob
   - Agent
-  - Bash(find *)
-  - Bash(wc *)
-  - Bash(git diff *)
-  - Bash(git log *)
+  - Bash(find:*)
+  - Bash(wc:*)
+  - Bash(git diff:*)
+  - Bash(git log:*)
 ---
 
 # Android Arch — Validacion de boundaries de Clean Architecture
@@ -159,4 +157,4 @@ Modulos: [N modulos Gradle]
 Archivos escaneados: N
 ```
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

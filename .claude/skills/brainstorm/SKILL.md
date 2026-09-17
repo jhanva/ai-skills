@@ -3,10 +3,7 @@ name: brainstorm
 description: >
   Guia un proceso de diseno riguroso ANTES de escribir codigo.
   Dialogo socratico, multiples enfoques con tradeoffs, spec escrita.
-when_to_use: >
-  Cuando el usuario quiere construir algo nuevo, agregar una feature no trivial,
-  redisenar un modulo, o dice "quiero hacer", "necesito", "como deberia".
-  Tambien cuando dice "brainstorm" o "disenar".
+  Usar cuando: el usuario quiere construir algo nuevo, agregar una feature no trivial, redisenar un modulo, o dice "brainstorm" o "disenar".
 argument-hint: "[descripcion del problema o feature]"
 disable-model-invocation: true
 ---
@@ -103,4 +100,4 @@ Cuando el usuario aprueba la spec: "Spec aprobada. Usa `/plan` para convertirla 
 | "Solo es un CRUD" | Validaciones, permisos, edge cases, migraciones — nunca es "solo" un CRUD |
 | "Ya empece a codear" | Codigo sin diseno es deuda tecnica desde el dia 1 |
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

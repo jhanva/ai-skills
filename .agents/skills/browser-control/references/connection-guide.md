@@ -4,7 +4,7 @@
 
 - Chrome, Edge, Brave u otro browser basado en Chromium
 - Python 3.11+
-- `websockets` instalado en el Python que ejecute el helper
+- `websockets` instalado en el Python que ejecute el helper (`pip install websockets`)
 
 Si falta:
 
@@ -73,14 +73,14 @@ Los helpers buscan Chrome en este orden:
 |---|---|
 | macOS | `~/Library/Application Support/Google/Chrome/`, Chrome Canary, Edge, Brave |
 | Linux | `~/.config/google-chrome/`, chromium, microsoft-edge |
-| Windows | `%LOCALAPPDATA%\Google\Chrome\User Data\`, Edge, Brave |
+| Windows | `%LOCALAPPDATA%\Google\Chrome\User Data\`, Edge |
 
 4. **Puertos conocidos** - prueba 9222 y 9223 via `/json/version`
 
 ## Test de conexion
 
 ```bash
-python3 .agents/skills/browser-control/references/cdp_helpers.py
+python .agents/skills/browser-control/references/cdp_helpers.py
 ```
 
 Output exitoso:

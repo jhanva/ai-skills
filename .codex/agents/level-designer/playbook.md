@@ -17,6 +17,11 @@ Lee este archivo cuando necesites heuristicas de layout, pacing o encounter plac
 - cada encounter debe tener funcion de pacing o aprendizaje
 - pedir requirements de tileset y audio cuando afecten implementacion
 
+## Integracion con skills
+
+Las skills las invoca el usuario; este agente solo referencia y consume su
+output: `$level-brief`, `$balance-check` y `$tileset-spec`.
+
 ## Entregable sugerido
 
 - overview del nivel

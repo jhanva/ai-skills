@@ -4,9 +4,6 @@
 
 ### Grep patterns
 ```
-# Usuario root (default si no se especifica USER)
-(?i)^FROM.*(?!.*AS\s+builder)   # Si no hay USER despues del FROM final, corre como root
-
 # Secrets en build args
 (?i)ARG.*(password|secret|key|token)
 (?i)ENV.*(password|secret|key|token)\s*=
@@ -22,6 +19,11 @@
 (?i)RUN.*pip install\s+(?!.*==)
 (?i)RUN.*npm install\s+(?!.*@\d)
 ```
+
+### Container corriendo como root (CWE-250)
+
+No hay una regex de una linea confiable. Busca `^USER ` y valida que exista
+despues del ultimo `FROM`; un `USER` en el stage builder no cuenta.
 
 **Buenas practicas:**
 - Usar imagenes slim/alpine con tag de version (`node:20-alpine`)
@@ -52,8 +54,8 @@
 (?i)echo.*\$\{\{.*secrets\.
 (?i)run:.*\$\{\{.*secrets\.   # Si el secret va en un run: puede imprimirse
 
-# Actions de terceros sin SHA pin
-(?i)uses:\s+[^@]+@(?!main$|master$)[a-z]   # Usar SHA, no tags
+# Actions de terceros con ref mutable (branch o tag)
+uses:\s*\S+@(main|master|v?[0-9][\w.]*)\s*$
 # BIEN: uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29
 # MAL:  uses: actions/checkout@v4
 

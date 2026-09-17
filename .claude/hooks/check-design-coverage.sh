@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # PostToolUse hook (Write|Edit) — advierte si gameplay code no tiene GDD
-# Exit 0 siempre (advisory only)
+# Exit 2 con warning = NO bloquea (PostToolUse corre despues del tool),
+# pero stderr se envia a Claude para que lo vea. Exit 0 = sin hallazgos.
 
 source "$(dirname "$0")/_parse.sh"
 
@@ -22,6 +23,8 @@ if [ ! -f "design/gdd/${SYSTEM}.md" ] && [ ! -f "design/gdd/${SYSTEM}-system.md"
   echo "  Expected: design/gdd/${SYSTEM}.md" >&2
   echo "  Run /design-system to create one." >&2
   echo "===============================" >&2
+  # Exit 2: stderr llega a Claude (PostToolUse no bloquea)
+  exit 2
 fi
 
 exit 0

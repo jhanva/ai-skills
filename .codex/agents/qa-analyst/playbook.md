@@ -22,6 +22,11 @@ Lee este archivo cuando necesites clasificar bugs, armar test plans o cerrar un 
 - regression check
 - playtest protocol
 
+## Integracion con skills
+
+Las skills las invoca el usuario; este agente solo referencia y consume su
+output: `$smoke-test`, `$playtest` y, para disciplina de implementacion, `$tdd`.
+
 ## Entregable sugerido
 
 - scope

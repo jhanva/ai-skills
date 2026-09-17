@@ -6,7 +6,6 @@ description: >
   actions, display settings, y export presets. Output: checklist de
   configuracion con valores concretos para project.godot y folder tree.
 disable-model-invocation: true
-agent: godot-architect
 allowed-tools:
   - Read
   - Grep
@@ -97,10 +96,16 @@ project_root/
 │   ├─ data/                # JSON, CSV, resource files
 │   └─ shaders/             # Custom shaders
 ├─ design/                  # Design documents (opcional, si estan en repo)
+│   ├─ gdd/                 # Game concept y GDDs por sistema
+│   ├─ levels/
 │   ├─ sprites/
 │   ├─ tilesets/
 │   ├─ audio/
-│   └─ levels/
+│   └─ scenes/              # Scene designs (/scene-design)
+├─ production/              # Sprints, stories, playtests
+│   ├─ sprints/
+│   ├─ stories/
+│   └─ playtests/
 ├─ tests/                   # Unit tests (GUT framework)
 └─ builds/                  # Export output (gitignored)
     ├─ windows/
@@ -135,9 +140,11 @@ mono_crash.*.json
 **Accion**: Crear directorios si no existen.
 
 ```bash
-mkdir -p src/{gameplay,core,ui,autoloads}
+mkdir -p src/{core,gameplay,ui,autoloads}
 mkdir -p scenes/{levels,characters,ui,prefabs}
 mkdir -p assets/{sprites,tiles,audio/{sfx,music,ambience},fonts,data,shaders}
+mkdir -p design/{gdd,levels,sprites,tilesets,audio,scenes}
+mkdir -p production/{sprints,stories,playtests}
 mkdir -p tests
 mkdir -p builds
 ```
@@ -470,7 +477,7 @@ window/stretch/scale_mode="integer"
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0  # Nearest neighbor (no blur)
-2d/snapping/use_gpu_pixel_snap=true  # Pixel snap enabled
+2d/snap/snap_2d_transforms_to_pixel=true  # Pixel snap enabled (Godot 4)
 ```
 
 ### Aspect ratio y scaling
@@ -511,7 +518,7 @@ textures/canvas_textures/default_texture_filter=0  # Nearest neighbor (no blur)
 |----------|-------------|----------|-------|
 | Windows Desktop | game.exe | DirectX/Vulkan, gamepad | Mas facil para testing |
 | Linux/X11 | game.x86_64 | Vulkan, gamepad | Universal compatibility |
-| HTML5 (Web) | index.html | WebGL 2, touch/mouse | Itch.io, Newgrounds |
+| Web | index.html | WebGL 2, touch/mouse | Itch.io, Newgrounds |
 | macOS | game.app | Metal, gamepad | Requiere certificado (opcional) |
 
 ### Export preset: Windows
@@ -527,7 +534,7 @@ textures/canvas_textures/default_texture_filter=0  # Nearest neighbor (no blur)
 **Custom Resources**: Excluir archivos innecesarios
 - Excluir: `design/*`, `tests/*`, `*.md`, `.git`
 
-### Export preset: HTML5
+### Export preset: Web
 
 **Settings**:
 - Export Path: `builds/web/index.html`
@@ -572,8 +579,8 @@ binary_format/embed_pck=true
 
 [preset.1]
 
-name="HTML5"
-platform="HTML5"
+name="Web"
+platform="Web"
 runnable=true
 export_filter="all_resources"
 exclude_filter="design/*, tests/*, *.md, .git*"
@@ -611,13 +618,15 @@ progressive_web_app/enabled=false
 **Project**: [nombre del juego]
 **Engine**: Godot 4.x
 **Language**: GDScript
-**Date**: 2026-04-17
+**Date**: YYYY-MM-DD
 
 ## 1. Folder Structure
 
-- [ ] Crear directorios: src/{gameplay,core,ui,autoloads}
+- [ ] Crear directorios: src/{core,gameplay,ui,autoloads}
 - [ ] Crear directorios: scenes/{levels,characters,ui,prefabs}
 - [ ] Crear directorios: assets/{sprites,tiles,audio,fonts,data,shaders}
+- [ ] Crear directorios: design/{gdd,levels,sprites,tilesets,audio,scenes}
+- [ ] Crear directorios: production/{sprints,stories,playtests}
 - [ ] Crear directorios: tests, builds
 - [ ] Crear .gitignore con reglas de Godot
 
@@ -657,10 +666,10 @@ progressive_web_app/enabled=false
 ## 6. Export Presets
 
 - [ ] Configurar Windows Desktop export
-- [ ] Configurar HTML5 export (opcional)
+- [ ] Configurar Web export (opcional)
 - [ ] Set exclude filters (design/*, tests/*, .git*)
 - [ ] Testear build Windows
-- [ ] Testear build HTML5
+- [ ] Testear build Web
 
 ## 7. Testing
 
@@ -699,7 +708,7 @@ interact={...}
 
 [rendering]
 textures/canvas_textures/default_texture_filter=0
-2d/snapping/use_gpu_pixel_snap=true
+2d/snap/snap_2d_transforms_to_pixel=true
 ```
 
 **.gitignore**:

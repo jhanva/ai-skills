@@ -20,21 +20,21 @@ Control del browser real del usuario via Chrome DevTools Protocol. Un WebSocket 
 ## Primer movimiento
 
 1. Si es la primera vez, leer `references/connection-guide.md` y configurar la conexion.
-2. Ejecutar el test de conexion para confirmar que Chrome responde:
+2. Ejecutar el test de conexion para confirmar que Chrome responde (desde la raiz del repo; `python` o `python3`/`py` segun la maquina):
 
 ```bash
-python3 ${CLAUDE_SKILL_DIR}/references/cdp_helpers.py
+python .claude/skills/browser-control/references/cdp_helpers.py
 ```
 
 3. Si falla, seguir la guia de troubleshooting en `references/connection-guide.md`.
 
 ## Patron de uso
 
-Ejecutar scripts Python inline via heredoc. Los helpers se importan desde el modulo de referencia:
+Ejecutar scripts Python inline via heredoc (ejecutar desde la raiz del repo). La ruta de los helpers se pasa como argumento y se lee con `sys.argv[1]`:
 
 ```bash
-python3 <<'PY'
-import sys; sys.path.insert(0, "${CLAUDE_SKILL_DIR}/references")
+python - ".claude/skills/browser-control/references" <<'PY'
+import sys; sys.path.insert(0, sys.argv[1])
 from cdp_helpers import *
 
 connect()
@@ -42,13 +42,13 @@ new_tab("https://example.com")
 wait_for_load()
 info = page_info()
 print(f"{info['title']} — {info['url']}")
-path = screenshot("/tmp/page.png")
+path = screenshot("./page.png")
 print(f"Screenshot: {path}")
 close()
 PY
 ```
 
-Siempre usar el heredoc `<<'PY'` (comillas en PY) para evitar expansion de variables shell dentro del Python.
+Usar `python` (o `python3`/`py` segun la maquina). Siempre usar el heredoc `<<'PY'` (comillas en PY) para evitar expansion de variables shell dentro del Python; por eso la ruta de los helpers se pasa como argumento en vez de interpolarla dentro del heredoc.
 
 ## API de helpers
 
@@ -84,7 +84,7 @@ Siempre usar el heredoc `<<'PY'` (comillas en PY) para evitar expansion de varia
 
 | Funcion | Descripcion |
 |---|---|
-| `screenshot(path="/tmp/cdp_screenshot.png", full=False)` | Capturar viewport como PNG. `full=True` para pagina completa |
+| `screenshot(path=..., full=False)` | Capturar viewport como PNG. Default: `cdp_screenshot.png` en el dir temporal del sistema (`tempfile.gettempdir()`). `full=True` para pagina completa |
 
 ### Tabs
 
@@ -124,7 +124,7 @@ Siempre usar el heredoc `<<'PY'` (comillas en PY) para evitar expansion de varia
 - **DevicePixelRatio**: screenshots son en device pixels. En displays 2x, dividir coordenadas de la imagen por `js("window.devicePixelRatio")` antes de pasarlas a `click_at_xy()`.
 - **Primer tab**: usar `new_tab(url)`, no `goto(url)` — goto navega en el tab activo del usuario y sobreescribe su trabajo.
 - **Dialogs bloquean JS**: si `page_info()` falla despues de una accion, puede haber un dialog pendiente. Usar `handle_dialog()`.
-- **Tab order CDP != visual**: el orden de `list_tabs()` no coincide con la barra de tabs visible. Usar AppleScript en macOS si importa el orden visual.
+- **Tab order CDP != visual**: el orden de `list_tabs()` no coincide con la barra de tabs visible. Si importa el orden visual, usar automatizacion del OS (AppleScript en macOS, UI Automation/PowerShell en Windows).
 - **Stale sessions**: si un tab se cierra externamente, las llamadas CDP fallan. Reconectar con `ensure_real_tab()`.
 - **Verificar despues de actuar**: siempre `screenshot()` despues de clicks o navegacion para confirmar que la accion funciono.
 
@@ -147,5 +147,3 @@ Siempre usar el heredoc `<<'PY'` (comillas en PY) para evitar expansion de varia
 |---|---|
 | `CDP_WS_URL` | WebSocket URL directa (override de auto-discovery) |
 | `CDP_URL` | HTTP DevTools endpoint (ej: `http://127.0.0.1:9222`). Se resuelve a WS via `/json/version` |
-
-## Argumento: $ARGUMENTS

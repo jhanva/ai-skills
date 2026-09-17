@@ -1,7 +1,8 @@
 ---
 name: optimize
-description: Filtrado de output, delegacion con umbral, seleccion de modelo para subagentes.
-when_to_use: Siempre.
+description: >
+  Filtrado de output, delegacion con umbral, seleccion de modelo para
+  subagentes. Usar cuando: siempre, en toda interaccion.
 user-invocable: false
 ---
 
@@ -31,8 +32,8 @@ MAL:  "Corre npm test"
 
 Usa el modelo de menor capacidad que pueda completar la tarea:
 
-| Modelo | Usar para |
-|---|---|
-| haiku | Buscar archivos, leer/extraer info, tareas mecanicas |
-| sonnet | Implementar, integrar, logica de negocio |
-| opus | Arquitectura, review, debugging complejo |
+- haiku: busqueda, lectura/extraccion, tareas mecanicas
+- sonnet: implementacion, integracion, logica de negocio
+- opus: arquitectura, review, debugging complejo
+
+Criterios completos y reglas de escalacion: .claude/skills/execute/model-selection.md (fuente canonica).

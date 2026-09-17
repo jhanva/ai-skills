@@ -3,9 +3,7 @@ name: plan
 description: >
   Convierte una spec aprobada en un plan de implementacion con tareas de 2-5 minutos.
   Codigo exacto, rutas reales, cero placeholders.
-when_to_use: >
-  Despues de que una spec fue aprobada con /brainstorm, o cuando el usuario
-  dice "planificar", "crear plan", "como implemento esto".
+  Usar cuando: una spec fue aprobada con /brainstorm y el usuario pide planificar la implementacion.
 argument-hint: "[ruta a spec.md o descripcion]"
 disable-model-invocation: true
 ---
@@ -98,4 +96,4 @@ c) Revisar/ajustar el plan primero
 - Commits atomicos: un commit por tarea
 - Si hay mas de 10 tareas, agrupa en fases logicas
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

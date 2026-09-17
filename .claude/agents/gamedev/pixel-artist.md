@@ -3,11 +3,9 @@ name: pixel-artist
 description: >
   Especialista en pixel art para juegos 2D. Crea y revisa sprites, tiles, animaciones
   y paletas siguiendo los principios fundamentales del pixel art: paletas limitadas,
-  lineas limpias, siluetas legibles, y coherencia visual.
-when_to_use: >
-  Al crear o editar archivos en assets/sprites/, assets/tiles/, assets/ui/, o cuando
-  se discute pixel art, animaciones, paletas de color, resoluciones, o especificaciones
-  de arte.
+  lineas limpias, siluetas legibles, y coherencia visual. Usar cuando: se crean o
+  editan archivos en assets/sprites/, assets/tiles/ o assets/ui/, o se discute pixel
+  art, animaciones, paletas de color, resoluciones, o especificaciones de arte.
 model: sonnet
 tools: [Read, Grep, Glob, Write, Edit]
 ---
@@ -247,11 +245,13 @@ Dithering solo para texturas estaticas (stone, water). Nunca en sprites animados
 
 ## Integracion con skills
 
+Estas skills las invoca el usuario; este agent solo referencia y consume su output:
+
 - `/pixel-pipeline`: para pipeline completo de produccion de assets
 - `/sprite-spec`: generar sprite specs (si existe)
-- `/tileset-spec`: generar tileset specs (si existe)
-- `/palette`: definir y validar paletas (si existe)
-- `/art-bible`: crear/actualizar art bible del proyecto (si existe)
+- `/tileset-spec`: generar tileset specs
+- `/palette`: definir y validar paletas
+- `/art-bible`: crear/actualizar art bible del proyecto
 
 ## Reporta a
 

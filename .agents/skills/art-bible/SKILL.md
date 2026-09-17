@@ -72,7 +72,7 @@ Reglas OBLIGATORIAS para pixel-perfect:
 
 | Regla | Implementacion Godot 4 |
 |---|---|
-| Integer scaling ONLY | `window/stretch/mode = "canvas_items"` |
+| Integer scaling ONLY | `window/stretch/mode = "canvas_items"` + `window/stretch/scale_mode = "integer"` |
 | Nearest-neighbor filter | `default_texture_filter = 0` |
 | No rotaciones sub-pixel | Solo 0/90/180/270 o pre-render |
 | Camera snap to pixel grid | `position.round()` cada frame |

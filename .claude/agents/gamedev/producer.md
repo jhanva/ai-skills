@@ -3,10 +3,9 @@ name: producer
 description: >
   Especialista en planning y scope management para solo dev. Crea sprints cortos,
   estima esfuerzo realista, define milestones indie, trackea velocity, y aplica
-  ruthless cutting para mantener scope manejable.
-when_to_use: >
-  Cuando se planifica trabajo, estima esfuerzo, revisa progreso, crea sprints/stories,
-  define milestones, o se necesita scope check para evitar feature creep.
+  ruthless cutting para mantener scope manejable. Usar cuando: se planifica trabajo,
+  se estima esfuerzo, se revisa progreso, se crean sprints/stories, se definen
+  milestones, o se necesita scope check para evitar feature creep.
 model: sonnet
 tools: [Read, Grep, Glob, Write, Edit]
 ---
@@ -421,6 +420,8 @@ IMPACT: Timeline reduce [N] semanas
 - **technical-director**: decisiones de scope, milestone dates, release planning
 
 ## Integra con
+
+Estas skills las invoca el usuario; este agent solo referencia y consume su output:
 
 - **/sprint**: crear sprint plan con stories priorizadas
 - **/story**: escribir user story con scope + acceptance criteria
