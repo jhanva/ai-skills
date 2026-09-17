@@ -4,6 +4,7 @@
 
 Skills de desarrollo y agentes especializados propios, escritos desde cero. Imponen flujos de trabajo disciplinados: TDD, debugging sistematico, diseno antes de implementacion, y verificacion con evidencia.
 
+Las skills, agentes y hooks de game development (Godot 4, pixel art, produccion de juegos) viven en el repositorio hermano `gamedev-skills` (https://github.com/jhanva/gamedev-skills) y se usan junto con este.
 ## Estructura
 
 ```
@@ -32,32 +33,6 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
   ml-ondevice/SKILL.md             — Integracion de ML on-device Android
   image-pipeline/SKILL.md          — Diseno de pipelines de imagen
   humanize/SKILL.md                — Humanizar texto generado por IA
-  rpg-design/SKILL.md              — Diseno de sistemas RPG (stats, combate, balance)
-  game-arch/SKILL.md               — Arquitectura de juegos 2D (game loop, FSM, commands)
-  pixel-pipeline/SKILL.md          — Pipeline de assets pixel art (sprites, tiles, atlas)
-  game-start/SKILL.md              — Onboarding de proyecto Godot (setup guiado)
-  game-concept/SKILL.md            — Formalizar concepto de juego (pillars, core loop, MVP)
-  art-bible/SKILL.md               — Identidad visual (paleta, estilo, restricciones)
-  design-system/SKILL.md           — GDD por sistema (inventario, dialogo, crafting)
-  level-brief/SKILL.md             — Diseno de nivel (layout, encounters, dificultad)
-  balance-check/SKILL.md           — Validacion de balance numerico
-  sprite-spec/SKILL.md             — Spec de sprite sheet (frames, estados, hitbox)
-  tileset-spec/SKILL.md            — Spec de tileset (autotile, variantes, layers)
-  palette/SKILL.md                 — Gestion de paletas de color (ramps, swaps)
-  sound-brief/SKILL.md             — Brief de audio (SFX, musica, Godot integration)
-  godot-setup/SKILL.md             — Config proyecto Godot (autoloads, input, display)
-  scene-design/SKILL.md            — Diseno de escena Godot (node tree, signals)
-  sprint/SKILL.md                  — Planificacion de sprints (1-2 semanas, 3-5 stories)
-  story/SKILL.md                   — GDD -> user story con scope y acceptance criteria
-  scope-check/SKILL.md             — Validacion de scope (MVP alcanzable? velocity, riesgos)
-  playtest/SKILL.md                — Sesion de playtest con checklist y game feel rating
-  smoke-test/SKILL.md              — Smoke test pre-merge/pre-release (automated + manual)
-  aseprite-workflows/SKILL.md      — Automatizacion de Aseprite via MCP (inspect, export, Lua)
-  aseprite-workflows/references/tool-map.md  — Recetas y mapeo de tools MCP
-  godot-workflows/SKILL.md         — Automatizacion headless de Godot 4 via MCP (import, export, scripts)
-  godot-workflows/references/tool-map.md     — Recetas y mapeo de tools MCP
-  pixellab-workflows/SKILL.md      — Generacion de assets pixel art via PixelLab MCP
-  pixellab-workflows/references/tool-map.md  — Catalogo de tools del MCP oficial
   windows-symlink/SKILL.md         — Soporte de symlinks en Windows (audit, setup, repair)
   windows-symlink/references/windows-requirements.md  — Prerequisitos y permisos Windows
   windows-symlink/references/git-recovery.md           — Recuperacion de symlinks rotos en Git
@@ -85,23 +60,11 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
   prompt-artist/techniques.md      — Catalogo de tecnicas visuales
   prompt-artist/platforms.md       — Adaptacion Gemini/MJ/DALL-E/SD
   prompt-artist/text-safety.md     — Texto en imagenes y safety filters
-  gamedev/creative-director.md     — Director: vision arte + diseno (opus)
-  gamedev/technical-director.md    — Director: arquitectura + calidad (opus)
-  gamedev/pixel-artist.md          — Especialista: sprites, tiles, animacion
-  gamedev/sound-designer.md        — Especialista: SFX, musica
-  gamedev/game-designer.md         — Especialista: sistemas, mecanicas, balance
-  gamedev/level-designer.md        — Especialista: niveles, encounters
-  gamedev/godot-architect.md       — Especialista: engine patterns, escenas
-  gamedev/qa-analyst.md            — Especialista: testing, playtesting
-  gamedev/producer.md              — Especialista: sprints, scope, milestones
 
 .claude/hooks/
   _parse.sh                        — Biblioteca compartida (JSON parsing)
   block-env-access.sh              — Bloquea acceso a archivos .env
-  validate-gameplay-code.sh        — No hardcoded values, delta time, layer separation
-  validate-assets.sh               — Naming convention, JSON valido en data files
-  check-design-coverage.sh         — Codigo sin GDD = warning
-  session-context.sh               — Contexto del proyecto al iniciar sesion
+  session-context.sh               — Contexto del repositorio al iniciar sesion
 ```
 
 ## Skills disponibles
@@ -125,29 +88,6 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
 | `/ml-ondevice` | Solo usuario | Integracion de modelos ML on-device en Android |
 | `/image-pipeline` | Solo usuario | Diseno de pipelines de procesamiento de imagen multi-paso |
 | `/humanize` | Solo usuario | Humanizar texto de IA: diagnostico y reescritura (review/rewrite) |
-| `/rpg-design` | Solo usuario | Diseno de sistemas RPG (stats, formulas, turnos, balance, enemy AI) |
-| `/game-arch` | Solo usuario | Arquitectura de juegos 2D (game loop, FSM, commands, save system) |
-| `/pixel-pipeline` | Solo usuario | Pipeline de assets pixel art (sprites, tiles, atlas, palette swap) |
-| `/game-start` | Solo usuario | Onboarding: Godot config, estructura, GDScript vs C# |
-| `/game-concept` | Solo usuario | Formalizar idea en concept doc (pillars, core loop, MVP) |
-| `/art-bible` | Solo usuario | Identidad visual: paleta, estilo, restricciones pixel art |
-| `/design-system` | Solo usuario | GDD para un sistema especifico (inventario, dialogo, crafting) |
-| `/level-brief` | Solo usuario | Disenar nivel: layout ASCII, encounters, dificultad |
-| `/balance-check` | Auto + usuario | Validar balance numerico (damage curves, economy) |
-| `/sprite-spec` | Solo usuario | Spec de sprite sheet: frames, estados, dimensiones, hitbox |
-| `/tileset-spec` | Solo usuario | Spec de tileset: autotile rules, variantes, layers |
-| `/palette` | Solo usuario | Crear/gestionar paletas de color (ramps, swaps) |
-| `/sound-brief` | Solo usuario | Brief de audio: SFX list, musica, integracion Godot |
-| `/godot-setup` | Solo usuario | Config proyecto Godot: autoloads, input, display |
-| `/scene-design` | Solo usuario | Disenar escena: node tree, signals, scripts |
-| `/sprint` | Solo usuario | Planificacion de sprint (stories, capacity, acceptance criteria) |
-| `/story` | Solo usuario | GDD -> user story (scope, files, estimacion S/M/L, dependencies) |
-| `/scope-check` | Auto + usuario | Validar si MVP es alcanzable (velocity, proyeccion, riesgos) |
-| `/playtest` | Solo usuario | Playtest estructurado (funcionalidad + game feel + bugs) |
-| `/smoke-test` | Solo usuario | Smoke test pre-merge/pre-release (automated + manual) |
-| `/aseprite-workflows` | Solo usuario | Inspeccionar, exportar y automatizar Aseprite via MCP |
-| `/godot-workflows` | Solo usuario | Import headless, export builds, scripts de Godot 4 via MCP |
-| `/pixellab-workflows` | Solo usuario | Generar personajes, tilesets y props con PixelLab MCP |
 | `/windows-symlink` | Solo usuario | Auditar/habilitar/reparar symlinks en Windows |
 | `/browser-control` | Solo usuario | Control de browser via CDP (navegacion, screenshots, clicks, tabs) |
 | `/codegraph` | Auto + usuario | Knowledge graph consultable del proyecto (build, query, path, explain) |
@@ -189,36 +129,6 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
 /humanize rewrite [archivo]   (reescritura completa)
 ```
 
-### Game development
-
-Workflow completo para juegos 2D pixel art con Godot 4. 9 agentes en jerarquia de estudio + 5 hooks.
-
-#### Concepto → Diseno → Arte → Arquitectura → Produccion → QA
-```
-/game-start  -->  /brainstorm  -->  /game-concept  -->  /art-bible
-                                         |
-                  /design-system  -->  /rpg-design  -->  /balance-check
-                  /level-brief
-                                                            |
-/palette  -->  /pixel-pipeline                     /game-arch  -->  /godot-setup
-/sprite-spec   /tileset-spec                       /scene-design
-/sound-brief   /pixellab-workflows                      |
-/aseprite-workflows                                     |
-                                                        v
-/scope-check  -->  /sprint  -->  /story  -->  /plan  -->  /execute (usa /tdd)
-                                                              |
-                                                    /playtest  -->  /smoke-test
-                                                              |
-                                                    /review  -->  /verify  -->  merge
-```
-
-#### Agentes gamedev (jerarquia de estudio)
-```
-Tier 1 — Directores (opus)
-  creative-director ──── pixel-artist, sound-designer, game-designer, level-designer
-  technical-director ─── godot-architect, qa-analyst, producer
-```
-
 ### Agentes especializados
 ```
 @prompt-artist    Transforma ideas en prompts optimizados para imagen
@@ -240,13 +150,6 @@ Tier 1 — Directores (opus)
 /codegraph explain [ruta] X    Un nodo y todas sus conexiones
                                Si codegraph-out/graph.json existe, las preguntas
                                de arquitectura se responden consultando el grafo
-```
-
-### Herramientas externas (MCP)
-```
-/aseprite-workflows    Inspeccionar .aseprite, exportar sheets/frames, correr Lua
-/godot-workflows       Import headless, export builds, scripts de automatizacion
-/pixellab-workflows    Generar personajes, tilesets, props con PixelLab AI
 ```
 
 ### Infraestructura
