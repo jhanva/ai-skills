@@ -4,10 +4,7 @@ description: >
   Definir art bible para pixel art: resolucion, tile/character size,
   paleta (16-32 colores), estilo de sprites, reglas de animacion,
   UI style. Produce art-bible.md.
-when_to_use: >
-  Cuando el usuario quiere definir la estetica de un juego pixel art,
-  o cuando dice "art-bible", "paleta", "estilo visual", "pixel art",
-  "resolucion", "sprites", "definir arte".
+  Usar cuando: se quiere definir la estetica visual de un juego pixel art o el usuario dice "art-bible", "paleta", "estilo visual".
 argument-hint: "[estilo o referencia visual]"
 disable-model-invocation: true
 allowed-tools:
@@ -15,7 +12,6 @@ allowed-tools:
   - Grep
   - Glob
   - Write
-agent: pixel-artist
 ---
 
 # Art Bible — Definir estetica pixel art
@@ -282,7 +278,7 @@ Estas reglas son OBLIGATORIAS para mantener pixel art limpio:
 
 | Regla | Implementacion Godot 4 |
 |---|---|
-| Integer scaling ONLY | `window/stretch/mode = "canvas_items"` |
+| Integer scaling ONLY | `window/stretch/mode = "canvas_items"` + `window/stretch/scale_mode = "integer"` |
 | Nearest-neighbor filter | `rendering/textures/canvas_textures/default_texture_filter = 0` |
 | No rotaciones sub-pixel | Sprites solo 0°/90°/180°/270° o pre-render rotaciones |
 | Camera snap to pixel grid | `camera.position = camera.position.round()` cada frame |
@@ -639,4 +635,4 @@ ANTI-PATRON: Linear filtering "por defecto"
   Solucion: texture filter Nearest en settings globales
 ```
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

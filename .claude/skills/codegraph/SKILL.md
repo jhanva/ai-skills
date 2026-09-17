@@ -8,8 +8,7 @@ description: >
   en vez de releer archivos. Outputs: graph.json, GRAPH_REPORT.md y
   visualizacion HTML interactiva. Si codegraph-out/graph.json ya existe,
   las preguntas sobre el codebase se responden consultando el grafo.
-when_to_use: >
-  Cuando el usuario dice "codegraph", "knowledge graph", "mapea el proyecto",
+  Usar cuando: el usuario dice "codegraph", "knowledge graph", "mapea el proyecto",
   "grafo del codigo", o hace preguntas de arquitectura sobre un proyecto que
   ya tiene codegraph-out/ (como funciona X, que llama a Y, traza el flujo
   de Z, que depende de W).
@@ -20,8 +19,9 @@ allowed-tools:
   - Glob
   - Grep
   - Agent
-  - Bash(python *)
-  - Bash(python3 *)
+  - Bash(python:*)
+  - Bash(python3:*)
+  - Bash(py:*)
 ---
 
 # Codegraph — Knowledge graph de proyectos

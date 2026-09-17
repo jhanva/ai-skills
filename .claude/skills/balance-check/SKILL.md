@@ -4,17 +4,16 @@ description: >
   Validar balance de sistemas de juego: generar tabla de escenarios, validar
   ratios (damage-to-HP, gold-to-item, XP-to-level), identificar outliers y
   breakpoints. Recomienda ajustes con valores concretos. Output en conversacion.
-when_to_use: >
-  Despues de definir formulas de combate/economia/progresion, o cuando el usuario
-  dice "balance", "los numeros no cuadran", "damage feels off", "balance-check",
-  "validar formulas", "testear escenarios".
+  Usar cuando: despues de definir formulas de combate/economia/progresion, o cuando el usuario dice "balance", "los numeros no cuadran", "damage feels off", "balance-check", "validar formulas", "testear escenarios".
 argument-hint: "[sistema o aspecto a balancear]"
 allowed-tools:
   - Read
   - Grep
   - Glob
-  - Bash(python3 *)
-agent: game-designer
+  - Bash(python3:*)
+  - Bash(python:*)
+  - Bash(py:*)
+  - Bash(find:*)
 ---
 
 # Balance Check — Validacion de balance de juego
@@ -414,4 +413,4 @@ ANTI-PATRON: Confiar solo en numeros, no playtest
   Solucion: balance-check es validacion matematica, playtest es validacion final
 ```
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

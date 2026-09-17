@@ -22,7 +22,9 @@ Entrada: `$story {system}/{feature}` (ej: combat/damage-formula, inventory/equip
 
 ## FASE 1: Leer seccion del GDD
 
-Buscar `design/gdd/{system}.md` seccion `## {Feature}`. Si no existe: error, usar `$brainstorm {system}` primero.
+Buscar `design/gdd/{system}.md` seccion `## {Feature}`. Si no existe: error,
+usar `$design-system {system}` para un sistema general o `$rpg-design` si es
+combate/progresion.
 
 Extraer: formulas/reglas, comportamientos esperados, valores/constantes, interacciones con otros sistemas, assets referenciados.
 
@@ -40,6 +42,17 @@ Si el usuario quiere incluir algo de out-of-scope: advertir que expande la story
 ## FASE 4: Archivos a crear/modificar
 
 Buscar archivos existentes relacionados en el proyecto. Tabla: `action (CREATE/MODIFY) → file → purpose → type (Script/Scene/Resource/Asset)`.
+
+Mantener la convencion de `$godot-setup`:
+
+```text
+src/{core,gameplay,ui,autoloads}/
+scenes/{levels,characters,ui,prefabs}/
+assets/{sprites,tiles,audio,data}/
+```
+
+Los sistemas de juego viven en `src/gameplay/{system}/`, no en
+`src/systems/` ni en un directorio top-level por sistema.
 
 ## FASE 5: Acceptance criteria
 
@@ -78,6 +91,6 @@ Escribir `production/stories/{system}-{feature}.md` con: size, status TODO, prio
 
 ## Edge cases
 
-- **GDD vago** (<5 lineas): error, expandir con `$brainstorm` primero
+- **GDD vago** (<5 lineas): error, expandir con `$design-system {system}`
 - **Story demasiado grande** (score >15): sugerir division con sub-stories concretas
 - **Dependencies circulares**: error, sugerir extraer dependency comun

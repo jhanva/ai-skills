@@ -4,11 +4,7 @@ description: >
   Diseno de sistemas RPG: stats, formulas de dano, sistema de turnos,
   status effects, enemy AI, balance, inventario. Produce spec matematica
   lista para /plan o /tdd.
-when_to_use: >
-  Cuando el usuario quiere disenar un sistema de combate, stats, balance,
-  inventario, o cualquier mecanica de juego RPG. Tambien cuando dice
-  "rpg-design", "sistema de combate", "damage formula", "turn system",
-  "balance", "enemy AI", "status effects", "inventario".
+  Usar cuando: se quiere disenar combate, stats, balance, inventario, enemy AI o cualquier mecanica RPG.
 argument-hint: "[sistema o mecanica a disenar]"
 disable-model-invocation: true
 allowed-tools:
@@ -371,4 +367,4 @@ Producir documento con:
 
 Transicion: "Usa `/plan` para convertir estos sistemas en tareas de implementacion."
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

@@ -7,7 +7,6 @@ description: >
   con tiles catalog y reglas de construccion de niveles.
 argument-hint: "<nombre de zona o biome> (ej: forest, dungeon, town)"
 disable-model-invocation: true
-agent: pixel-artist
 allowed-tools:
   - Read
   - Grep

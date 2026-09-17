@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # PostToolUse hook (Write|Edit) — valida assets
-# Exit 0 = advisory, Exit 1 = blocking
+# Exit 0 = silencioso. Exit 2 = NO bloquea (el tool ya corrio en PostToolUse),
+# pero stderr se envia a Claude para que corrija el problema.
+# (Exit 1 seria un error no bloqueante visible solo al usuario — no usar.)
 
 source "$(dirname "$0")/_parse.sh"
 
@@ -15,12 +17,12 @@ FILENAME=$(basename "$FILE_PATH")
 WARNINGS=""
 ERRORS=""
 
-# Advisory: naming convention (lowercase_snake)
+# Warning: naming convention (lowercase_snake) — reportado a Claude via exit 2
 if echo "$FILENAME" | grep -qE '[A-Z[:space:]-]'; then
   WARNINGS="$WARNINGS\n  NAMING: $FILE_PATH — use lowercase_snake_case (got: $FILENAME)"
 fi
 
-# Blocking: JSON valido en assets/data/
+# Error: JSON valido en assets/data/ — reportado a Claude via exit 2
 if echo "$FILE_PATH" | grep -qE '(^|/)assets/data/.*\.json$' && [ -f "$FILE_PATH" ]; then
   PYTHON_CMD=""
   for cmd in python python3 py; do
@@ -33,9 +35,11 @@ if echo "$FILE_PATH" | grep -qE '(^|/)assets/data/.*\.json$' && [ -f "$FILE_PATH
 fi
 
 [ -n "$WARNINGS" ] && echo -e "=== Asset Warnings ===$WARNINGS\n=====================" >&2
-if [ -n "$ERRORS" ]; then
-  echo -e "=== Asset ERRORS (Blocking) ===$ERRORS\n==============================" >&2
-  exit 1
+[ -n "$ERRORS" ] && echo -e "=== Asset ERRORS ===$ERRORS\n====================" >&2
+
+# Exit 2: stderr llega a Claude (PostToolUse no bloquea, el tool ya corrio)
+if [ -n "$WARNINGS" ] || [ -n "$ERRORS" ]; then
+  exit 2
 fi
 
 exit 0

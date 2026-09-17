@@ -108,16 +108,17 @@ Usarlas si existen. Si no, analisis nativo con `rg -n` + patterns de los archivo
 
 ## FASE 2: Scan de secrets (siempre, primera prioridad)
 
-Ejecutar el script de deteccion:
+Ejecutar el scanner nativo de esta skill desde la raiz del target. Usa el
+launcher de Python disponible (`python`, `python3` o `py -3`):
 
 ```bash
-python3 .agents/skills/secure/scripts/scan-secrets.py TARGET_DIR
+python .agents/skills/secure/scripts/scan_secrets.py TARGET_DIR
 ```
 
 En modo quick, pasar solo los archivos cambiados:
 
 ```bash
-git diff --name-only HEAD | python3 .agents/skills/secure/scripts/scan-secrets.py --stdin TARGET_DIR
+git diff --name-only HEAD | python .agents/skills/secure/scripts/scan_secrets.py --stdin TARGET_DIR
 ```
 
 Si el script no esta disponible, usa `rg -n` con los patrones de `secrets-patterns.md`.
@@ -169,22 +170,22 @@ Output inline con formato navegable. NO generar archivo de reporte.
 
 ### CRITICO (arreglar antes de deploy)
 - `src/api/users.ts:45` — SQL injection: input de usuario concatenado directamente en query
-  CWE-89 | OWASP A03:2025
+  CWE-89 | OWASP A03:2021
   Fix: usar parameterized queries
 
 ### ALTO
 - `.env.production:3` — API key de Stripe expuesta en repo
-  CWE-798 | OWASP A07:2025
+  CWE-798 | OWASP A07:2021
   Fix: mover a variables de entorno del hosting, agregar a .gitignore
 
 ### MEDIO
 - `Dockerfile:1` — Imagen base sin tag fijo (`node:latest`)
-  CWE-1395 | OWASP A06:2025
+  CWE-1395 | OWASP A06:2021
   Fix: usar tag especifico (`node:20-alpine`)
 
 ### BAJO
 - `src/utils/logger.ts:12` — Email de usuario en logs de debug
-  CWE-532 | OWASP A09:2025
+  CWE-532 | OWASP A09:2021
   Fix: redactar PII antes de loggear
 
 ### Resumen
@@ -201,7 +202,7 @@ Modo: [quick|full] | Stack: [detectado] | Archivos escaneados: N
 Cada hallazgo DEBE tener:
 - `archivo:linea` — referencia navegable
 - CWE ID — clasificacion de debilidad
-- Categoria OWASP 2025
+- Categoria OWASP Top 10 2021
 - Fix concreto con ejemplo de codigo cuando aplique
 
 Si no hay hallazgos: "Scan completo. No se encontraron vulnerabilidades en [N archivos escaneados]."

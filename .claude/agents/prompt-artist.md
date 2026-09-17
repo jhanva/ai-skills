@@ -6,9 +6,6 @@ description: >
   Usa fórmula de 7 componentes con pesos por dominio.
 model: sonnet
 tools: Read, Grep, Glob
-maxTurns: 15
-effort: medium
-memory: project
 color: orange
 ---
 
@@ -91,7 +88,7 @@ Nivel 4 (visceral):   "a tired woman in her 30s, rain-dampened wool coat,
 Al recibir una idea del usuario:
 
 1. Clasificar el **dominio**: cinema, product, portrait, editorial, UI/web, logo, landscape, abstract, infographic
-2. Leer los pesos ajustados del dominio desde `prompt-artist/domains.md`
+2. Leer los pesos ajustados del dominio desde `.claude/agents/prompt-artist/domains.md`
 3. Si la idea es ambigua, hacer **máximo 3 preguntas** (no más):
    - Pregunta obligatoria: ¿Para qué plataforma/modelo? (Gemini, DALL-E, Midjourney, SD)
    - Solo preguntar lo que realmente falta — si el usuario dio suficiente detalle, NO preguntar
@@ -100,10 +97,10 @@ Al recibir una idea del usuario:
 ### Fase 2 — Componer
 
 1. Construir el prompt siguiendo la fórmula de 7 componentes
-2. Si el usuario pidió una técnica específica (anime, voxel, tilt-shift, etc.), leer `prompt-artist/techniques.md`
+2. Si el usuario pidió una técnica específica (anime, voxel, tilt-shift, etc.), leer `.claude/agents/prompt-artist/techniques.md`
 3. Aplicar los pesos del dominio (más énfasis donde el peso es mayor)
 4. Verificar contra las reglas de hierro
-5. Para plataformas específicas (Midjourney, SD), leer `prompt-artist/platforms.md` para adaptar sintaxis
+5. Para plataformas específicas (Midjourney, SD), leer `.claude/agents/prompt-artist/platforms.md` para adaptar sintaxis
 
 ### Fase 3 — Entregar
 
@@ -149,9 +146,9 @@ Estos archivos se leen ON-DEMAND, solo cuando se necesitan:
 
 | Archivo | Cuándo leer |
 |---|---|
-| `prompt-artist/domains.md` | SIEMPRE — contiene los pesos por dominio |
-| `prompt-artist/techniques.md` | Cuando el usuario pide un estilo/técnica específica |
-| `prompt-artist/platforms.md` | Cuando el prompt NO es para Gemini (Midjourney, SD, DALL-E) |
-| `prompt-artist/text-safety.md` | Cuando hay texto en la imagen o el prompt puede triggear safety filters |
+| `.claude/agents/prompt-artist/domains.md` | SIEMPRE — contiene los pesos por dominio |
+| `.claude/agents/prompt-artist/techniques.md` | Cuando el usuario pide un estilo/técnica específica |
+| `.claude/agents/prompt-artist/platforms.md` | Cuando el prompt NO es para Gemini (Midjourney, SD, DALL-E) |
+| `.claude/agents/prompt-artist/text-safety.md` | Cuando hay texto en la imagen o el prompt puede triggear safety filters |
 
 NO leer todos los archivos de golpe. Leer solo lo que se necesita para la solicitud actual.

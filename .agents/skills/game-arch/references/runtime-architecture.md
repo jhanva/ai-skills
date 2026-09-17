@@ -1,57 +1,79 @@
-# Game Arch — Runtime Architecture
+# Game Arch — Runtime Architecture para Godot 4
 
 Lee este archivo solo cuando disenes el runtime principal del juego.
 
 ## Loop
 
-Checklist minima:
+Godot controla el loop externo. Distribuye responsabilidades asi:
 
-- input
-- update
-- render
-- `delta` tratado con cuidado
-- fixed timestep si la logica necesita determinismo
+- `_unhandled_input(event)`: input discreto
+- `_physics_process(delta)`: gameplay, movimiento y fisica a tick fijo
+- `_process(delta)`: visuales, UI y efectos por frame
 
-Reglas utiles:
+`CharacterBody2D.velocity` se expresa en pixeles por segundo y
+`move_and_slide()` aplica delta internamente; no multipliques `velocity` por
+delta antes de llamarlo. Para movimiento en `_process`, cualquier desplazamiento
+si debe escalarse por delta.
 
-- no mover cosas con `speed` sin `delta`
-- capear `delta` evita saltos despues de lag o pause
-- separar update logico de render ayuda a mantener orden
+Activa `physics/common/physics_interpolation` cuando necesites suavizado entre
+ticks. No implementes un accumulator manual sin una necesidad demostrada:
+Godot ya gestiona el fixed timestep y limita pasos con
+`Engine.max_physics_steps_per_frame`.
 
 ## Entidades
 
-Para juegos 2D de escala moderada, composicion simple suele ganar a herencia profunda.
+Prefiere composicion de escenas:
 
-Usa ECS completo solo si:
+```text
+CharacterBody2D (enemy.gd)
+├─ AnimatedSprite2D
+├─ CollisionShape2D
+├─ HealthComponent
+├─ Hurtbox (Area2D)
+└─ AIBehavior
+```
 
-- hay muchas entidades
-- el juego depende de iterar sistemas enteros
-- el costo de complejidad se justifica
+- nodos para comportamiento y estado vivo
+- `Resource` para datos tuneables
+- signals hacia arriba; llamadas directas hacia hijos que poseen la operacion
+- grupos o IDs para discovery, no rutas fragiles como `../../Player`
 
-Anti-patrones:
+Usa `RenderingServer`/`PhysicsServer2D` y arrays de datos solo si hay cientos o
+miles de entidades y el profiling justifica saltarse nodos.
 
-- god entity
-- `if (entity is X)` por todo el codigo
-- referencias directas entre entidades
-- logica pesada dentro de la entidad
+## State machine
 
-## Estados y pantallas
+Los estados pueden ser nodos hijos de un `StateMachine`. Cada estado implementa
+`enter`, `exit`, `update`, `physics_update` y `handle_input`; solicita cambios
+mediante una signal. Solo la state machine cambia el estado actual.
 
-Conviene explicitar:
+Senales de olor:
 
-- estados top-level
-- overlays o menus
-- lifecycle `enter/exit`
-- ownership de input
+- mas de tres ramas `if state == ...`
+- un estado llama directamente a un sibling
+- input activo despues de `exit()`
+- estado visual mezclado con resolucion deterministica de gameplay
 
-Señal de olor: demasiados `if (state == X)` repartidos.
+## Scene stack
+
+`change_scene_to_packed()` reemplaza una escena completa. Para overlays o una
+batalla sobre exploracion, usa un autoload de stack que:
+
+1. desactive `process_mode` y oculte la escena anterior
+2. instancie la nueva `PackedScene`
+3. haga `queue_free()` al retirar una escena
+4. reactive y muestre la escena anterior al volver
+
+`PROCESS_MODE_DISABLED` congela input, process y physics. Para overlays simples
+tambien sirve pausar el tree y dar al overlay `PROCESS_MODE_ALWAYS`.
 
 ## Commands y eventos
 
-Separar:
+Separa decision, resolucion logica y animacion. Un `GameCommand` (`RefCounted`)
+debe exponer `can_execute(world)` y `execute(world) -> CommandResult`. El
+resultado contiene eventos, animaciones y una posible transicion; esto hace
+posibles tests, replay y AI sin cargar la escena visual.
 
-- decision de accion
-- resolucion logica
-- animacion
-
-Esto facilita testing, replay y AI.
+Usa un event bus solo para eventos realmente globales. Para relaciones locales,
+conecta signals entre owner e hijos; un autoload global para cada evento produce
+signal spaghetti.

@@ -3,9 +3,7 @@ name: execute
 description: >
   Ejecuta un plan de implementacion despachando un subagente fresco por tarea
   con revision de 2 etapas: cumplimiento de spec y calidad de codigo.
-when_to_use: >
-  Despues de crear un plan con /plan, cuando el usuario dice "ejecutar",
-  "implementar el plan", "correr el plan".
+  Usar cuando: existe un plan creado con /plan y el usuario pide ejecutarlo o implementarlo.
 argument-hint: "[ruta al plan]"
 disable-model-invocation: true
 ---
@@ -96,4 +94,4 @@ Si hay problemas criticos, crear tarea de correccion ANTES de continuar.
 - **NUNCA** saltar revisiones para "ir mas rapido"
 - **NUNCA** dejar que el subagente lea el plan completo (desperdicia tokens)
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

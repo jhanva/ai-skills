@@ -55,13 +55,17 @@ Cada genero define que skills se usaran despues:
 
 ```
 project-root/
-├─ src/{core,entities,systems,ui,utils}/
+├─ src/{core,gameplay,ui,autoloads}/
 ├─ assets/{sprites,tiles,audio/{music,sfx},data,fonts}/
 ├─ scenes/{levels,characters,ui,prefabs}/
 ├─ design/{gdd,levels}/
 ├─ production/sprints/
 └─ tests/
 ```
+
+Esta estructura es la misma de `$godot-setup`; no crear variantes paralelas
+como `src/entities` o `src/systems`. Si se elige C#, no crear `.csproj` a
+mano: Godot genera la solucion al crear el primer script C#.
 
 ## FASE 5: Crear .gitignore
 
@@ -70,7 +74,11 @@ Para Godot 4: `.godot/`, `.import/`, `builds/`, `.mono/`, `data_*/`, OS files, I
 ## FASE 6: Crear project.godot (si no existe)
 
 Config minima con pixel-perfect settings:
-- viewport 1280x720, stretch canvas_items, texture_filter 0 (Nearest)
+- viewport interno 320x180 y ventana 1280x720
+- `window/stretch/mode="canvas_items"` y `window/stretch/scale_mode="integer"`
+- `rendering/textures/canvas_textures/default_texture_filter=0` (Nearest)
+- `rendering/2d/snap/snap_2d_transforms_to_pixel=true`
+- modo de ventana `2` es maximized; fullscreen es `3` y exclusive fullscreen `4`
 
 ## FASE 7: Crear primer sprint
 

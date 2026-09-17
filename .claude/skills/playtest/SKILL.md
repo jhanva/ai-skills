@@ -12,7 +12,6 @@ allowed-tools:
   - Grep
   - Glob
   - Write
-agent: qa-analyst
 ---
 
 # Playtest

@@ -75,7 +75,26 @@ Excepciones: ataques asimetricos (arma en mano derecha) pueden requerir sprites 
 
 **Naming**: `{entity}_{state}_{frame}.png` — lowercase, underscore, frame index desde 0.
 
-**Integracion Godot**: SpriteFrames resource (.tres) con todas las animaciones configuradas.
+**Integracion Godot 4**: `AnimatedSprite2D.sprite_frames` recibe un recurso
+`SpriteFrames`, no una textura. Crear el `.tres` en el editor o recortar el
+sheet mediante `AtlasTexture`:
+
+```gdscript
+var frames := SpriteFrames.new()
+frames.add_animation("idle")
+frames.set_animation_speed("idle", 8.0)
+var sheet := preload("res://assets/sprites/player_spritesheet.png")
+for i in 6:
+    var atlas := AtlasTexture.new()
+    atlas.atlas = sheet
+    atlas.region = Rect2(i * 32, 0, 32, 32)
+    frames.add_frame("idle", atlas)
+$AnimatedSprite2D.sprite_frames = frames
+```
+
+`hframes` y `vframes` pertenecen a `Sprite2D`, no a `AnimatedSprite2D`.
+Godot tampoco auto-detecta secuencias `player_idle_*.png`: agregar cada frame
+al `SpriteFrames` desde el editor o con `add_frame()`.
 
 ## FASE 7: Generar spec document
 

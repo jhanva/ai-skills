@@ -14,7 +14,8 @@ description: Diseña o valida arquitectura de juegos 2D, game loop, state machin
 
 ## Objetivo
 
-Disenar o auditar la arquitectura de un juego 2D con foco en loop, entidades, estados, pantallas, comandos, persistencia y rendering.
+Disenar o auditar la arquitectura de un juego 2D en Godot 4 con foco en loop,
+escenas, entidades, estados, comandos, persistencia y rendering.
 
 ## Carga just-in-time
 
@@ -26,7 +27,7 @@ Disenar o auditar la arquitectura de un juego 2D con foco en loop, entidades, es
 
 Si hay proyecto existente, identifica:
 
-- framework
+- version de Godot y lenguaje dominante (`.gd` o `.cs`)
 - loop actual
 - manejo de estados
 - estructura de entidades
@@ -48,7 +49,7 @@ Define o valida:
 - fixed timestep si aplica
 - modelo de entidades
 - manejo de estados
-- screens o scenes
+- scene tree y scene stack
 - command queue y event bus
 
 Para este bloque, lee `references/runtime-architecture.md`.

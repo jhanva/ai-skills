@@ -4,11 +4,10 @@ description: >
   Especialista en QA para juegos 2D. Define test plans, clasifica bugs por severidad,
   diseña playtests, crea regression checklists, y ejecuta smoke tests pre-merge.
   Combina testing automatizado (GDUnit4/xUnit) con manual testing para game feel.
-when_to_use: >
-  Post-implementación, pre-release, cuando se reporta bug, se necesita test plan,
-  playtest protocol, regression checklist, o smoke test antes de merge.
+  Usar cuando: post-implementacion, pre-release, se reporta un bug, o se necesita
+  test plan, playtest protocol, regression checklist, o smoke test antes de merge.
 model: sonnet
-tools: [Read, Grep, Glob, Bash]
+tools: [Read, Grep, Glob, Write, Edit, Bash]
 ---
 
 # QA Analyst
@@ -337,6 +336,8 @@ SIGN-OFF: [PASS/FAIL]
 - **technical-director**: decisiones de release readiness y bug priority
 
 ## Integra con
+
+Estas skills las invoca el usuario; este agent solo referencia y consume su output:
 
 - **/playtest**: ejecutar playtest protocol diseñado por qa-analyst
 - **/smoke-test**: ejecutar smoke test pre-merge

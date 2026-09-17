@@ -4,10 +4,7 @@ description: >
   Disenar el concepto de un juego: 3 pillars, core loop, mecanicas MVP/NICE/FUTURE,
   look & feel, target audience. Produce game-concept.md listo para /art-bible
   o /design-system.
-when_to_use: >
-  Cuando el usuario quiere definir el concepto de un juego nuevo, o cuando
-  dice "game-concept", "concepto del juego", "pillars", "core loop", "que
-  tipo de juego", "definir juego".
+  Usar cuando: el usuario quiere definir el concepto de un juego nuevo (pillars, core loop, tipo de juego).
 argument-hint: "<idea o genero del juego>"
 disable-model-invocation: true
 allowed-tools:
@@ -15,7 +12,6 @@ allowed-tools:
   - Grep
   - Glob
   - Write
-agent: game-designer
 ---
 
 # Game Concept — Disenar concepto de juego
@@ -245,7 +241,7 @@ Definir plataforma, audiencia, y session length.
 ### Plataforma
 a) PC (Steam, itch.io)
 b) Mobile (Android/iOS)
-c) Web (navegador, HTML5 export)
+c) Web (navegador, export Web de Godot)
 d) Consola (Switch, PlayStation, Xbox — requiere devkit)
 
 ¿Plataforma target?
@@ -476,4 +472,4 @@ ANTI-PATRON: Target audience "todos"
   Solucion: elegir UN target y disenar para ese
 ```
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS

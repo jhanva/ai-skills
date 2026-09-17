@@ -4,9 +4,7 @@ description: >
   Audita bases de datos Room en proyectos Android. Verifica exportSchema,
   tests de migracion, type converters fragiles, indices faltantes,
   FK cascades, y transaction boundaries.
-when_to_use: >
-  Cuando el usuario dice "room audit", "database", "migracion", "migration",
-  "schema", "room-audit", o antes de releases que incluyen cambios de DB.
+  Usar cuando: el usuario dice "room audit", "database", "migracion", "schema", o antes de releases con cambios de DB.
 argument-hint: "[ruta al proyecto Android]"
 disable-model-invocation: true
 allowed-tools:
@@ -14,9 +12,9 @@ allowed-tools:
   - Grep
   - Glob
   - Agent
-  - Bash(find *)
-  - Bash(wc *)
-  - Bash(git diff *)
+  - Bash(find:*)
+  - Bash(wc:*)
+  - Bash(git diff:*)
 ---
 
 # Room Audit — Auditoria de seguridad de datos
@@ -232,4 +230,4 @@ Database version: N | Tablas: N | DAOs: N | Migraciones: N
 Tests de migracion encontrados: N/N
 ```
 
-## Argumento: $ARGUMENTS
+Argumento recibido: $ARGUMENTS
