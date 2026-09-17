@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "file": "C:\\Users\\mdmgu\\OneDrive\\Documentos\\johan\\repositorios\\ai-skills\\tmp\\hatch-pet-lich-king\\final\\spritesheet.webp",
+  "file": "D:\\Johan\\repositorios\\ai-skills\\pets\\the-lich-king\\spritesheet.webp",
   "format": "WEBP",
   "mode": "RGBA",
   "width": 1536,
@@ -126,56 +126,56 @@
       "row": 2,
       "column": 0,
       "used": true,
-      "nontransparent_pixels": 13781
+      "nontransparent_pixels": 13901
     },
     {
       "state": "running-left",
       "row": 2,
       "column": 1,
       "used": true,
-      "nontransparent_pixels": 14326
+      "nontransparent_pixels": 13835
     },
     {
       "state": "running-left",
       "row": 2,
       "column": 2,
       "used": true,
-      "nontransparent_pixels": 13505
+      "nontransparent_pixels": 13301
     },
     {
       "state": "running-left",
       "row": 2,
       "column": 3,
       "used": true,
-      "nontransparent_pixels": 12883
+      "nontransparent_pixels": 12818
     },
     {
       "state": "running-left",
       "row": 2,
       "column": 4,
       "used": true,
-      "nontransparent_pixels": 13603
+      "nontransparent_pixels": 13873
     },
     {
       "state": "running-left",
       "row": 2,
       "column": 5,
       "used": true,
-      "nontransparent_pixels": 13345
+      "nontransparent_pixels": 13781
     },
     {
       "state": "running-left",
       "row": 2,
       "column": 6,
       "used": true,
-      "nontransparent_pixels": 13099
+      "nontransparent_pixels": 13850
     },
     {
       "state": "running-left",
       "row": 2,
       "column": 7,
       "used": true,
-      "nontransparent_pixels": 12561
+      "nontransparent_pixels": 13111
     },
     {
       "state": "waving",
@@ -406,42 +406,42 @@
       "row": 7,
       "column": 0,
       "used": true,
-      "nontransparent_pixels": 15167
+      "nontransparent_pixels": 19221
     },
     {
       "state": "running",
       "row": 7,
       "column": 1,
       "used": true,
-      "nontransparent_pixels": 13641
+      "nontransparent_pixels": 17140
     },
     {
       "state": "running",
       "row": 7,
       "column": 2,
       "used": true,
-      "nontransparent_pixels": 19808
+      "nontransparent_pixels": 25129
     },
     {
       "state": "running",
       "row": 7,
       "column": 3,
       "used": true,
-      "nontransparent_pixels": 17328
+      "nontransparent_pixels": 20661
     },
     {
       "state": "running",
       "row": 7,
       "column": 4,
       "used": true,
-      "nontransparent_pixels": 19008
+      "nontransparent_pixels": 23823
     },
     {
       "state": "running",
       "row": 7,
       "column": 5,
       "used": true,
-      "nontransparent_pixels": 15273
+      "nontransparent_pixels": 19064
     },
     {
       "state": "running",
