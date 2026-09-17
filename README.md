@@ -4,13 +4,12 @@
 
 Convierte un repositorio en un stack de desarrollo asistido por IA con skills, agentes y reglas reutilizables.
 
-**44 skills. 13 agentes de Codex. Hooks nativos en Codex y Claude. Dos runtimes, un mismo workflow.**
+**21 skills. 4 agentes de Codex. Hooks nativos en Codex y Claude. Dos runtimes, un mismo workflow.**
 
-[![Skills](https://img.shields.io/badge/skills-44-84cc16?style=for-the-badge)](#skills)
-[![Codex Agents](https://img.shields.io/badge/codex%20agents-13-8b5cf6?style=for-the-badge)](#agentes)
-[![Hooks](https://img.shields.io/badge/hooks-codex%20%2B%20claude-f97316?style=for-the-badge)](#hooks-game-dev)
+[![Skills](https://img.shields.io/badge/skills-21-84cc16?style=for-the-badge)](#skills)
+[![Codex Agents](https://img.shields.io/badge/codex%20agents-4-8b5cf6?style=for-the-badge)](#agentes)
+[![Hooks](https://img.shields.io/badge/hooks-codex%20%2B%20claude-f97316?style=for-the-badge)](#hooks)
 [![Runtimes](https://img.shields.io/badge/runtimes-2-0ea5e9?style=for-the-badge)](#compatibilidad-por-runtime)
-[![Game Dev](https://img.shields.io/badge/game%20dev-20%20skills-ec4899?style=for-the-badge)](#game-development)
 
 [Ver skills](#skills) • [Ver agentes](#agentes) • [Ver flujos](#flujos-de-trabajo) • [Ver compatibilidad](#compatibilidad-por-runtime)
 
@@ -39,24 +38,21 @@ En este README, las tablas se enfocan primero en la capacidad que aporta cada sk
 - [Skills de Imagen](#imagen)
 - [Browser Automation](#browser-automation)
 - [Knowledge Graph](#knowledge-graph)
-- [Skills de Game Development](#game-development)
 - [Agentes](#agentes)
-- [Plugins](#plugins)
-- [Pets](#pets)
 - [Flujos de trabajo](#flujos-de-trabajo)
 - [Compatibilidad por runtime](#compatibilidad-por-runtime)
 - [Instalacion](#instalacion)
 - [Estructura](#estructura)
+- [Repos relacionados](#repos-relacionados)
 
 ## Que incluye
 
 | Categoria | Cantidad | Descripcion |
 |---|---:|---|
-| Skills | 44 | Workflows para desarrollo general, Android, imagen, game dev, browser automation, knowledge graphs, herramientas MCP (Aseprite, Godot, PixelLab), texto y operaciones de repo |
-| Agentes Codex | 13 | Especialistas para implementacion, review, seguridad, prompt design y game development |
-| Plugins Codex | 3 | Integraciones instalables para Aseprite, Godot y PixelLab via plugin + MCP |
-| Hooks Codex | 4 handlers | Politica pre-tool, gameplay pre-commit, validacion post-edit y contexto de sesion |
-| Hooks Claude | 5 | Implementacion original equivalente para Claude Code |
+| Skills | 21 | Workflows para desarrollo general, Android, imagen, browser automation, knowledge graphs, texto y operaciones de repo |
+| Agentes Codex | 4 | Implementacion, review, seguridad y prompt design |
+| Hooks Codex | 2 handlers | Politica pre-tool y contexto de sesion |
+| Hooks Claude | 2 | Implementacion original equivalente para Claude Code |
 | Runtimes | 2 | Mismas capacidades adaptadas a Claude Code y Codex |
 
 ## Skills
@@ -114,65 +110,6 @@ Incluye libreria Python CDP (`cdp_helpers.py`, ~370 lineas) con auto-discovery d
 
 Disponible en ambos runtimes: `$codegraph` en Codex y `/codegraph` en Claude Code. Zero dependencias (solo stdlib de Python 3.10+, sin pip install), pipeline completo en un comando, builds incrementales por hash de contenido. Outputs: `graph.json` (node-link, compatible d3/GraphRAG), `GRAPH_REPORT.md` (god nodes, conexiones sorprendentes, preguntas sugeridas) y `graph.html` (visualizacion interactiva offline). El directorio `codegraph-out/` es committeable: el equipo comparte un solo grafo.
 
-### Game development
-
-Stack orientado a juegos 2D pixel art (RPG, platformer, roguelike) con Godot 4, GDScript y C#. Incluye 20 skills y 9 agentes especializados.
-
-#### Onboarding
-
-| Skill | Activacion | Agente | Proposito |
-|---|---|---|---|
-| [`game-start`](./.agents/skills/game-start/SKILL.md) | Explicita | — | Setup guiado: Godot config, estructura de proyecto, GDScript vs C# |
-
-#### Concepto
-
-| Skill | Activacion | Agente | Proposito |
-|---|---|---|---|
-| [`game-concept`](./.agents/skills/game-concept/SKILL.md) | Explicita | [`game-designer`](./.codex/agents/game-designer.toml) | Formalizar idea en concept doc (genero, pillars, target audience) |
-| [`art-bible`](./.agents/skills/art-bible/SKILL.md) | Explicita | [`pixel-artist`](./.codex/agents/pixel-artist.toml) + [`creative-director`](./.codex/agents/creative-director.toml) | Identidad visual: paleta, estilo, resoluciones, restricciones |
-
-#### Diseno
-
-| Skill | Activacion | Agente | Proposito |
-|---|---|---|---|
-| [`rpg-design`](./.agents/skills/rpg-design/SKILL.md) | Explicita | [`game-designer`](./.codex/agents/game-designer.toml) | Sistemas RPG (stats, formulas, turnos, balance, enemy AI) |
-| [`design-system`](./.agents/skills/design-system/SKILL.md) | Explicita | [`game-designer`](./.codex/agents/game-designer.toml) | GDD para un sistema especifico (inventario, dialog, crafting) |
-| [`level-brief`](./.agents/skills/level-brief/SKILL.md) | Explicita | [`level-designer`](./.codex/agents/level-designer.toml) | Disenar nivel: layout, encounters, curva de dificultad, pacing |
-| [`balance-check`](./.agents/skills/balance-check/SKILL.md) | Contextual + explicita | [`game-designer`](./.codex/agents/game-designer.toml) | Validar balance numerico (damage curves, economy sinks/faucets) |
-
-#### Arte y assets
-
-| Skill | Activacion | Agente | Proposito |
-|---|---|---|---|
-| [`pixel-pipeline`](./.agents/skills/pixel-pipeline/SKILL.md) | Explicita | [`pixel-artist`](./.codex/agents/pixel-artist.toml) | Pipeline completo de pixel art (sprites, tiles, atlas, palette swap) |
-| [`sprite-spec`](./.agents/skills/sprite-spec/SKILL.md) | Explicita | [`pixel-artist`](./.codex/agents/pixel-artist.toml) | Spec de sprite sheet: frames, estados, dimensiones, hitbox |
-| [`tileset-spec`](./.agents/skills/tileset-spec/SKILL.md) | Explicita | [`pixel-artist`](./.codex/agents/pixel-artist.toml) | Spec de tileset: tile size, autotile rules, variantes |
-| [`palette`](./.agents/skills/palette/SKILL.md) | Explicita | [`pixel-artist`](./.codex/agents/pixel-artist.toml) | Crear/gestionar paletas de color (ramps, restrictions) |
-| [`sound-brief`](./.agents/skills/sound-brief/SKILL.md) | Explicita | [`sound-designer`](./.codex/agents/sound-designer.toml) | Brief de audio: SFX list, mood board musical, integracion Godot |
-
-#### Arquitectura
-
-| Skill | Activacion | Agente | Proposito |
-|---|---|---|---|
-| [`game-arch`](./.agents/skills/game-arch/SKILL.md) | Explicita | [`godot-architect`](./.codex/agents/godot-architect.toml) | Arquitectura de juegos 2D (game loop, FSM, commands, save system) |
-| [`godot-setup`](./.agents/skills/godot-setup/SKILL.md) | Explicita | [`godot-architect`](./.codex/agents/godot-architect.toml) | Config proyecto Godot: autoloads, input map, export, folder structure |
-| [`scene-design`](./.agents/skills/scene-design/SKILL.md) | Explicita | [`godot-architect`](./.codex/agents/godot-architect.toml) | Disenar escena: node tree, signals, script responsibilities |
-
-#### Produccion
-
-| Skill | Activacion | Agente | Proposito |
-|---|---|---|---|
-| [`sprint`](./.agents/skills/sprint/SKILL.md) | Explicita | [`producer`](./.codex/agents/producer.toml) | Planificar sprint: stories, estimacion, prioridades |
-| [`story`](./.agents/skills/story/SKILL.md) | Explicita | [`producer`](./.codex/agents/producer.toml) | Crear dev story desde seccion de GDD |
-| [`scope-check`](./.agents/skills/scope-check/SKILL.md) | Contextual + explicita | [`producer`](./.codex/agents/producer.toml) | Verificar que el scope es realista vs tiempo disponible |
-
-#### QA
-
-| Skill | Activacion | Agente | Proposito |
-|---|---|---|---|
-| [`playtest`](./.agents/skills/playtest/SKILL.md) | Explicita | [`qa-analyst`](./.codex/agents/qa-analyst.toml) | Reporte estructurado de playtest session |
-| [`smoke-test`](./.agents/skills/smoke-test/SKILL.md) | Explicita | [`qa-analyst`](./.codex/agents/qa-analyst.toml) | Checklist rapido pre-merge/pre-release |
-
 ### Texto
 
 | Skill | Activacion | Proposito |
@@ -191,59 +128,24 @@ Stack orientado a juegos 2D pixel art (RPG, platformer, roguelike) con Godot 4, 
 |---|---|
 | [`prompt-artist`](./.codex/agents/prompt-artist.toml) | Transforma ideas en prompts narrativos optimizados para generacion de imagenes (Gemini, DALL-E, Midjourney, Stable Diffusion). Formula de 7 componentes con pesos por dominio |
 
-### Game dev — Jerarquia de estudio
-
-9 agentes organizados en 2 niveles para concepto, arte, arquitectura, produccion y QA. La implementacion concreta depende del runtime; en Codex viven en `.codex/agents/`.
-
-```
-Tier 1 — Directores
-  creative-director ──── pixel-artist
-    (vision, coherencia       sound-designer
-     arte + diseno)           game-designer
-                              level-designer
-
-  technical-director ─── godot-architect
-    (arquitectura,            qa-analyst
-     codigo + calidad)        producer
-```
-
-| Agente | Tier | Dominio | Se activa cuando... |
-|---|---|---|---|
-| [`creative-director`](./.codex/agents/creative-director.toml) | Director | Vision global, coherencia arte/diseno | Conflicto entre dominios creativos, review de concepto |
-| [`technical-director`](./.codex/agents/technical-director.toml) | Director | Arquitectura global, performance | Conflicto codigo/performance, decision arquitectural |
-| [`pixel-artist`](./.codex/agents/pixel-artist.toml) | Especialista | Sprites, tiles, animacion, paletas, atlas | Editando `assets/sprites/`, `assets/tiles/` |
-| [`sound-designer`](./.codex/agents/sound-designer.toml) | Especialista | SFX, musica, audio pipeline | Editando `assets/audio/`, definiendo audio en GDD |
-| [`game-designer`](./.codex/agents/game-designer.toml) | Especialista | Sistemas, mecanicas, balance, economia | Escribiendo GDDs en `design/`, discutiendo mecanicas |
-| [`level-designer`](./.codex/agents/level-designer.toml) | Especialista | Niveles, encounters, dificultad, world building | Editando `design/levels/`, discutiendo layout |
-| [`godot-architect`](./.codex/agents/godot-architect.toml) | Especialista | Escenas, signals, GDScript/C#, patterns Godot | Editando `.gd`, `.cs`, `.tscn`, `.tres` |
-| [`qa-analyst`](./.codex/agents/qa-analyst.toml) | Especialista | Tests, bug triage, playtesting | Post-implementacion, pre-release |
-| [`producer`](./.codex/agents/producer.toml) | Especialista | Sprints, scope, milestones, stories | Planificando trabajo, revisando progreso |
-
-## Hooks (game dev)
+## Hooks
 
 Codex carga [`hooks.json`](./.codex/hooks.json) desde la capa confiable del
 proyecto. Los handlers multiplataforma viven en
 [`codex_hooks.py`](./.codex/hooks/codex_hooks.py) y consumen el JSON nativo de
-`PreToolUse`, `PostToolUse` y `SessionStart`.
+`PreToolUse` y `SessionStart`.
 
 | Handler Codex | Evento | Que valida |
 |---|---|---|
 | `pre-tool-policy` | PreToolUse (Bash/apply_patch) | Bloquea `.env`, comandos destructivos y edits protegidos |
-| `validate-gameplay-code` | PreToolUse (git commit) | Valores hardcoded, estrategia de delta y dependencias UI |
-| `post-edit-checks` | PostToolUse (apply_patch) | Naming/JSON de assets y cobertura GDD de gameplay |
-| `session-context` | SessionStart | Branch, commits, sprint y archivos modificados |
+| `session-context` | SessionStart | Branch, commits y archivos modificados |
 
-La capa Claude conserva sus cinco scripts originales:
-
-5 hooks de validacion automatica para codigo, assets y seguridad. Comparten biblioteca `_parse.sh` para parsing JSON (cero duplicacion).
+La capa Claude tiene los scripts equivalentes. Comparten biblioteca `_parse.sh` para parsing JSON.
 
 | Hook | Evento | Que valida |
 |---|---|---|
 | [`block-env-access.sh`](./.claude/hooks/block-env-access.sh) | PreToolUse (Bash) | Bloquea lectura/escritura/source de archivos `.env` (permite `.env.example`, `.env.sample`, `.env.template`) |
-| [`validate-gameplay-code.sh`](./.claude/hooks/validate-gameplay-code.sh) | PreToolUse (git commit) | No hardcoded values en `src/gameplay/`, delta time usage, no imports de UI en gameplay |
-| [`validate-assets.sh`](./.claude/hooks/validate-assets.sh) | PostToolUse (Write/Edit) | Naming convention en `assets/` (lowercase_snake), JSON valido en data files |
-| [`check-design-coverage.sh`](./.claude/hooks/check-design-coverage.sh) | PostToolUse (Write/Edit) | Advierte si existe codigo en `src/gameplay/X/` sin su `design/gdd/X.md` correspondiente |
-| [`session-context.sh`](./.claude/hooks/session-context.sh) | SessionStart | Muestra branch, sprint activo, archivos modificados sin commit |
+| [`session-context.sh`](./.claude/hooks/session-context.sh) | SessionStart | Muestra branch, commits recientes y archivos modificados sin commit |
 
 ## Comandos
 
@@ -251,21 +153,6 @@ La capa Claude conserva sus cinco scripts originales:
 |---|---|
 | [`git-identity`](./.agents/skills/git-identity/SKILL.md) | Auditoria de cuentas git (4 capas: includeIf, shell guards, pre-commit hook, SSH keys) |
 | [`git-identity setup`](./.agents/skills/git-identity/SKILL.md) | Configurar separacion de cuentas (macOS/Linux/Windows, mismo host o hosts diferentes) |
-
-## Plugins
-
-| Plugin | Ruta | Proposito |
-|---|---|---|
-| [`aseprite-codex`](./plugins/aseprite-codex/.codex-plugin/plugin.json) | `plugins/aseprite-codex/` | Integracion local para Aseprite con `skill` + `MCP` para inspeccionar sprites, exportar sprite sheets y correr scripts Lua desde Codex |
-| [`godot-codex`](./plugins/godot-codex/.codex-plugin/plugin.json) | `plugins/godot-codex/` | Integracion local para Godot 4 con `skill` + `MCP` para inspeccionar proyectos, correr imports headless, exportar builds y ejecutar scripts desde Codex |
-| [`pixellab-codex`](./plugins/pixellab-codex/.codex-plugin/plugin.json) | `plugins/pixellab-codex/` | Integracion para PixelLab AI con `skill` + `MCP` oficial hospedado para generar personajes, animaciones, tilesets y props pixel art desde Codex |
-
-## Pets
-
-Custom pets portables para Codex, listas para copiar a otra maquina:
-
-- [`albedo`](./pets/albedo/README.md): paquete portable final con `pet.json` y `spritesheet.webp`
-- [`the-lich-king`](./pets/the-lich-king/README.md): paquete portable con `pet.json`, `spritesheet.webp`, QA visual y guia de instalacion, transporte y regeneracion con `hatch-pet`
 
 ## Flujos de trabajo
 
@@ -292,30 +179,6 @@ image-algo     -->  image-pipeline  -->  plan  -->  execute
 ml-ondevice    -->  image-pipeline  -->  plan  -->  execute
   (modelo ML)       (arquitectura)       (tareas)    (implementar)
 ```
-
-### Game development
-
-```
-Concepto:
-  brainstorm  -->  game-concept  -->  art-bible
-                         |
-Diseno:                  |
-  design-system  -->  rpg-design     -->  balance-check
-  level-brief                                  |
-                                                v
-Arte:                                    Arquitectura:
-  palette  -->  pixel-pipeline           game-arch  -->  godot-setup
-  sprite-spec   tileset-spec             scene-design
-  sound-brief                                  |
-                                                v
-Produccion:                              QA:
-  sprint  -->  story  -->  plan         playtest  -->  smoke-test
-                  |
-                  v
-            execute (usa tdd)  -->  review  -->  verify
-```
-
-Integracion con skills generales: `tdd` para todo codigo, `debug` para bugs, `verify` antes de completar, `review` para code review de GDScript/C#.
 
 ### Auditorias
 
@@ -374,6 +237,16 @@ AGENTS.md                              # reglas globales del repo para Codex
 ```
 
 Cada skill es un directorio con `SKILL.md` como punto de entrada y archivos de soporte opcionales (`references/`, `scripts/`, `assets/`) que se cargan on-demand.
+
+## Repos relacionados
+
+Las skills, agentes, hooks y plugins de **game development** (Godot 4, pixel art, Aseprite, PixelLab, produccion por sprints) se movieron a [`gamedev-skills`](https://github.com/jhanva/gamedev-skills). Si usabas `/game-concept`, `/rpg-design`, `/godot-setup`, `/sprite-spec`, `/sprint`, la jerarquia de agentes de estudio o los plugins MCP desde este repo, clona el nuevo y carga ambos:
+
+```bash
+claude --add-dir /ruta/a/ai-skills --add-dir /ruta/a/gamedev-skills
+```
+
+Los flujos de juego siguen usando `/brainstorm`, `/plan`, `/tdd`, `/execute`, `/review` y `/verify` de este repo.
 
 ## Instalacion
 

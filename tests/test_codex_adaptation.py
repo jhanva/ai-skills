@@ -42,26 +42,11 @@ class CodexConfigTests(unittest.TestCase):
                 self.assertTrue(agent.get("description"))
                 self.assertTrue(agent.get("developer_instructions"))
 
-    def test_gamedev_agents_do_not_implicitly_run_user_skills(self) -> None:
-        playbooks = [
-            "game-designer/playbook.md",
-            "level-designer/playbook.md",
-            "pixel-artist/playbook.md",
-            "producer/playbook.md",
-            "qa-analyst/playbook.md",
-            "sound-designer/playbook.md",
-        ]
-        for relative in playbooks:
-            with self.subTest(playbook=relative):
-                content = read(f".codex/agents/{relative}")
-                self.assertIn("Las skills las invoca el usuario", content)
-
     def test_hooks_are_registered_with_cross_platform_commands(self) -> None:
         hooks = json.loads(read(".codex/hooks.json"))["hooks"]
 
         self.assertIn("SessionStart", hooks)
         self.assertIn("PreToolUse", hooks)
-        self.assertIn("PostToolUse", hooks)
         handlers = [
             handler
             for groups in hooks.values()
@@ -103,47 +88,6 @@ class CodexHookTests(unittest.TestCase):
 
         self.assertEqual("deny", json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"])
 
-    def test_post_edit_checks_understand_apply_patch_paths(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            asset = root / "assets" / "data" / "Bad-Name.json"
-            asset.parent.mkdir(parents=True)
-            asset.write_text("{broken", encoding="utf-8")
-            payload = {
-                "cwd": str(root),
-                "tool_name": "apply_patch",
-                "tool_input": {
-                    "command": "*** Begin Patch\n*** Update File: assets/data/Bad-Name.json\n*** End Patch"
-                },
-            }
-
-            result = run_hook("post-edit-checks", payload)
-
-        context = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
-        self.assertIn("NAMING", context)
-        self.assertIn("JSON", context)
-
-    def test_post_edit_checks_warn_when_gameplay_has_no_gdd(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            gameplay = root / "src" / "gameplay" / "combat" / "damage.gd"
-            gameplay.parent.mkdir(parents=True)
-            gameplay.write_text("extends Node\n", encoding="utf-8")
-            payload = {
-                "cwd": str(root),
-                "tool_name": "apply_patch",
-                "tool_input": {
-                    "command": "*** Begin Patch\n*** Add File: src/gameplay/combat/damage.gd\n*** End Patch"
-                },
-            }
-
-            result = run_hook("post-edit-checks", payload)
-
-        context = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
-        self.assertIn("design/gdd/combat.md", context)
-        self.assertIn("$design-system", context)
-
-
 class SkillRegressionTests(unittest.TestCase):
     def test_secure_scanner_is_native_and_has_fixed_classification(self) -> None:
         self.assertTrue(SECRET_SCANNER.is_file())
@@ -180,31 +124,6 @@ class SkillRegressionTests(unittest.TestCase):
         report = json.loads(scan_result.stdout)
         self.assertEqual(1, report["findings_count"])
         self.assertEqual("GitHub Token", report["findings"][0]["type"])
-
-    def test_godot_fixes_are_present_in_codex_skills(self) -> None:
-        game_start = read(".agents/skills/game-start/SKILL.md")
-        setup = read(".agents/skills/godot-setup/SKILL.md")
-        sprite = read(".agents/skills/sprite-spec/SKILL.md")
-        architecture = read(".agents/skills/game-arch/references/runtime-architecture.md")
-
-        self.assertIn("src/{core,gameplay,ui,autoloads}", game_start)
-        self.assertNotIn("src/{core,entities,systems,ui,utils}", game_start)
-        self.assertIn("2d/snap/snap_2d_transforms_to_pixel", setup)
-        self.assertNotIn("HTML5", setup)
-        self.assertIn("AtlasTexture", sprite)
-        self.assertIn("SpriteFrames", sprite)
-        self.assertIn("CharacterBody2D", architecture)
-        self.assertNotIn("SpriteBatch", architecture)
-
-    def test_planning_fixes_are_consistent(self) -> None:
-        sprint = read(".agents/skills/sprint/SKILL.md")
-        story = read(".agents/skills/story/SKILL.md")
-
-        self.assertIn("3S + 1M por semana", sprint)
-        self.assertIn("6S + 2M", sprint)
-        self.assertIn("$design-system", story)
-        self.assertIn("src/gameplay/", story)
-        self.assertNotIn("$brainstorm {system}", story)
 
     def test_readme_points_to_native_browser_skill_and_codex_hooks(self) -> None:
         readme = read("README.md")
