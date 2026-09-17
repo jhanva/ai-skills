@@ -135,5 +135,76 @@ class SkillLayoutTests(unittest.TestCase):
                 self.assertNotIn(".agents/skills/", text)
 
 
+class CoreAgentParityTests(unittest.TestCase):
+    CORE_AGENTS = PLUGINS_DIR / "core" / "agents"
+    CODEX_AGENTS = ROOT / ".codex" / "agents"
+
+    def test_codex_review_and_security_agents_exist_for_claude_code(self) -> None:
+        # Paridad: los agentes de Codex que respaldan /review y /secure tienen
+        # equivalente en el plugin core (mismo nombre, con guion en vez de _).
+        for toml_name in ("reviewer", "security-auditor"):
+            with self.subTest(agent=toml_name):
+                self.assertTrue((self.CODEX_AGENTS / f"{toml_name}.toml").is_file())
+                fm = frontmatter(self.CORE_AGENTS / f"{toml_name}.md")
+                self.assertEqual(toml_name, fm["name"])
+                self.assertTrue(fm.get("model"))
+                self.assertNotIn("Write", fm["tools"])
+                self.assertNotIn("Edit", fm["tools"])
+
+    def test_agent_references_use_plugin_root(self) -> None:
+        for agent in self.CORE_AGENTS.glob("*.md"):
+            with self.subTest(agent=agent.name):
+                text = agent.read_text(encoding="utf-8")
+                self.assertNotIn(".claude/", text)
+                self.assertNotIn(".agents/", text)
+                for ref in re.findall(r"\$\{CLAUDE_PLUGIN_ROOT\}/([^`\s\"]+)", text):
+                    self.assertTrue((PLUGINS_DIR / "core" / ref).exists(), ref)
+
+    def test_review_and_secure_skills_dispatch_the_plugin_agents(self) -> None:
+        review = (PLUGINS_DIR / "core" / "skills" / "review" / "SKILL.md").read_text(encoding="utf-8")
+        secure = (PLUGINS_DIR / "core" / "skills" / "secure" / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("core:reviewer", review)
+        self.assertIn("core:security-auditor", secure)
+
+
+class EvalSuiteTests(unittest.TestCase):
+    GRADER_TYPES = {"regex", "tool_used", "tool_order", "file_exists", "llm", "baseline"}
+
+    def cases(self) -> list[Path]:
+        evals = PLUGINS_DIR / "core" / "evals"
+        return sorted(p for p in evals.iterdir() if p.is_dir() and p.name != "results")
+
+    def test_every_case_has_prompt_and_at_least_one_grader(self) -> None:
+        cases = self.cases()
+        self.assertGreaterEqual(len(cases), 5)
+        for case in cases:
+            with self.subTest(case=case.name):
+                prompt = frontmatter(case / "prompt.md")
+                self.assertTrue(prompt.get("description"))
+                graders = sorted((case / "graders").glob("*.md"))
+                self.assertTrue(graders)
+                for grader in graders:
+                    self.assertIn(frontmatter(grader)["type"], self.GRADER_TYPES, grader)
+
+    def test_contextual_skills_have_a_firing_case_and_a_negative_case(self) -> None:
+        fired = set()
+        negative = False
+        for case in self.cases():
+            for grader in (case / "graders").glob("*.md"):
+                fm = frontmatter(grader)
+                if fm["type"] != "tool_used" or fm.get("tool") != "Skill":
+                    continue
+                if fm.get("max") == "0":
+                    negative = True
+                match = re.search(r"\)\?([\w-]+)\"", fm.get("input_match", ""))
+                if match:
+                    fired.add(match.group(1))
+        self.assertTrue({"tdd", "debug", "verify", "codegraph"} <= fired, fired)
+        self.assertTrue(negative)
+
+    def test_eval_results_are_ignored_by_git(self) -> None:
+        self.assertIn("plugins/*/evals/results/", (ROOT / ".gitignore").read_text(encoding="utf-8"))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -12,10 +12,10 @@ disable-model-invocation: true
 
 ## Modo 1: Solicitar review
 
-Despachar subagente revisor con contexto preciso:
+Despachar el agente `reviewer` del plugin con Agent tool (`subagent_type: "core:reviewer"`; `reviewer` si el plugin se carga con `--plugin-dir`). Es de solo lectura y ya conoce el formato de salida; el prompt aporta el rango y el contexto:
 
 ```
-Eres un code reviewer senior. Revisa los cambios entre [BASE_SHA] y [HEAD_SHA].
+Revisa los cambios entre [BASE_SHA] y [HEAD_SHA].
 
 Contexto: [que se implemento y por que]
 

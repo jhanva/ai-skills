@@ -12,7 +12,7 @@ El repo es un marketplace de plugins. Cada skill vive una sola vez en `plugins/<
 ```
 .claude-plugin/marketplace.json    — Catalogo para Claude Code
 .agents/plugins/marketplace.json   — Catalogo para Codex
-plugins/core/                      — Flujo de desarrollo (12 skills, agente prompt-artist, hooks)
+plugins/core/                      — Flujo de desarrollo (12 skills, 3 agentes, hooks, evals)
   skills/optimize                  — Optimizacion de tokens (siempre activa)
   skills/brainstorm                — Diseno antes de implementar
   skills/plan                      — Spec -> plan de implementacion
@@ -26,6 +26,9 @@ plugins/core/                      — Flujo de desarrollo (12 skills, agente pr
   skills/codegraph                 — Knowledge graph consultable (references/, scripts/)
   skills/humanize                  — Humanizar texto generado por IA (references/)
   agents/prompt-artist.md          — Agent: prompts para generacion de imagen
+  agents/reviewer.md               — Agent: code review de solo lectura (lo despacha /review)
+  agents/security-auditor.md       — Agent: auditoria de seguridad de solo lectura (lo despacha /secure full)
+  evals/                           — Casos de eval para tdd, debug, verify, codegraph y un negativo
   references/prompt-artist/        — domains, techniques, platforms, text-safety
   hooks/hooks.json                 — SessionStart (session-context.sh) y PreToolUse (block-env-access.sh)
 plugins/android/                   — android-arch, bitmap-safety, room-audit, ml-ondevice
@@ -104,8 +107,10 @@ Instalacion: `/plugin marketplace add jhanva/ai-skills` y `/plugin install core@
 
 ### Agentes especializados
 ```
-@prompt-artist    Transforma ideas en prompts optimizados para imagen
-                  (Gemini, DALL-E, Midjourney, Stable Diffusion)
+@prompt-artist      Transforma ideas en prompts optimizados para imagen
+                    (Gemini, DALL-E, Midjourney, Stable Diffusion)
+@reviewer           Code review de solo lectura con severidades (usado por /review)
+@security-auditor   Auditoria de seguridad por area (usado por /secure full)
 ```
 
 ### Browser automation
@@ -155,4 +160,4 @@ La skill `optimize` se carga automaticamente y aplica estas reglas en toda inter
 - Delegar a subagentes solo cuando output esperado > 50 lineas
 - Seleccion de modelo para subagentes (haiku/sonnet/opus)
 
-Al anadir o mover una skill: actualizar el `marketplace.json` de ambos runtimes, el `plugin.json` del plugin (subir `version`) y correr `claude plugin validate .`.
+Al anadir o mover una skill: actualizar el `marketplace.json` de ambos runtimes, el `plugin.json` del plugin (subir `version`) y correr `claude plugin validate .`. Si la skill es contextual, anadir un caso en `plugins/core/evals/` y medir con `claude plugin eval .` desde `plugins/core`.

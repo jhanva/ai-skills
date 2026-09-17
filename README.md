@@ -73,7 +73,7 @@ Cada plugin declara una `version`. Solo recibes cambios cuando esa version sube 
 
 | Plugin | Para que | Skills | Extras |
 |---|---|---|---|
-| **`core`** | Cualquier proyecto. El flujo completo de desarrollo | `optimize`, `brainstorm`, `plan`, `tdd`, `debug`, `verify`, `execute`, `review`, `parallel`, `secure`, `codegraph`, `humanize` | Agente `prompt-artist`; hooks `session-context` y `block-env-access` |
+| **`core`** | Cualquier proyecto. El flujo completo de desarrollo | `optimize`, `brainstorm`, `plan`, `tdd`, `debug`, `verify`, `execute`, `review`, `parallel`, `secure`, `codegraph`, `humanize` | Agentes `prompt-artist`, `reviewer`, `security-auditor`; hooks `session-context` y `block-env-access`; suite de evals |
 | **`android`** | Apps Android con Clean Architecture, Room o ML on-device | `android-arch`, `bitmap-safety`, `room-audit`, `ml-ondevice` | — |
 | **`image`** | Features de procesamiento de imagen (hashing, similitud, pipelines) | `image-algo`, `image-pipeline` | — |
 | **`repo-ops`** | Operaciones de entorno y repositorio | `git-identity`, `windows-symlink`, `browser-control` | — |
@@ -243,12 +243,14 @@ Los nombres de las tablas son los cortos; con el plugin instalado se invocan com
 | Agente | Runtime | Proposito |
 |---|---|---|
 | [`prompt-artist`](./plugins/core/agents/prompt-artist.md) | Claude Code (plugin `core`) | Transforma ideas en prompts narrativos para generacion de imagenes (Gemini, DALL-E, Midjourney, Stable Diffusion). Formula de 7 componentes con pesos por dominio; anexos en [`references/prompt-artist/`](./plugins/core/references/prompt-artist/) |
-| [`prompt_artist`](./.codex/agents/prompt-artist.toml) | Codex | Misma capacidad, definido como agente custom de Codex |
-| [`task_implementer`](./.codex/agents/task-implementer.toml) | Codex | Backend de `$execute`: implementa una tarea del plan con TDD |
-| [`reviewer`](./.codex/agents/reviewer.toml) | Codex | Backend de `$review` |
-| [`security_auditor`](./.codex/agents/security-auditor.toml) | Codex | Backend de `$secure` |
+| [`reviewer`](./plugins/core/agents/reviewer.md) | Claude Code (plugin `core`) | Revisor de solo lectura (correccion, regresiones, tests, seguridad). `/core:review` lo despacha como `core:reviewer` |
+| [`security-auditor`](./plugins/core/agents/security-auditor.md) | Claude Code (plugin `core`) | Auditor de seguridad de solo lectura por area (code, infra, deps). `/core:secure full` lo despacha en paralelo |
+| [`prompt_artist`](./.codex/agents/prompt-artist.toml) | Codex | Equivalente de `prompt-artist` como agente custom de Codex |
+| [`reviewer`](./.codex/agents/reviewer.toml) | Codex | Equivalente de `reviewer`; backend de `$review` |
+| [`security_auditor`](./.codex/agents/security-auditor.toml) | Codex | Equivalente de `security-auditor`; backend de `$secure` |
+| [`task_implementer`](./.codex/agents/task-implementer.toml) | Codex | Backend de `$execute`: implementa una tarea del plan con TDD. En Claude Code, `execute` despacha el subagente con prompt inline |
 
-En Claude Code, `execute`, `review` y `secure` despachan subagentes con la herramienta `Agent` directamente desde la skill, por eso no necesitan agentes custom.
+Los agentes de Claude Code son de solo lectura por definicion (`tools` sin `Write`/`Edit`), asi que un review o una auditoria nunca modifica el codigo.
 
 ## Hooks
 
@@ -335,7 +337,8 @@ plugins/
       agents/openai.yaml            politica de invocacion para Codex
       references/                   anexos que se cargan on-demand
       scripts/                      scripts de la skill (Python sin deps, PowerShell)
-    agents/prompt-artist.md         agente de Claude Code
+    agents/*.md                     agentes de Claude Code (prompt-artist, reviewer, security-auditor)
+    evals/<caso>/                   suite de evals: prompt.md + graders/
     references/prompt-artist/       anexos del agente (fuera de agents/, que solo admite agentes)
     hooks/hooks.json                registro de hooks + scripts .sh
   android/  image/  repo-ops/       misma estructura, sin agentes ni hooks
@@ -380,7 +383,21 @@ claude plugin validate .
 claude --plugin-dir ./plugins/<plugin>
 ```
 
-Los tests comprueban que los dos marketplaces listan los mismos plugins con la misma version, que cada plugin tiene sus dos manifests en sync, que `agents/` solo contiene agentes, que los hooks apuntan a scripts existentes, que cada skill tiene `openai.yaml` coherente y que ningun `SKILL.md` supera las 500 lineas ni referencia capas antiguas.
+### Evals: medir si las skills se activan
+
+`plugins/core/evals/` contiene una suite de casos para las skills contextuales (`tdd`, `debug`, `verify`, `codegraph`) y un caso negativo que no debe activar ninguna. Cada caso es un `prompt.md` escrito como lo escribiria un usuario (sin nombrar la skill) y uno o mas `graders/*.md`: un `tool_used` que comprueba que la skill se invoco y un `llm` o `regex` sobre la respuesta.
+
+```bash
+cd plugins/core
+```
+
+```bash
+claude plugin eval . --runs 3
+```
+
+Cada caso corre con el plugin y sin el; la columna `Δ` dice cuanto aporta el plugin. Un `Δ` cercano a cero con `skill-fired` fallando significa que la `description` de la skill no dispara con frases naturales: ese es el momento de reescribirla. Los resultados van a `evals/results/` (ignorado por git). Requiere una version de Claude Code que incluya `claude plugin eval`.
+
+Los tests comprueban que los dos marketplaces listan los mismos plugins con la misma version, que cada plugin tiene sus dos manifests en sync, que `agents/` solo contiene agentes, que los hooks apuntan a scripts existentes, que cada skill tiene `openai.yaml` coherente, que ningun `SKILL.md` supera las 500 lineas ni referencia capas antiguas, que los agentes `reviewer` y `security-auditor` existen en ambos runtimes y que cada caso de eval tiene prompt y graders validos.
 
 ### Flujo git
 

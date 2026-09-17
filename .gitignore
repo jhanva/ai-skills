@@ -9,3 +9,6 @@ tmp/
 
 # Artefactos generados (no versionados)
 codegraph-out/
+
+# Resultados de evals de plugins
+plugins/*/evals/results/

@@ -1,6 +1,6 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "core",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Flujo de desarrollo disciplinado: brainstorm, plan, tdd, debug, verify, execute, review, parallel, secure, codegraph, humanize y el agente prompt-artist"
 }
