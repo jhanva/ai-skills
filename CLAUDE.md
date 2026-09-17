@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # AI Skills — Custom Skills & Agents para Claude Code
 
 Skills de desarrollo y agentes especializados propios, escritos desde cero. Imponen flujos de trabajo disciplinados: TDD, debugging sistematico, diseno antes de implementacion, y verificacion con evidencia.
