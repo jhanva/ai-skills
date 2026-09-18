@@ -36,6 +36,7 @@
     "core@ai-skills": true,
     "android@ai-skills": true,
     "image@ai-skills": true,
+    "design@ai-skills": true,
     "repo-ops@ai-skills": true
   }
 }

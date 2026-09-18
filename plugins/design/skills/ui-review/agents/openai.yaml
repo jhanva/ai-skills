@@ -1,0 +1,7 @@
+interface:
+  display_name: "UI Review"
+  short_description: "Auditoría de accesibilidad y UX"
+  default_prompt: "Usa $ui-review para auditar una pantalla contra criterios de accesibilidad, interacción y layout."
+
+policy:
+  allow_implicit_invocation: false

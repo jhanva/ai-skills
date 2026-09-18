@@ -56,6 +56,7 @@ Reusables por skills y por el usuario:
 - `task_implementer`: backend reusable para `$execute`
 - `reviewer`: backend reusable para `$review`
 - `security_auditor`: backend reusable para `$secure`
+- `ui_reviewer`: backend reusable para `$ui-review` (plugin `design`). Consulta el catalogo con `python plugins/design/scripts/search.py` porque Codex no sustituye `${CLAUDE_PLUGIN_ROOT}`
 - `prompt_artist`: adaptacion del agente original `prompt-artist`
 
 Los agentes de game development viven en el repositorio hermano `gamedev-skills`.

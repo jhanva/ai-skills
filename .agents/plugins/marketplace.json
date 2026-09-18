@@ -38,6 +38,17 @@
       "category": "Developer Tools"
     },
     {
+      "name": "design",
+      "source": {
+        "source": "local",
+        "path": "./plugins/design"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Developer Tools"
+    },
+    {
       "name": "repo-ops",
       "source": {
         "source": "local",

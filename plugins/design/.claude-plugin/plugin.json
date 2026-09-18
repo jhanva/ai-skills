@@ -1,0 +1,17 @@
+{
+  "name": "design",
+  "description": "Sistema de diseno, auditoria de UI y tokens de codigo para Jetpack Compose y web, con catalogo consultable y contraste validado",
+  "version": "1.0.0",
+  "author": {
+    "name": "jhanva"
+  },
+  "repository": "https://github.com/jhanva/ai-skills",
+  "keywords": [
+    "design-system",
+    "ui",
+    "ux",
+    "accessibility",
+    "compose",
+    "tokens"
+  ]
+}

@@ -4,11 +4,11 @@
 
 Marketplace de plugins para desarrollo asistido por IA: skills, agentes y hooks que imponen flujos disciplinados (diseno antes de codear, TDD, debugging con causa raiz, verificacion con evidencia).
 
-**21 skills en 4 plugins. Un catalogo, dos runtimes: Claude Code y Codex.**
+**24 skills en 5 plugins. Un catalogo, dos runtimes: Claude Code y Codex.**
 
-[![Plugins](https://img.shields.io/badge/plugins-4-0ea5e9?style=for-the-badge)](#plugins)
-[![Skills](https://img.shields.io/badge/skills-21-84cc16?style=for-the-badge)](#skills)
-[![Codex Agents](https://img.shields.io/badge/codex%20agents-4-8b5cf6?style=for-the-badge)](#agentes)
+[![Plugins](https://img.shields.io/badge/plugins-5-0ea5e9?style=for-the-badge)](#plugins)
+[![Skills](https://img.shields.io/badge/skills-24-84cc16?style=for-the-badge)](#skills)
+[![Codex Agents](https://img.shields.io/badge/codex%20agents-5-8b5cf6?style=for-the-badge)](#agentes)
 [![Hooks](https://img.shields.io/badge/hooks-codex%20%2B%20claude-f97316?style=for-the-badge)](#hooks)
 
 [Inicio rapido](#inicio-rapido) • [Plugins](#plugins) • [Instalacion](#instalacion) • [Skills](#skills) • [Flujos](#flujos-de-trabajo) • [Contribuir](#contribuir)
@@ -27,7 +27,7 @@ Desde cualquier proyecto abierto en Claude Code:
 /plugin install core@ai-skills
 ```
 
-Listo. Ya tienes `/core:brainstorm`, `/core:plan`, `/core:tdd`, `/core:debug`, `/core:verify` y el resto del plugin `core`, mas el agente `prompt-artist` y los hooks de proteccion de `.env`. Instala `android`, `image` o `repo-ops` solo si el proyecto los necesita.
+Listo. Ya tienes `/core:brainstorm`, `/core:plan`, `/core:tdd`, `/core:debug`, `/core:verify` y el resto del plugin `core`, mas el agente `prompt-artist` y los hooks de proteccion de `.env`. Instala `android`, `image`, `design` o `repo-ops` solo si el proyecto los necesita.
 
 ## Indice
 
@@ -76,6 +76,7 @@ Cada plugin declara una `version`. Solo recibes cambios cuando esa version sube 
 | **`core`** | Cualquier proyecto. El flujo completo de desarrollo | `optimize`, `brainstorm`, `plan`, `tdd`, `debug`, `verify`, `execute`, `review`, `parallel`, `secure`, `codegraph`, `humanize` | Agentes `prompt-artist`, `reviewer`, `security-auditor`; hooks `session-context` y `block-env-access`; suite de evals |
 | **`android`** | Apps Android con Clean Architecture, Room o ML on-device | `android-arch`, `bitmap-safety`, `room-audit`, `ml-ondevice` | — |
 | **`image`** | Features de procesamiento de imagen (hashing, similitud, pipelines) | `image-algo`, `image-pipeline` | — |
+| **`design`** | Interfaces con criterio: sistema de diseno, auditoria de UI y tokens para Jetpack Compose y web | `design-system`, `ui-review`, `ui-tokens` | Agente `ui-reviewer`; catalogo CSV (estilos, paletas con contraste validado, tipografia, guias UX con criterio WCAG, motion, reglas por stack) y buscador `search.py` sin dependencias |
 | **`repo-ops`** | Operaciones de entorno y repositorio | `git-identity`, `windows-symlink`, `browser-control` | — |
 
 Instala `core` siempre; el resto segun el proyecto. Los plugins son independientes entre si: `android` no requiere `image`, aunque `ml-ondevice` suele encadenarse con `image-pipeline`.
@@ -102,6 +103,10 @@ Instala `core` siempre; el resto segun el proyecto. Los plugins son independient
 
 ```bash
 /plugin install image@ai-skills
+```
+
+```bash
+/plugin install design@ai-skills
 ```
 
 ```bash
@@ -230,6 +235,14 @@ Los nombres de las tablas son los cortos; con el plugin instalado se invocan com
 | [`image-algo`](./plugins/image/skills/image-algo/SKILL.md) | Explicita | Diseno de algoritmos de imagen: hashing perceptual, similitud, clustering |
 | [`image-pipeline`](./plugins/image/skills/image-pipeline/SKILL.md) | Explicita | Arquitectura de pipelines multi-paso: stages, memoria, concurrencia, errores, cache |
 
+### `design`
+
+| Skill | Activacion | Proposito |
+|---|---|---|
+| [`design-system`](./plugins/design/skills/design-system/SKILL.md) | Explicita | Decide estilo, paleta, tipografia, espaciado, motion y reglas de stack consultando el catalogo; persiste `design-system/<proyecto>/MASTER.md` y overrides por pantalla. Nunca sobreescribe sin autorizacion |
+| [`ui-review`](./plugins/design/skills/ui-review/SKILL.md) | Explicita | Auditoria de solo lectura de pantallas existentes: contraste medido, foco, nombres accesibles, area tactil, responsive, tokens, motion, formularios y estados. Reporte con severidades y `archivo:linea` |
+| [`ui-tokens`](./plugins/design/skills/ui-tokens/SKILL.md) | Explicita | Traduce `MASTER.md` a codigo: `Theme.kt`/`Color.kt`/`Type.kt` en Compose o `tokens.css` + tema Tailwind en web, con test de contraste primero (`/tdd`) |
+
 ### `repo-ops`
 
 | Skill | Activacion | Proposito |
@@ -245,9 +258,11 @@ Los nombres de las tablas son los cortos; con el plugin instalado se invocan com
 | [`prompt-artist`](./plugins/core/agents/prompt-artist.md) | Claude Code (plugin `core`) | Transforma ideas en prompts narrativos para generacion de imagenes (Gemini, DALL-E, Midjourney, Stable Diffusion). Formula de 7 componentes con pesos por dominio; anexos en [`references/prompt-artist/`](./plugins/core/references/prompt-artist/) |
 | [`reviewer`](./plugins/core/agents/reviewer.md) | Claude Code (plugin `core`) | Revisor de solo lectura (correccion, regresiones, tests, seguridad). `/core:review` lo despacha como `core:reviewer` |
 | [`security-auditor`](./plugins/core/agents/security-auditor.md) | Claude Code (plugin `core`) | Auditor de seguridad de solo lectura por area (code, infra, deps). `/core:secure full` lo despacha en paralelo |
+| [`ui-reviewer`](./plugins/design/agents/ui-reviewer.md) | Claude Code (plugin `design`) | Auditor de UI de solo lectura (accesibilidad, interaccion, layout, tokens, motion) para Compose y web. `/design:ui-review` lo despacha como `design:ui-reviewer` |
 | [`prompt_artist`](./.codex/agents/prompt-artist.toml) | Codex | Equivalente de `prompt-artist` como agente custom de Codex |
 | [`reviewer`](./.codex/agents/reviewer.toml) | Codex | Equivalente de `reviewer`; backend de `$review` |
 | [`security_auditor`](./.codex/agents/security-auditor.toml) | Codex | Equivalente de `security-auditor`; backend de `$secure` |
+| [`ui_reviewer`](./.codex/agents/ui-reviewer.toml) | Codex | Equivalente de `ui-reviewer`; backend de `$ui-review` |
 | [`task_implementer`](./.codex/agents/task-implementer.toml) | Codex | Backend de `$execute`: implementa una tarea del plan con TDD. En Claude Code, `execute` despacha el subagente con prompt inline |
 
 Los agentes de Claude Code son de solo lectura por definicion (`tools` sin `Write`/`Edit`), asi que un review o una auditoria nunca modifica el codigo.
@@ -285,6 +300,15 @@ Los hooks de Claude Code se registran en [`plugins/core/hooks/hooks.json`](./plu
 /image:image-algo      -->  /image:image-pipeline  -->  /core:plan  -->  /core:execute
 /android:ml-ondevice   -->  /image:image-pipeline  -->  /core:plan  -->  /core:execute
 ```
+
+### Interfaces (Compose o web)
+
+```
+/design:design-system  -->  /core:plan  -->  /core:execute (+ /design:ui-tokens)  -->  /design:ui-review  -->  /core:verify
+   (MASTER.md)              (pantallas)       (tokens con test de contraste)          (auditoria a11y/UX)
+```
+
+`MASTER.md` vive en el proyecto consumidor (`design-system/<proyecto>/`) y es la fuente de verdad que `plan`, `execute` y `ui-tokens` leen antes de tocar UI. Consultas puntuales al catalogo: `python plugins/design/scripts/search.py "<terminos>" --domain ux` o `--stack compose`.
 
 ### Auditorias
 
@@ -341,6 +365,10 @@ plugins/
     evals/<caso>/                   suite de evals: prompt.md + graders/
     references/prompt-artist/       anexos del agente (fuera de agents/, que solo admite agentes)
     hooks/hooks.json                registro de hooks + scripts .sh
+  design/
+    data/*.csv, data/stacks/*.csv   catalogo UI/UX (estilos, paletas, tipografia, guias, motion, reglas por stack)
+    scripts/catalog.py, search.py   indice BM25 sin dependencias, generador de MASTER.md, calculo de contraste
+    agents/ui-reviewer.md           auditor de UI de solo lectura
   android/  image/  repo-ops/       misma estructura, sin agentes ni hooks
 .codex/
   agents/*.toml                     agentes custom de Codex (+ playbooks en subcarpetas)
