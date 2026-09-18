@@ -35,6 +35,20 @@ recursos, y se reporta. Los arreglos se hacen despues con `/tdd`.
 4. Si existe `design-system/**/MASTER.md`, leerlo: sus tokens, escala y checklist son el contrato
    a verificar. Si existe `pages/<pantalla>.md`, prevalece para esa pantalla.
 
+## Paso 0: detector determinista
+
+Antes de gastar un agente, correr las reglas mecanicas:
+
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/detect.py" <rutas> [--json]
+```
+
+Exit 1 = hallazgos (cada uno con `archivo:linea`, regla, severidad y la guia que incumple); 0 =
+limpio. Estos hallazgos van al reporte tal cual, en la seccion `Detector`, y el agente **no los
+repite**: se concentra en lo que un regex no ve (contraste efectivo, orden de lectura, estados,
+copy, composicion). Si el plugin tiene el hook activo, el detector ya corrio en cada edicion;
+igual se corre aqui para tener la foto completa.
+
 ## Despachar el auditor
 
 Despachar el agente `ui-reviewer` del plugin con Agent tool (`subagent_type: "design:ui-reviewer"`;
@@ -45,6 +59,9 @@ El prompt aporta:
 Audita la UI en: [rutas]
 Stack: [compose|web]
 Sistema de diseno: [ruta a MASTER.md y page override, o "no hay"]
+Producto: [ruta a PRODUCT.md o "no hay"]
+Modo de la superficie: [persuadir|operar|leer|experimentar, de MASTER/pages]
+Hallazgos del detector (no repetir): [pegar salida de detect.py]
 Contexto: [que hace la pantalla y para quien]
 
 Verifica en este orden y detente en cada categoria hasta agotarla:
@@ -55,6 +72,8 @@ Verifica en este orden y detente en cada categoria hasta agotarla:
 4. Tipografia y color: tamanos base, escala respetada, tokens en vez de literales, modo oscuro
 5. Motion: proposito, duraciones, reduced motion
 6. Formularios, estados (vacio/carga/error) y navegacion atras
+7. Composicion (solo modo persuadir/experimentar): eyebrows, hero, familias de layout, zigzag,
+   tarjetas iguales, bento (guias comp-*)
 
 Para cada categoria consulta el criterio exacto con:
 python "${CLAUDE_PLUGIN_ROOT}/scripts/search.py" "<tema>" --domain ux -n 3
@@ -77,6 +96,9 @@ python -c "import sys; sys.path.insert(0, r'${CLAUDE_PLUGIN_ROOT}/scripts'); imp
 
 ```
 ## UI Review — [pantalla o rutas]
+
+### Detector (mecanico)
+- [archivo:linea] regla `id` -> guia `id-guia`
 
 ### Critico (bloquea entrega)
 - [archivo:linea] Hallazgo. Criterio: `id-guia` (WCAG x.x.x). Evidencia: [valor medido o codigo]

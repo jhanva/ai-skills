@@ -5,8 +5,15 @@ search.py — Consulta el catalogo UI/UX del plugin design.
 Uso (python puede ser python3 o py segun la maquina):
   python search.py "<consulta>" --domain <style|palette|typography|ux|motion> [-n N] [--json]
   python search.py "<consulta>" --stack <compose|web> [-n N] [--json]
-  python search.py "<consulta>" --design-system -p "Nombre" --stack <compose|web> [--json]
+  python search.py "<consulta>" --design-system -p "Nombre" --stack <compose|web> [--mode <modo>] [--json]
   python search.py "<consulta>" --design-system -p "Nombre" --stack <stack> --persist --output-dir <raiz> [--page <nombre>] [--force]
+  python search.py "<consulta>" --design-system ... --persist --audience "..." --context "..." [--voice "..."] [--constraints "..."]
+
+Modos por superficie (--mode; si se omite se infiere de la consulta y se marca como no verificado):
+  persuadir   el visitante decide y actua: landing, marketing, pricing
+  operar      el visitante completa tareas: app, dashboard, formularios, admin
+  leer        el visitante entiende algo: docs, articulos, ayuda
+  experimentar el visitante esta dentro de la obra: portfolio, galeria, showcase
 
 Exit codes:
   0 = resultados encontrados / archivo escrito / --help
@@ -34,6 +41,50 @@ SPACING = {
 }
 FALLBACK = {"style": "minimalismo-editorial", "palette": "neutral-producto", "typography": "sistema-neutral"}
 
+MODES = {
+    "persuadir": (
+        "El visitante decide y actua; el diseno es el producto.",
+        "Gana la expresion: una idea por seccion, imagen real, CTA visible en el primer viewport. Las reglas de composicion (comp-*) aplican completas.",
+        ("landing", "marketing", "campana", "pricing", "precio", "portada", "home", "venta", "conversion", "promocion", "lanzamiento", "waitlist", "sitio"),
+    ),
+    "operar": (
+        "El visitante completa una tarea.",
+        "Gana la escaneabilidad: consistencia, expectativas nativas, densidad segun el uso real. La marca vive en los detalles, no en el layout.",
+        ("app", "dashboard", "panel", "admin", "formulario", "herramienta", "configuracion", "editor", "consola", "tarea", "gestion", "checkout", "onboarding", "chat", "mapa", "pantalla"),
+    ),
+    "leer": (
+        "El visitante entiende algo.",
+        "Gana la comprension: estructura navegable, medida de 60-75 caracteres, jerarquia de encabezados; la expresion va despues.",
+        ("documentacion", "docs", "articulo", "blog", "ayuda", "guia", "changelog", "legal", "terminos", "manual", "lectura", "noticias"),
+    ),
+    "experimentar": (
+        "El visitante esta dentro de la obra.",
+        "Gana el artefacto: la interfaz retrocede, el contenido manda desde el primer viewport; motion con proposito, nunca decorativo.",
+        ("portfolio", "galeria", "showcase", "exposicion", "inmersivo", "obra", "museo", "fotografia", "arte", "evento"),
+    ),
+}
+
+
+def infer_mode(query: str):
+    """Modo por superficie a partir de la consulta; None si ninguna palabra clave aparece."""
+    # Palabras normalizadas sin filtrar stopwords: "app" es stopword en el catalogo
+    # pero aqui es la senal principal de "operar".
+    words = set(re.findall(r"[a-z0-9]+", catalog.normalize(query)))
+    best, best_hits = None, 0
+    for mode, (_, _, keywords) in MODES.items():
+        hits = sum(1 for k in keywords if k in words or k + "s" in words or k + "es" in words)
+        if hits > best_hits:
+            best, best_hits = mode, hits
+    return best
+
+
+def pick_style(query: str, mode: str):
+    """Estilo restringido al modo; si nada del modo hace match, busca sin restriccion."""
+    hits = [h for h in catalog.search(query, "style", limit=10) if mode in h.get("modo", "").split("|")]
+    if hits:
+        return hits[0], True
+    return pick(query, "style")
+
 
 def slugify(name: str) -> str:
     text = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
@@ -48,8 +99,12 @@ def pick(query: str, domain: str):
     return next(r for r in rows if r["id"] == FALLBACK[domain]), False
 
 
-def build_design_system(query: str, project: str, stack: str) -> dict:
-    style, style_hit = pick(query, "style")
+def build_design_system(query: str, project: str, stack: str, mode=None) -> dict:
+    mode_verified = mode is not None
+    mode = mode or infer_mode(query)
+    mode_inferred = mode is not None
+    mode = mode or "operar"
+    style, style_hit = pick_style(query, mode)
     palette, palette_hit = pick(query, "palette")
     typography, typo_hit = pick(query, "typography")
     ux_rows = catalog.load_rows(catalog.catalog_path("ux"))
@@ -71,6 +126,8 @@ def build_design_system(query: str, project: str, stack: str) -> dict:
         "slug": slugify(project),
         "query": query,
         "stack": stack,
+        "mode": mode,
+        "mode_source": "explicito" if mode_verified else ("inferido" if mode_inferred else "por defecto"),
         "style": style, "palette": palette, "typography": typography,
         "verified": {"style": style_hit, "palette": palette_hit, "typography": typo_hit},
         "spacing": SPACING[style.get("densidad", "media")],
@@ -95,7 +152,15 @@ def render_master(ds: dict, page=None) -> str:
     unverified = [k for k, v in ds["verified"].items() if not v]
     if unverified:
         lines += [f"> Sin match verificado para: {', '.join(unverified)}. Se uso el valor neutral por defecto; revisar antes de aplicar.", ""]
+    if ds["mode_source"] == "por defecto":
+        lines += ["> Modo no inferido de la consulta: se asumio `operar`. Confirmar con el usuario o pasar --mode.", ""]
+    if not page:
+        lines += ["Verdad durable del producto (audiencia, contexto de uso, voz, restricciones): ver `PRODUCT.md` en esta carpeta. Este archivo decide el look; aquel decide para quien y por que.", ""]
+    what, rule, _ = MODES[ds["mode"]]
     lines += [
+        "## Modo", "",
+        f"**{ds['mode']}** ({ds['mode_source']}) — {what}", "",
+        f"Regla de desempate: {rule}", "",
         "## Estilo", "",
         f"**{s['nombre']}** (`{s['id']}`) — {s['resumen']}", "",
         f"- Usar cuando: {s['cuando_usar']}",
@@ -133,6 +198,29 @@ def render_master(ds: dict, page=None) -> str:
         lines.append(f"- **{r['tema']}** — {r['regla']} Implementacion: {r['implementacion']}")
     lines.append("")
     return "\n".join(lines)
+
+
+def render_product(ds: dict, audience: str, context: str, voice: str, constraints: str) -> str:
+    return "\n".join([
+        f"# Producto — {ds['project']}", "",
+        f"Generado: {date.today().isoformat()}. Verdad durable del producto; cambia mucho menos que el look (`MASTER.md`).", "",
+        "## Audiencia", "", audience, "",
+        "## Contexto de uso", "", context, "",
+        "## Voz", "", voice or "Por definir con el usuario.", "",
+        "## Restricciones", "", constraints or "Ninguna declarada.", "",
+        "## Superficies y modos", "",
+        f"- {ds['query']}: `{ds['mode']}` ({ds['mode_source']})", "",
+    ])
+
+
+def persist_product(ds: dict, output_dir: Path, audience: str, context: str, voice: str, constraints: str):
+    base = output_dir / "design-system" / ds["slug"]
+    target = base / "PRODUCT.md"
+    if target.exists():
+        return None
+    base.mkdir(parents=True, exist_ok=True)
+    target.write_text(render_product(ds, audience, context, voice, constraints), encoding="utf-8", newline="\n")
+    return target
 
 
 def persist(ds: dict, output_dir: Path, page, force: bool) -> Path:
@@ -177,6 +265,11 @@ def main(argv=None) -> int:
     parser.add_argument("--output-dir")
     parser.add_argument("--page")
     parser.add_argument("--force", action="store_true")
+    parser.add_argument("--mode", choices=list(MODES))
+    parser.add_argument("--audience")
+    parser.add_argument("--context")
+    parser.add_argument("--voice", default="")
+    parser.add_argument("--constraints", default="")
     try:
         args = parser.parse_args(argv)
     except SystemExit as exc:
@@ -186,10 +279,13 @@ def main(argv=None) -> int:
         if not args.stack:
             print("error: --design-system requiere --stack (compose|web)", file=sys.stderr)
             return 2
-        ds = build_design_system(args.query, args.project, args.stack)
+        ds = build_design_system(args.query, args.project, args.stack, args.mode)
         if args.persist:
             if not args.output_dir:
                 print("error: --persist requiere --output-dir apuntando a la raiz del proyecto", file=sys.stderr)
+                return 2
+            if bool(args.audience) != bool(args.context):
+                print("error: --audience y --context van juntos", file=sys.stderr)
                 return 2
             try:
                 target = persist(ds, Path(args.output_dir), args.page, args.force)
@@ -197,6 +293,11 @@ def main(argv=None) -> int:
                 print(f"existe {exc}; no se sobreescribe sin --force (requiere autorizacion del usuario)", file=sys.stderr)
                 return 3
             print(f"escrito {target}")
+            if args.audience:
+                product = persist_product(ds, Path(args.output_dir), args.audience, args.context, args.voice, args.constraints)
+                print(f"escrito {product}" if product else "PRODUCT.md ya existe; no se toca (editarlo a mano si cambio la verdad del producto)")
+            elif not args.page and not (Path(args.output_dir) / "design-system" / ds["slug"] / "PRODUCT.md").exists():
+                print("aviso: no existe PRODUCT.md; pasar --audience y --context para crearlo", file=sys.stderr)
             return 0
         if args.json:
             print(json.dumps(ds, ensure_ascii=False, indent=2))

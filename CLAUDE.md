@@ -33,9 +33,10 @@ plugins/core/                      — Flujo de desarrollo (12 skills, 3 agentes
   hooks/hooks.json                 — SessionStart (session-context.sh) y PreToolUse (block-env-access.sh)
 plugins/android/                   — android-arch, bitmap-safety, room-audit, ml-ondevice
 plugins/image/                     — image-algo, image-pipeline
-plugins/design/                    — design-system, ui-review, ui-tokens + agente ui-reviewer
-  data/*.csv, data/stacks/*.csv    — Catalogo UI/UX: estilos, paletas (contraste validado), tipografia, guias WCAG, motion, reglas compose/web
-  scripts/search.py                — Buscador BM25 sin deps; --design-system genera MASTER.md; calculo de contraste
+plugins/design/                    — design-system, ui-review, ui-tokens + agente ui-reviewer + hook PostToolUse
+  data/*.csv, data/stacks/*.csv    — Catalogo UI/UX: estilos (con modo), paletas (contraste validado), tipografia, guias WCAG y de composicion, motion, reglas compose/web
+  scripts/search.py                — Buscador BM25 sin deps; --design-system genera PRODUCT.md + MASTER.md con modo por superficie
+  scripts/detect.py                — Detector determinista (24 reglas) que corre el hook tras editar UI y ui-review antes del agente
 plugins/repo-ops/                  — git-identity, windows-symlink, browser-control
 .codex/                            — Agentes custom, config y hooks nativos de Codex
 ```
@@ -64,8 +65,8 @@ Instaladas desde el marketplace, las skills se invocan con prefijo de plugin: `/
 | `/image-algo` | Solo usuario | Diseno de algoritmos de imagen (hashing, similarity, clustering) |
 | `/ml-ondevice` | Solo usuario | Integracion de modelos ML on-device en Android |
 | `/image-pipeline` | Solo usuario | Diseno de pipelines de procesamiento de imagen multi-paso |
-| `/design-system` | Solo usuario | Decide y persiste el sistema de diseno (estilo, paleta, tipografia, motion, reglas de stack) en `design-system/<proyecto>/MASTER.md` |
-| `/ui-review` | Solo usuario | Auditoria read-only de UI: contraste medido, foco, nombres accesibles, area tactil, tokens, estados (despacha `ui-reviewer`) |
+| `/design-system` | Solo usuario | Design Read + modo por superficie; persiste `PRODUCT.md` (verdad del producto) y `MASTER.md` (look) en `design-system/<proyecto>/` |
+| `/ui-review` | Solo usuario | Auditoria read-only de UI: detector determinista primero, despues `ui-reviewer` para contraste efectivo, orden de lectura, estados y composicion |
 | `/ui-tokens` | Solo usuario | `MASTER.md` -> `Theme.kt`/`Color.kt`/`Type.kt` (Compose) o `tokens.css` + Tailwind (web), con test de contraste |
 | `/humanize` | Solo usuario | Humanizar texto de IA: diagnostico y reescritura (review/rewrite) |
 | `/windows-symlink` | Solo usuario | Auditar/habilitar/reparar symlinks en Windows |
@@ -100,11 +101,14 @@ Instalacion: `/plugin marketplace add jhanva/ai-skills` y `/plugin install core@
 ### Interfaces (Compose o web)
 ```
 /design-system  -->  /plan  -->  /execute (+ /ui-tokens)  -->  /ui-review  -->  /verify
-  (MASTER.md)       (pantallas)   (tokens con test)          (auditoria a11y)
+  (PRODUCT.md +       (pantallas)   (tokens con test;          (detector +
+   MASTER.md, modo)                  hook detect.py en          auditoria a11y)
+                                     cada edicion de UI)
 
-MASTER.md vive en el proyecto consumidor (design-system/<proyecto>/); plan, execute
-y ui-tokens lo leen antes de tocar UI. Consultas puntuales:
+PRODUCT.md y MASTER.md viven en el proyecto consumidor (design-system/<proyecto>/);
+plan, execute y ui-tokens los leen antes de tocar UI. Consultas puntuales:
 python plugins/design/scripts/search.py "<terminos>" --domain ux | --stack compose
+python plugins/design/scripts/detect.py <ruta>      escaneo manual (24 reglas)
 ```
 
 ### Auditorias

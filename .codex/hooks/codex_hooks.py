@@ -152,9 +152,49 @@ def session_context(payload: dict[str, Any]) -> None:
     print("\n".join(lines))
 
 
+UI_EXTENSIONS = {".kt", ".tsx", ".jsx", ".vue", ".svelte", ".astro", ".html", ".css", ".scss"}
+
+
+def edited_paths(payload: dict[str, Any]) -> list[str]:
+    """Rutas tocadas por la herramienta: apply_patch las lleva en el patch, Edit/Write en file_path."""
+    tool_input = payload.get("tool_input")
+    if not isinstance(tool_input, dict):
+        return []
+    if payload.get("tool_name") == "apply_patch":
+        return patch_paths(tool_command(payload))
+    path = tool_input.get("file_path") or tool_input.get("path")
+    return [path] if isinstance(path, str) and path else []
+
+
+def ui_detect(payload: dict[str, Any]) -> None:
+    """PostToolUse: corre el detector del plugin design sobre los archivos de UI editados."""
+    cwd = Path(str(payload.get("cwd") or ".")).resolve()
+    detector = cwd / "plugins/design/scripts/detect.py"
+    if not detector.is_file():
+        return
+    targets = [str(cwd / p) for p in edited_paths(payload) if Path(p).suffix.lower() in UI_EXTENSIONS]
+    targets = [t for t in targets if Path(t).is_file()]
+    if not targets:
+        return
+    try:
+        result = subprocess.run(
+            [sys.executable, str(detector), *targets],
+            capture_output=True, text=True, encoding="utf-8", check=False, timeout=12,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return
+    if result.returncode == 1 and result.stdout.strip():
+        additional_context(
+            "PostToolUse",
+            "design-detect: hallazgos de UI en los archivos editados; corregir antes de continuar.\n"
+            + result.stdout.strip(),
+        )
+
+
 ACTIONS = {
     "pre-tool-policy": pre_tool_policy,
     "session-context": session_context,
+    "ui-detect": ui_detect,
 }
 
 

@@ -78,4 +78,5 @@ Los pins de modelo se centralizan en `.codex/config.toml` y se propagan con
 - La conversion a marketplace eliminó la copia `.agents/skills/` adaptada a Codex: la traduccion de `/skill` a `$skill` y de herramientas a `rg`/`find`/`sed -n` la aplica `AGENTS.md`, no cada `SKILL.md`.
 - Los agentes custom largos se convirtieron en prompts cortos con `playbook.md`/`patterns.md` cargados on-demand, alineados con la guia oficial de skills y subagentes.
 - Los hooks de Codex analizan `tool_input.command`; en `apply_patch` extraen las rutas desde el patch porque Codex no envia el campo Claude `tool_input.file_path`.
+- El hook `PostToolUse` `ui-detect` replica el hook del plugin `design`: extrae las rutas editadas (patch o `file_path`), filtra las de UI y ejecuta `plugins/design/scripts/detect.py`; los hallazgos vuelven como `additionalContext`. Nunca deniega.
 - No agregues tablas auxiliares bajo `[agents]`: Codex interpreta cada subtaba como una definicion de agente. Los pins de modelo viven en los TOML standalone de `.codex/agents/`.
