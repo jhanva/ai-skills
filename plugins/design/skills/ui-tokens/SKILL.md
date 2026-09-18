@@ -47,11 +47,15 @@ contraste validado). Estructura y ejemplos en `references/compose-tokens.md`.
 
 Archivos: `tokens.css` con `:root`, `@media (prefers-color-scheme: dark)` y
 `[data-theme="dark"]`; si hay Tailwind, `theme.extend` apuntando a las variables. La escala
-tipografica con `clamp`. Estructura y ejemplos en `references/web-tokens.md`.
+tipografica con `clamp`. Incluye las **superficies del navegador** (`::selection`, `caret-color`,
+`scrollbar-color`, `text-underline-offset`, `tabular-nums`): son lo que delata una pagina
+ensamblada frente a una disenada. Estructura y ejemplos en `references/web-tokens.md`.
 
 ## Verificacion antes de cerrar
 
 - El test de contraste pasa (leer el output, no asumirlo).
+- `python "${CLAUDE_PLUGIN_ROOT}/scripts/detect.py" <directorio de tema y componentes tocados>` sale
+  con 0 (los archivos de tema estan exentos de la regla de literales; los componentes no).
 - `Grep` de literales de color y tamano fuera del directorio de tema devuelve cero o una lista
   justificada (imagenes de marca, casos documentados).
 - Los nombres de tokens coinciden con los de `MASTER.md`; si se anadio alguno, se anota en

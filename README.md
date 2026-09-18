@@ -76,7 +76,7 @@ Cada plugin declara una `version`. Solo recibes cambios cuando esa version sube 
 | **`core`** | Cualquier proyecto. El flujo completo de desarrollo | `optimize`, `brainstorm`, `plan`, `tdd`, `debug`, `verify`, `execute`, `review`, `parallel`, `secure`, `codegraph`, `humanize` | Agentes `prompt-artist`, `reviewer`, `security-auditor`; hooks `session-context` y `block-env-access`; suite de evals |
 | **`android`** | Apps Android con Clean Architecture, Room o ML on-device | `android-arch`, `bitmap-safety`, `room-audit`, `ml-ondevice` | — |
 | **`image`** | Features de procesamiento de imagen (hashing, similitud, pipelines) | `image-algo`, `image-pipeline` | — |
-| **`design`** | Interfaces con criterio: sistema de diseno, auditoria de UI y tokens para Jetpack Compose y web | `design-system`, `ui-review`, `ui-tokens` | Agente `ui-reviewer`; catalogo CSV (estilos, paletas con contraste validado, tipografia, guias UX con criterio WCAG, motion, reglas por stack) y buscador `search.py` sin dependencias |
+| **`design`** | Interfaces con criterio: sistema de diseno por modo de superficie, auditoria de UI y tokens para Jetpack Compose y web | `design-system`, `ui-review`, `ui-tokens` | Agente `ui-reviewer`; catalogo CSV (estilos, paletas con contraste validado, tipografia, guias UX con criterio WCAG y de composicion, motion, reglas por stack), buscador `search.py` y detector determinista `detect.py` con hook PostToolUse, todo sin dependencias |
 | **`repo-ops`** | Operaciones de entorno y repositorio | `git-identity`, `windows-symlink`, `browser-control` | — |
 
 Instala `core` siempre; el resto segun el proyecto. Los plugins son independientes entre si: `android` no requiere `image`, aunque `ml-ondevice` suele encadenarse con `image-pipeline`.
@@ -239,8 +239,8 @@ Los nombres de las tablas son los cortos; con el plugin instalado se invocan com
 
 | Skill | Activacion | Proposito |
 |---|---|---|
-| [`design-system`](./plugins/design/skills/design-system/SKILL.md) | Explicita | Decide estilo, paleta, tipografia, espaciado, motion y reglas de stack consultando el catalogo; persiste `design-system/<proyecto>/MASTER.md` y overrides por pantalla. Nunca sobreescribe sin autorizacion |
-| [`ui-review`](./plugins/design/skills/ui-review/SKILL.md) | Explicita | Auditoria de solo lectura de pantallas existentes: contraste medido, foco, nombres accesibles, area tactil, responsive, tokens, motion, formularios y estados. Reporte con severidades y `archivo:linea` |
+| [`design-system`](./plugins/design/skills/design-system/SKILL.md) | Explicita | Design Read en una linea, modo por superficie (persuadir / operar / leer / experimentar), estilo, paleta, tipografia, espaciado, motion y reglas de stack desde el catalogo; persiste `PRODUCT.md` (verdad del producto, nunca se sobreescribe), `MASTER.md` (look) y overrides por pantalla |
+| [`ui-review`](./plugins/design/skills/ui-review/SKILL.md) | Explicita | Auditoria de solo lectura: primero el detector determinista (`detect.py`), despues el agente para lo que un regex no ve (contraste efectivo, orden de lectura, estados, composicion segun el modo). Reporte con severidades y `archivo:linea` |
 | [`ui-tokens`](./plugins/design/skills/ui-tokens/SKILL.md) | Explicita | Traduce `MASTER.md` a codigo: `Theme.kt`/`Color.kt`/`Type.kt` en Compose o `tokens.css` + tema Tailwind en web, con test de contraste primero (`/tdd`) |
 
 ### `repo-ops`
@@ -275,8 +275,9 @@ Los hooks corren automaticamente en eventos del runtime. El plugin `core` los tr
 |---|---|---|---|
 | SessionStart | [`session-context.sh`](./plugins/core/hooks/session-context.sh) | `session-context` | Muestra branch, ultimos commits y archivos sin commit al iniciar |
 | PreToolUse | [`block-env-access.sh`](./plugins/core/hooks/block-env-access.sh) | `pre-tool-policy` | Bloquea leer, escribir, redirigir, `source`, `cp`/`mv` sobre `.env*`. Permite `.env.example`, `.env.sample`, `.env.template`. En Codex ademas bloquea comandos destructivos de git |
+| PostToolUse | [`detect-ui.sh`](./plugins/design/hooks/detect-ui.sh) (plugin `design`) | `ui-detect` | Tras `Edit`/`Write` (o `apply_patch`) sobre `.kt`, `.tsx`, `.vue`, `.html`, `.css`..., corre [`detect.py`](./plugins/design/scripts/detect.py): 24 reglas deterministas (color literal, `contentDescription = null`, `outline: none` sin `:focus-visible`, `<img>` sin `alt`, eyebrows de mas, easing con rebote...) y devuelve los hallazgos como contexto adicional. Nunca bloquea; se suprime en linea con `design-detect: ignore <regla>` |
 
-Los hooks de Claude Code se registran en [`plugins/core/hooks/hooks.json`](./plugins/core/hooks/hooks.json) y se suman a los que el proyecto ya tenga en su `settings.json`. Los de Codex se registran en [`.codex/hooks.json`](./.codex/hooks.json) con `command` y `commandWindows` separados para no asumir un binario fijo de Python.
+Los hooks de Claude Code se registran en el `hooks/hooks.json` de cada plugin ([`core`](./plugins/core/hooks/hooks.json), [`design`](./plugins/design/hooks/hooks.json)) y se suman a los que el proyecto ya tenga en su `settings.json`. Los de Codex se registran en [`.codex/hooks.json`](./.codex/hooks.json) con `command` y `commandWindows` separados para no asumir un binario fijo de Python.
 
 ## Flujos de trabajo
 
@@ -308,7 +309,7 @@ Los hooks de Claude Code se registran en [`plugins/core/hooks/hooks.json`](./plu
    (MASTER.md)              (pantallas)       (tokens con test de contraste)          (auditoria a11y/UX)
 ```
 
-`MASTER.md` vive en el proyecto consumidor (`design-system/<proyecto>/`) y es la fuente de verdad que `plan`, `execute` y `ui-tokens` leen antes de tocar UI. Consultas puntuales al catalogo: `python plugins/design/scripts/search.py "<terminos>" --domain ux` o `--stack compose`.
+`PRODUCT.md` (audiencia, contexto, voz, superficies y su modo) y `MASTER.md` (look) viven en el proyecto consumidor (`design-system/<proyecto>/`) y son la fuente de verdad que `plan`, `execute` y `ui-tokens` leen antes de tocar UI. Con el plugin instalado, cada edicion de un archivo de UI pasa por el detector determinista. Consultas puntuales al catalogo: `python plugins/design/scripts/search.py "<terminos>" --domain ux` o `--stack compose`; escaneo manual: `python plugins/design/scripts/detect.py <ruta>`.
 
 ### Auditorias
 
@@ -367,7 +368,9 @@ plugins/
     hooks/hooks.json                registro de hooks + scripts .sh
   design/
     data/*.csv, data/stacks/*.csv   catalogo UI/UX (estilos, paletas, tipografia, guias, motion, reglas por stack)
-    scripts/catalog.py, search.py   indice BM25 sin dependencias, generador de MASTER.md, calculo de contraste
+    scripts/catalog.py, search.py   indice BM25 sin dependencias, generador de PRODUCT.md/MASTER.md, calculo de contraste
+    scripts/detect.py               detector determinista (24 reglas compose/web) usado por el hook y por ui-review
+    hooks/hooks.json, detect-ui.sh  PostToolUse: corre detect.py tras editar archivos de UI
     agents/ui-reviewer.md           auditor de UI de solo lectura
   android/  image/  repo-ops/       misma estructura, sin agentes ni hooks
 .codex/

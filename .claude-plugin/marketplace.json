@@ -26,8 +26,8 @@
     {
       "name": "design",
       "source": "./plugins/design",
-      "description": "Sistema de diseno, auditoria de UI y tokens de codigo para Jetpack Compose y web, con catalogo consultable y contraste validado",
-      "version": "1.0.0"
+      "description": "Sistema de diseno con modos por superficie, auditoria de UI, tokens de codigo y detector determinista con hook para Jetpack Compose y web",
+      "version": "1.1.0"
     },
     {
       "name": "repo-ops",

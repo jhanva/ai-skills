@@ -231,3 +231,57 @@ class DesignPluginLayoutTests(unittest.TestCase):
             for stack in re.findall(r"--stack (?:<)?([a-z|]+)", text):
                 for name in stack.split("|"):
                     self.assertIn(name, catalog.STACKS + ("stack",), path.name)
+
+
+class SurfaceModeTests(unittest.TestCase):
+    def test_styles_declare_valid_modes_and_every_mode_has_a_style(self) -> None:
+        import search
+        seen = set()
+        for row in rows("styles.csv"):
+            modes = row["modo"].split("|")
+            self.assertTrue(set(modes) <= set(search.MODES), row["id"])
+            seen |= set(modes)
+        self.assertEqual(set(search.MODES), seen)
+
+    def test_mode_is_inferred_from_query_and_filters_style(self) -> None:
+        import search
+        self.assertEqual("persuadir", search.infer_mode("landing page saas startup"))
+        self.assertEqual("leer", search.infer_mode("documentacion api desarrolladores"))
+        self.assertEqual("operar", search.infer_mode("app de salud pacientes"))
+        self.assertIsNone(search.infer_mode("zzqx"))
+        ds = search.build_design_system("documentacion api desarrolladores", "X", "web")
+        self.assertEqual("leer", ds["mode"])
+        self.assertEqual("inferido", ds["mode_source"])
+        self.assertIn("leer", ds["style"]["modo"])
+        forced = search.build_design_system("zzqx", "X", "web", mode="experimentar")
+        self.assertEqual(("experimentar", "explicito"), (forced["mode"], forced["mode_source"]))
+        default = search.build_design_system("zzqx", "X", "web")
+        self.assertEqual(("operar", "por defecto"), (default["mode"], default["mode_source"]))
+        self.assertIn("se asumio `operar`", search.render_master(default))
+
+    def test_master_has_mode_section_and_product_file_is_never_overwritten(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            first = run_search(
+                "landing saas startup", "--design-system", "-p", "Acme", "--stack", "web",
+                "--persist", "--output-dir", tmp, "--audience", "Compradores tecnicos B2B",
+                "--context", "Desktop en horario laboral", "--voice", "Directa",
+            )
+            self.assertEqual(0, first.returncode, first.stderr)
+            base = Path(tmp) / "design-system" / "acme"
+            master = (base / "MASTER.md").read_text(encoding="utf-8")
+            self.assertIn("## Modo", master)
+            self.assertIn("**persuadir** (inferido)", master)
+            self.assertIn("PRODUCT.md", master)
+            product = (base / "PRODUCT.md").read_text(encoding="utf-8")
+            self.assertIn("Compradores tecnicos B2B", product)
+            self.assertIn("`persuadir`", product)
+            again = run_search(
+                "otra", "--design-system", "-p", "Acme", "--stack", "web", "--persist", "--output-dir", tmp,
+                "--page", "precios", "--audience", "Otro", "--context", "Otro",
+            )
+            self.assertEqual(0, again.returncode, again.stderr)
+            self.assertEqual(product, (base / "PRODUCT.md").read_text(encoding="utf-8"))
+            self.assertIn("ya existe", again.stdout)
+            half = run_search("x", "--design-system", "-p", "Acme", "--stack", "web", "--persist",
+                              "--output-dir", tmp, "--page", "p2", "--audience", "solo")
+            self.assertEqual(2, half.returncode)

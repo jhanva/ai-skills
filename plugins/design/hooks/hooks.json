@@ -1,0 +1,17 @@
+{
+  "description": "Detector determinista de defectos de UI tras editar archivos de Compose o web",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}\"/hooks/detect-ui.sh",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
