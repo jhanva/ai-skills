@@ -1,6 +1,6 @@
 {
   "name": "ai-skills",
-  "description": "Skills, agentes y hooks para desarrollo asistido por IA: flujo TDD/debug/verify, auditorias Android, pipelines de imagen y operaciones de repo",
+  "description": "Skills, agentes y hooks para desarrollo asistido por IA: flujo TDD/debug/verify, auditorias Android, pipelines de imagen, sistema de diseno UI/UX y operaciones de repo",
   "owner": {
     "name": "jhanva"
   },
@@ -21,6 +21,12 @@
       "name": "image",
       "source": "./plugins/image",
       "description": "Diseno de algoritmos y pipelines de procesamiento de imagen",
+      "version": "1.0.0"
+    },
+    {
+      "name": "design",
+      "source": "./plugins/design",
+      "description": "Sistema de diseno, auditoria de UI y tokens de codigo para Jetpack Compose y web, con catalogo consultable y contraste validado",
       "version": "1.0.0"
     },
     {
