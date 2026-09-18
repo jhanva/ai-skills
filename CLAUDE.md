@@ -33,6 +33,9 @@ plugins/core/                      — Flujo de desarrollo (12 skills, 3 agentes
   hooks/hooks.json                 — SessionStart (session-context.sh) y PreToolUse (block-env-access.sh)
 plugins/android/                   — android-arch, bitmap-safety, room-audit, ml-ondevice
 plugins/image/                     — image-algo, image-pipeline
+plugins/design/                    — design-system, ui-review, ui-tokens + agente ui-reviewer
+  data/*.csv, data/stacks/*.csv    — Catalogo UI/UX: estilos, paletas (contraste validado), tipografia, guias WCAG, motion, reglas compose/web
+  scripts/search.py                — Buscador BM25 sin deps; --design-system genera MASTER.md; calculo de contraste
 plugins/repo-ops/                  — git-identity, windows-symlink, browser-control
 .codex/                            — Agentes custom, config y hooks nativos de Codex
 ```
@@ -41,7 +44,7 @@ Cada plugin lleva `.claude-plugin/plugin.json` (Claude Code) y `plugin.json` (fo
 
 ## Skills disponibles
 
-Instaladas desde el marketplace, las skills se invocan con prefijo de plugin: `/core:tdd`, `/android:room-audit`, `/image:image-algo`, `/repo-ops:git-identity`. La tabla usa el nombre corto.
+Instaladas desde el marketplace, las skills se invocan con prefijo de plugin: `/core:tdd`, `/android:room-audit`, `/image:image-algo`, `/design:design-system`, `/repo-ops:git-identity`. La tabla usa el nombre corto.
 
 | Skill | Invocacion | Proposito |
 |---|---|---|
@@ -61,6 +64,9 @@ Instaladas desde el marketplace, las skills se invocan con prefijo de plugin: `/
 | `/image-algo` | Solo usuario | Diseno de algoritmos de imagen (hashing, similarity, clustering) |
 | `/ml-ondevice` | Solo usuario | Integracion de modelos ML on-device en Android |
 | `/image-pipeline` | Solo usuario | Diseno de pipelines de procesamiento de imagen multi-paso |
+| `/design-system` | Solo usuario | Decide y persiste el sistema de diseno (estilo, paleta, tipografia, motion, reglas de stack) en `design-system/<proyecto>/MASTER.md` |
+| `/ui-review` | Solo usuario | Auditoria read-only de UI: contraste medido, foco, nombres accesibles, area tactil, tokens, estados (despacha `ui-reviewer`) |
+| `/ui-tokens` | Solo usuario | `MASTER.md` -> `Theme.kt`/`Color.kt`/`Type.kt` (Compose) o `tokens.css` + Tailwind (web), con test de contraste |
 | `/humanize` | Solo usuario | Humanizar texto de IA: diagnostico y reescritura (review/rewrite) |
 | `/windows-symlink` | Solo usuario | Auditar/habilitar/reparar symlinks en Windows |
 | `/browser-control` | Solo usuario | Control de browser via CDP (navegacion, screenshots, clicks, tabs) |
@@ -69,7 +75,7 @@ Instaladas desde el marketplace, las skills se invocan con prefijo de plugin: `/
 
 "Siempre activa" = `user-invocable: false` (Claude la carga automaticamente, no aparece en menu `/`)
 
-Instalacion: `/plugin marketplace add jhanva/ai-skills` y `/plugin install core@ai-skills` (idem `android`, `image`, `repo-ops`). Desarrollo local: `claude --plugin-dir ./plugins/core`.
+Instalacion: `/plugin marketplace add jhanva/ai-skills` y `/plugin install core@ai-skills` (idem `android`, `image`, `design`, `repo-ops`). Desarrollo local: `claude --plugin-dir ./plugins/core`.
 "Solo usuario" = `disable-model-invocation: true` (se invoca manualmente con `/nombre`)
 "Auto + usuario" = Claude puede invocarlo automaticamente cuando detecta el contexto relevante
 
@@ -89,6 +95,16 @@ Instalacion: `/plugin marketplace add jhanva/ai-skills` y `/plugin install core@
 
 /ml-ondevice    -->  /image-pipeline  -->  /plan  -->  /execute
   (modelo ML)       (arquitectura)       (tareas)    (implementar)
+```
+
+### Interfaces (Compose o web)
+```
+/design-system  -->  /plan  -->  /execute (+ /ui-tokens)  -->  /ui-review  -->  /verify
+  (MASTER.md)       (pantallas)   (tokens con test)          (auditoria a11y)
+
+MASTER.md vive en el proyecto consumidor (design-system/<proyecto>/); plan, execute
+y ui-tokens lo leen antes de tocar UI. Consultas puntuales:
+python plugins/design/scripts/search.py "<terminos>" --domain ux | --stack compose
 ```
 
 ### Auditorias
@@ -111,6 +127,7 @@ Instalacion: `/plugin marketplace add jhanva/ai-skills` y `/plugin install core@
                     (Gemini, DALL-E, Midjourney, Stable Diffusion)
 @reviewer           Code review de solo lectura con severidades (usado por /review)
 @security-auditor   Auditoria de seguridad por area (usado por /secure full)
+@ui-reviewer        Auditoria de UI de solo lectura (usado por /ui-review)
 ```
 
 ### Browser automation

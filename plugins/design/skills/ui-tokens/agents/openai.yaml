@@ -1,0 +1,7 @@
+interface:
+  display_name: "UI Tokens"
+  short_description: "Del design system a tokens de código"
+  default_prompt: "Usa $ui-tokens para generar el theme de Compose o los tokens CSS desde MASTER.md."
+
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Design System"
+  short_description: "Decide y persiste el sistema de diseño"
+  default_prompt: "Usa $design-system para definir estilo, paleta, tipografía y reglas de stack antes de construir UI."
+
+policy:
+  allow_implicit_invocation: false
