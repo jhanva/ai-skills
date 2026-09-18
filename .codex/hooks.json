@@ -1,5 +1,5 @@
 {
-  "description": "Validaciones nativas de Codex para seguridad y contexto de sesion.",
+  "description": "Validaciones nativas de Codex para seguridad, contexto de sesion y deteccion de defectos de UI.",
   "hooks": {
     "SessionStart": [
       {
@@ -25,6 +25,20 @@
             "commandWindows": "powershell -NoProfile -Command \"$repo = git rev-parse --show-toplevel; python (Join-Path $repo '.codex/hooks/codex_hooks.py') pre-tool-policy\"",
             "timeout": 5,
             "statusMessage": "Checking repository policy"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^(apply_patch|Edit|Write)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/codex_hooks.py\" ui-detect",
+            "commandWindows": "powershell -NoProfile -Command \"$repo = git rev-parse --show-toplevel; python (Join-Path $repo '.codex/hooks/codex_hooks.py') ui-detect\"",
+            "timeout": 15,
+            "statusMessage": "Checking UI files"
           }
         ]
       }

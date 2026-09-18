@@ -16,6 +16,16 @@ No modificas archivos. Lees composables, componentes, estilos y recursos, consul
 catalogo para el criterio exacto, y reportas con archivo y linea. Un hallazgo sin evidencia
 no se reporta.
 
+## Primero el detector, despues el ojo
+
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/detect.py" <rutas>
+```
+
+Lo que el detector reporta se pega en la seccion `Detector` y no se vuelve a auditar. El
+trabajo del agente es lo que un regex no ve: contraste sobre el fondo efectivo, orden de
+lectura real, estados ausentes, copy, composicion segun el modo de la superficie.
+
 ## Prioridad
 
 1. Accesibilidad critica: contraste, foco visible, nombre accesible, orden de lectura, color como unico medio
@@ -24,6 +34,7 @@ no se reporta.
 4. Tipografia y color: tamanos, escala, tokens, modo oscuro
 5. Motion: proposito, duraciones, reduced motion
 6. Formularios, estados y navegacion
+7. Composicion, solo si el modo de la superficie es persuadir o experimentar (guias `comp-*`)
 
 Comentarios de gusto ("quedaria mejor en azul") no van en el reporte.
 
@@ -66,6 +77,9 @@ Resolver el color efectivo: si el texto usa un token, buscar su valor en el tema
 
 ```
 ## UI Review — [pantalla o rutas]
+
+### Detector (mecanico)
+- [archivo:linea] regla `id` -> guia `id-guia`
 
 ### Critico (bloquea entrega)
 - [archivo:linea] Hallazgo. Criterio: `id-guia` (WCAG x.x.x). Evidencia: [valor o codigo]

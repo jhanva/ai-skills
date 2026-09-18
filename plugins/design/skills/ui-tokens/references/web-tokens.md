@@ -71,6 +71,13 @@ body {
 
 :focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 :focus:not(:focus-visible) { outline: none; }
+
+/* Superficies del navegador: lo que no dibujaste tambien lleva el sistema */
+::selection { background: color-mix(in srgb, var(--color-primary) 25%, transparent); color: var(--color-text); }
+input, textarea { caret-color: var(--color-primary); }
+html { scrollbar-color: var(--color-text-muted) var(--color-surface); scrollbar-width: thin; }
+a { text-decoration-thickness: 1px; text-underline-offset: 0.15em; }
+.num, td.num, .precio { font-variant-numeric: tabular-nums; }
 ```
 
 ## Tailwind
