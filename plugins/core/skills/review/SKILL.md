@@ -1,88 +1,62 @@
 ---
 name: review
 description: >
-  Code review estructurado con severidades. Solicitar review con subagente
-  revisor o manejar feedback recibido con evaluacion tecnica, no sycophancy.
-  Usar cuando: se termina una feature, antes de merge, o al recibir feedback de un reviewer.
+  Revisa cambios con severidades, evidencia y evaluacion tecnica del feedback.
+  Usar al terminar una feature, antes de merge o al recibir comentarios de revision.
 argument-hint: "[SHA base o descripcion]"
 disable-model-invocation: true
 ---
 
-# Review — Code review estructurado
+# Review - Revision estructurada
 
-## Modo 1: Solicitar review
+## Solicitar revision
 
-Despachar el agente `reviewer` del plugin con Agent tool (`subagent_type: "core:reviewer"`; `reviewer` si el plugin se carga con `--plugin-dir`). Es de solo lectura y ya conoce el formato de salida; el prompt aporta el rango y el contexto:
+Determinar el rango exacto con Git y aportar contexto sobre la intencion del cambio. Si existe un
+especialista de revision de solo lectura, pedirle que inspeccione:
 
-```
-Revisa los cambios entre [BASE_SHA] y [HEAD_SHA].
+1. cumplimiento de requerimientos y ausencia de alcance extra
+2. errores funcionales, regresiones y condiciones de borde
+3. seguridad, validacion de entradas y manejo de errores
+4. cobertura y calidad de las pruebas
+5. consistencia con los patrones del proyecto
 
-Contexto: [que se implemento y por que]
+Cada issue debe incluir severidad, `archivo:linea`, impacto y correccion concreta. No reportar
+preferencias estilisticas como defectos si no violan una regla verificable.
 
-Revisa:
-1. Cumplimiento de spec: cada requerimiento implementado? Falta? Sobra?
-2. Calidad: nombres claros, sin duplicacion, patrones consistentes
-3. Testing: happy path + error cases, sin testear mocks
-4. Seguridad: sin secrets, sin injection, inputs validados
-5. Produccion: manejo de errores en boundaries, sin console.log de debug
+### Fallback sin subagente
 
-Output:
-## Fortalezas
-- [lo que esta bien]
+Si no hay especialista, el agente principal hace una segunda lectura independiente del diff,
+consulta las reglas del repo y ejecuta las pruebas relevantes. Mantiene el mismo formato y umbral
+de evidencia.
 
+## Formato
+
+```markdown
 ## Issues
-### Critico (bloquea merge)
-- [archivo:linea] Descripcion
+### Critico
+- `archivo:linea` - impacto y correccion
 
-### Importante (arreglar antes de merge)
-- [archivo:linea] Descripcion
+### Importante
+- `archivo:linea` - impacto y correccion
 
-### Menor (nice to have)
-- [archivo:linea] Descripcion
+### Menor
+- `archivo:linea` - mejora justificada
 
 ## Evaluacion
-APROBADO / APROBADO_CON_CAMBIOS / CAMBIOS_REQUERIDOS
+APROBADO | APROBADO_CON_CAMBIOS | CAMBIOS_REQUERIDOS
 ```
 
-Para obtener SHAs: `git log --oneline -5` y `git rev-parse HEAD`
+Si no hay issues, decirlo de forma explicita y mencionar cualquier riesgo o prueba no cubierta.
 
-## Modo 2: Recibir review
+## Recibir feedback
 
-```
-LEER feedback completo
-  -> ENTENDER que se pide
-    -> VERIFICAR tecnicamente: tiene razon?
-      -> EVALUAR: aplica a este contexto?
-        SI -> Implementar
-        NO -> Explicar por que no, con evidencia
-```
+1. Leer el feedback completo.
+2. Verificarlo contra codigo, requisitos y pruebas.
+3. Implementar lo correcto por prioridad: critico, simple, complejo.
+4. Rechazar con evidencia lo que sea incorrecto, rompa comportamiento o agregue complejidad sin
+   un caso real.
+5. Volver a ejecutar las verificaciones afectadas.
 
-### Respuestas prohibidas
+Evitar asentir o editar antes de comprobar el comentario.
 
-- "Tienes toda la razon!" (sin verificar)
-- "Gran punto!" (sycophancy)
-- "Deja lo implemento ya" (sin verificar si aplica)
-
-### Antes de implementar feedback
-
-1. **Correcto tecnicamente?** Verificar en el codigo
-2. **Aplica a este contexto?** El reviewer puede no tener todo el contexto
-3. **Pasa YAGNI?** Si sugiere "implementar bien" algo, buscar si se usa: `grep -r "funcion" src/`
-4. **Rompe algo?** Pasan los tests despues del cambio?
-
-### Orden de implementacion
-
-1. Issues criticos (bloqueantes)
-2. Fixes simples (typos, nombres, imports)
-3. Cambios complejos (refactors)
-
-### Cuando rechazar feedback
-
-- Rompe funcionalidad existente que el reviewer desconoce
-- Ya se evaluo y descarto (explicar por que)
-- Viola YAGNI: complejidad para caso inexistente
-- Es tecnicamente incorrecto (mostrar evidencia)
-
-Rechazar con evidencia tecnica, nunca con opinion.
-
-Argumento recibido: $ARGUMENTS
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.

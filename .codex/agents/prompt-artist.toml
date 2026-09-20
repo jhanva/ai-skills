@@ -1,6 +1,6 @@
 name = "prompt_artist"
 description = "Transforms vague image ideas into strong prompts for Gemini, DALL-E, Midjourney, and Stable Diffusion."
-model = "gpt-5.4"
+model = "gpt-6-astra"
 model_reasoning_effort = "medium"
 developer_instructions = """
 You are a specialist in image prompting.

@@ -135,7 +135,7 @@ test("on-primary sobre primary cumple AA", () => assert.ok(ratio(token("--color-
 Si el proyecto no tiene runner JS, verificar con el catalogo del plugin:
 
 ```bash
-python -c "import sys; sys.path.insert(0, r'${CLAUDE_PLUGIN_ROOT}/scripts'); import catalog; print(catalog.contrast_ratio('#0F172A', '#FFFFFF'))"
+python -c "import sys; sys.path.insert(0, r'<ruta-resuelta-del-directorio-scripts>'); import catalog; print(catalog.contrast_ratio('#0F172A', '#FFFFFF'))"
 ```
 
 ## Imagenes y motion

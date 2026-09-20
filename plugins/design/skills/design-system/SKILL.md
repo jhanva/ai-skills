@@ -1,16 +1,8 @@
 ---
 name: design-system
 description: >
-  Decide y persiste el sistema de diseno de un producto antes de construir UI:
-  modo por superficie (persuadir, operar, leer, experimentar), estilo, paleta con
-  contraste validado, tipografia, escala de espaciado, motion, checklist de
-  accesibilidad y reglas del stack (Jetpack Compose o web). Consulta un catalogo
-  local con buscador; no improvisa colores ni estilos. Genera
-  design-system/<proyecto>/PRODUCT.md (verdad del producto), MASTER.md (look) y
-  overrides por pantalla.
-  Usar cuando: el usuario dice "design system", "sistema de diseno", "define la
-  paleta", "que estilo usamos", "tokens de diseno", o va a construir la primera
-  pantalla de un producto nuevo.
+  Define y persiste sistema visual, tokens, accesibilidad y reglas Compose o web.
+  Usar al iniciar un producto, elegir estilo o paleta, o crear un design system.
 argument-hint: "[descripcion del producto] [--stack compose|web] [--mode persuadir|operar|leer|experimentar] [--page nombre]"
 disable-model-invocation: true
 allowed-tools:
@@ -26,7 +18,7 @@ allowed-tools:
 
 El objetivo es que ninguna pantalla nazca con colores, tamanos o animaciones inventados
 sobre la marcha. Primero se decide el sistema, se persiste en el proyecto, y despues
-`/plan` y `/execute` lo leen como fuente de verdad.
+Las skills `plan` y `execute` lo leen como fuente de verdad.
 
 ## Ley de hierro
 
@@ -41,7 +33,7 @@ sobre la marcha. Primero se decide el sistema, se persiste en el proyecto, y des
 ## Herramienta
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/scripts/search.py" "<consulta>" --design-system -p "<Proyecto>" --stack <compose|web> [--mode <modo>]
+python <ruta-resuelta-de-search.py> "<consulta>" --design-system -p "<Proyecto>" --stack <compose|web> [--mode <modo>]
 ```
 
 Sin `--mode` el script lo infiere de la consulta y lo marca `(inferido)`; si no puede, asume
@@ -96,8 +88,8 @@ Construir la consulta con 2-5 terminos que nombren dominio, superficie y tono
 3. Ajustar con busquedas puntuales si hace falta:
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/scripts/search.py" "<terminos>" --domain <style|palette|typography|ux|motion> -n 3
-python "${CLAUDE_PLUGIN_ROOT}/scripts/search.py" "<terminos>" --stack <compose|web> -n 3
+python <ruta-resuelta-de-search.py> "<terminos>" --domain <style|palette|typography|ux|motion> -n 3
+python <ruta-resuelta-de-search.py> "<terminos>" --stack <compose|web> -n 3
 ```
 
 4. Presentar al usuario un resumen de 6-8 lineas (estilo, paleta, tipografia, espaciado, motion,
@@ -108,7 +100,7 @@ python "${CLAUDE_PLUGIN_ROOT}/scripts/search.py" "<terminos>" --stack <compose|w
 Con la conformidad del usuario:
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/scripts/search.py" "<consulta>" --design-system -p "<Proyecto>" --stack <stack> --mode <modo> --persist --output-dir "<raiz del proyecto>" --audience "<quien>" --context "<donde y cuando lo usa>" [--voice "<tono>"] [--constraints "<regulatorio, marca, a11y>"]
+python <ruta-resuelta-de-search.py> "<consulta>" --design-system -p "<Proyecto>" --stack <stack> --mode <modo> --persist --output-dir "<raiz del proyecto>" --audience "<quien>" --context "<donde y cuando lo usa>" [--voice "<tono>"] [--constraints "<regulatorio, marca, a11y>"]
 ```
 
 Crea dos archivos en `design-system/<slug>/`:
@@ -117,9 +109,9 @@ Crea dos archivos en `design-system/<slug>/`:
   la lista de superficies con su modo. Cambia poco; **nunca se sobreescribe** (si existe, se edita
   a mano y se anade la superficie nueva a su lista).
 - `MASTER.md` — el look: modo, estilo, color, tipografia, espaciado, motion, checklist y reglas de
-  stack. Es la fuente de verdad visual que `/plan`, `/execute` y `/ui-tokens` leen antes de tocar UI.
+  stack. Es la fuente de verdad visual que las skills `plan`, `execute` y `ui-tokens` leen antes de tocar UI.
 
-`--audience` y `--context` salen del Design Read; si `/brainstorm` ya produjo una spec con esa
+`--audience` y `--context` salen del Design Read; si la skill `brainstorm` ya produjo una spec con esa
 informacion, se copia de ahi.
 
 ### Overrides por pantalla
@@ -127,7 +119,7 @@ informacion, se copia de ahi.
 Cuando una pantalla necesita reglas distintas (un dashboard denso dentro de una app espaciosa):
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/scripts/search.py" "<consulta de la pantalla>" --design-system -p "<Proyecto>" --stack <stack> --persist --output-dir "<raiz>" --page "<nombre>"
+python <ruta-resuelta-de-search.py> "<consulta de la pantalla>" --design-system -p "<Proyecto>" --stack <stack> --persist --output-dir "<raiz>" --page "<nombre>"
 ```
 
 Crea `design-system/<slug>/pages/<nombre>.md` sin tocar `MASTER.md`. Una pantalla puede tener
@@ -144,6 +136,8 @@ no se pisan en silencio.
 ## FASE 4: Cerrar
 
 Reportar: rutas escritas, Design Read final, resumen de decisiones, valores sin match verificado
-(si los hubo) y el siguiente paso sugerido (`/plan` de la primera pantalla o `/ui-tokens` para materializar tokens).
+(si los hubo) y el siguiente paso sugerido (skill `plan` para la primera pantalla o skill `ui-tokens` para materializar tokens).
 
-Argumento recibido: $ARGUMENTS
+El script [search.py](../../scripts/search.py) se resuelve desde esta skill antes de ejecutar los comandos.
+
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.

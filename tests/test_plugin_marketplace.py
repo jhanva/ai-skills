@@ -160,11 +160,12 @@ class CoreAgentParityTests(unittest.TestCase):
                 for ref in re.findall(r"\$\{CLAUDE_PLUGIN_ROOT\}/([^`\s\"]+)", text):
                     self.assertTrue((PLUGINS_DIR / "core" / ref).exists(), ref)
 
-    def test_review_and_secure_skills_dispatch_the_plugin_agents(self) -> None:
+    def test_review_and_secure_skills_do_not_require_plugin_agents(self) -> None:
         review = (PLUGINS_DIR / "core" / "skills" / "review" / "SKILL.md").read_text(encoding="utf-8")
         secure = (PLUGINS_DIR / "core" / "skills" / "secure" / "SKILL.md").read_text(encoding="utf-8")
-        self.assertIn("core:reviewer", review)
-        self.assertIn("core:security-auditor", secure)
+        self.assertIn("Fallback sin subagente", review)
+        self.assertIn("Fallback sin subagente", secure)
+        self.assertNotIn("subagent_type", review + secure)
 
 
 class EvalSuiteTests(unittest.TestCase):
@@ -176,7 +177,7 @@ class EvalSuiteTests(unittest.TestCase):
 
     def test_every_case_has_prompt_and_at_least_one_grader(self) -> None:
         cases = self.cases()
-        self.assertGreaterEqual(len(cases), 5)
+        self.assertGreaterEqual(len(cases), 8)
         for case in cases:
             with self.subTest(case=case.name):
                 prompt = frontmatter(case / "prompt.md")
@@ -199,7 +200,7 @@ class EvalSuiteTests(unittest.TestCase):
                 match = re.search(r"\)\?([\w-]+)\"", fm.get("input_match", ""))
                 if match:
                     fired.add(match.group(1))
-        self.assertTrue({"tdd", "debug", "verify", "codegraph"} <= fired, fired)
+        self.assertTrue({"tdd", "debug", "verify", "codegraph", "execute"} <= fired, fired)
         self.assertTrue(negative)
 
     def test_eval_results_are_ignored_by_git(self) -> None:

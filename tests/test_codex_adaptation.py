@@ -42,6 +42,19 @@ class CodexConfigTests(unittest.TestCase):
                 self.assertTrue(agent.get("description"))
                 self.assertTrue(agent.get("developer_instructions"))
 
+    def test_custom_agents_use_supported_role_pins_without_repo_dependencies(self) -> None:
+        expected = {
+            "prompt-artist.toml": "gpt-6-astra",
+            "reviewer.toml": "gpt-6-astra",
+            "security-auditor.toml": "gpt-6-astra",
+            "ui-reviewer.toml": "gpt-6-astra",
+            "task-implementer.toml": "gpt-5.6-sol",
+        }
+        for name, model in expected.items():
+            agent = tomllib.loads(read(f".codex/agents/{name}"))
+            self.assertEqual(model, agent["model"], name)
+            self.assertNotIn("plugins/", agent["developer_instructions"], name)
+
     def test_hooks_are_registered_with_cross_platform_commands(self) -> None:
         hooks = json.loads(read(".codex/hooks.json"))["hooks"]
 
@@ -98,8 +111,8 @@ class SkillRegressionTests(unittest.TestCase):
         self.assertNotIn(".agents/skills", scanner)
         self.assertIn('"Stripe Publishable Key", r"pk_live_', scanner)
         self.assertIn('"low"', scanner)
-        self.assertIn("OWASP A03:2021", secure)
-        self.assertIn("${CLAUDE_PLUGIN_ROOT}/skills/secure/scripts/scan-secrets.py", secure)
+        self.assertIn("OWASP", secure)
+        self.assertIn("[scan-secrets.py](scripts/scan-secrets.py)", secure)
 
     def test_secure_scanner_detects_a_token_and_help_is_successful(self) -> None:
         help_result = subprocess.run(

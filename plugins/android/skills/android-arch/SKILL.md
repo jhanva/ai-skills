@@ -1,10 +1,8 @@
 ---
 name: android-arch
 description: >
-  Valida boundaries de Clean Architecture en proyectos Android/Kotlin.
-  Detecta leaks de framework en domain, codigo muerto, bindings DI sin uso,
-  y dependencias de modulos incorrectas.
-  Usar cuando: el usuario dice "revisar arquitectura", "arch check", "android-arch", "clean architecture", "boundaries", o antes de refactors grandes.
+  Audita boundaries de Clean Architecture en Android/Kotlin: fugas de framework,
+  dependencias de modulos, DI y codigo muerto. Usar para revisar arquitectura o antes de refactors grandes.
 argument-hint: "[ruta al proyecto Android]"
 disable-model-invocation: true
 allowed-tools:
@@ -26,8 +24,8 @@ allowed-tools:
 
 ## Resolver target
 
-1. Si `$ARGUMENTS` contiene una ruta, usarla como target
-2. Si `$ARGUMENTS` esta vacio, usar el directorio actual
+1. Si la entrada del usuario contiene una ruta, usarla como target
+2. Si no contiene una ruta, usar el directorio actual
 3. Validar que existe y contiene `build.gradle` o `build.gradle.kts`
 
 ---
@@ -157,4 +155,4 @@ Modulos: [N modulos Gradle]
 Archivos escaneados: N
 ```
 
-Argumento recibido: $ARGUMENTS
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.

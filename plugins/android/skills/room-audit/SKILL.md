@@ -25,8 +25,8 @@ allowed-tools:
 
 ## Resolver target
 
-1. Si `$ARGUMENTS` contiene una ruta, usarla como target
-2. Si `$ARGUMENTS` esta vacio, usar el directorio actual
+1. Si la entrada del usuario contiene una ruta, usarla como target
+2. Si no contiene una ruta, usar el directorio actual
 3. Validar que contiene Room (`Grep: "androidx.room"`)
 
 ---
@@ -230,4 +230,4 @@ Database version: N | Tablas: N | DAOs: N | Migraciones: N
 Tests de migracion encontrados: N/N
 ```
 
-Argumento recibido: $ARGUMENTS
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.

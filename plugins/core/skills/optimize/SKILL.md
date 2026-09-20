@@ -1,39 +1,34 @@
 ---
 name: optimize
 description: >
-  Filtrado de output, delegacion con umbral, seleccion de modelo para
-  subagentes. Usar cuando: siempre, en toda interaccion.
-user-invocable: false
+  Audita un flujo de trabajo para reducir contexto, latencia, costo y delegacion innecesaria.
+  Usar cuando el usuario pide optimizar el trabajo del agente o diagnosticar consumo excesivo.
+disable-model-invocation: true
 ---
 
-# Optimize — Eficiencia de tokens
+# Optimize - Eficiencia de trabajo
 
-## 1. Filtrar output de comandos
+## Diagnostico
 
-Filtra con pipes en Bash antes de que entre al contexto:
+1. Identificar lecturas repetidas, output ruidoso, pasos seriales independientes y delegaciones
+   cuyo costo supera su valor.
+2. Medir cuando haya datos disponibles; no inventar ahorros.
+3. Proponer cambios pequenos y reversibles, ordenados por impacto.
+
+## Principios
+
+- Filtrar output antes de incorporarlo al contexto, conservando errores y evidencia relevante.
+- Leer indices y rangos puntuales antes de archivos completos.
+- Delegar solo tareas independientes, acotadas y con un resultado claramente especificado.
+- Elegir capacidades segun complejidad y riesgo con los modelos realmente disponibles en el
+  runtime; no asumir nombres o tiers.
+- Mantener la verificacion en el agente coordinador.
+
+Ejemplo de salida filtrada:
 
 ```bash
 npm test 2>&1 | grep -A 5 -E '(FAIL|ERROR|error:)' | head -100
-npm run build 2>&1 | grep -i -E '(error|failed)' | head -50
 ```
 
-## 2. Delegar a subagentes (con umbral)
-
-Delega operaciones cuyo output se espera > 50 lineas. No delegues si es corto — el overhead del subagente supera el ahorro.
-
-Cuando delegues, especifica que necesitas de vuelta:
-
-```
-BIEN: "Corre npm test y reporta: cuantos pasan, cuantos fallan, y los que fallan"
-MAL:  "Corre npm test"
-```
-
-## 3. Seleccion de modelo para subagentes
-
-Usa el modelo de menor capacidad que pueda completar la tarea:
-
-- haiku: busqueda, lectura/extraccion, tareas mecanicas
-- sonnet: implementacion, integracion, logica de negocio
-- opus: arquitectura, review, debugging complejo
-
-Criterios completos y reglas de escalacion: ${CLAUDE_PLUGIN_ROOT}/skills/execute/model-selection.md (fuente canonica).
+El resultado debe separar observaciones, propuesta, beneficio esperado y riesgo. Esta skill es
+una auditoria explicita; no se carga automaticamente en cada interaccion.

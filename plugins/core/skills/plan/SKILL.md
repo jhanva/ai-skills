@@ -3,7 +3,7 @@ name: plan
 description: >
   Convierte una spec aprobada en un plan de implementacion con tareas de 2-5 minutos.
   Codigo exacto, rutas reales, cero placeholders.
-  Usar cuando: una spec fue aprobada con /brainstorm y el usuario pide planificar la implementacion.
+  Usar cuando existe una spec o alcance aprobado y el usuario pide planificar la implementacion.
 argument-hint: "[ruta a spec.md o descripcion]"
 disable-model-invocation: true
 ---
@@ -20,7 +20,7 @@ disable-model-invocation: true
 
 - Lee el documento de spec completo
 - Verifica que esta aprobada y completa
-- Si no hay spec: "Primero usa `/brainstorm` para crear una spec"
+- Si falta definir el problema: "Primero usa la skill `brainstorm` para crear una spec"
 
 ### Paso 2: Mapear archivos
 
@@ -84,7 +84,7 @@ Si una tarea necesita mas de 2 archivos de produccion (excluyendo tests), es dem
 
 ```
 Plan listo con N tareas. Como quieres ejecutarlo?
-a) Con subagentes (recomendado) — usa /execute
+a) Con especialistas disponibles - usa la skill `execute`
 b) Paso a paso en esta sesion
 c) Revisar/ajustar el plan primero
 ```
@@ -96,4 +96,4 @@ c) Revisar/ajustar el plan primero
 - Commits atomicos: un commit por tarea
 - Si hay mas de 10 tareas, agrupa en fases logicas
 
-Argumento recibido: $ARGUMENTS
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.

@@ -23,7 +23,7 @@ Control del browser real del usuario via Chrome DevTools Protocol. Un WebSocket 
 2. Ejecutar el test de conexion para confirmar que Chrome responde (desde la raiz del repo; `python` o `python3`/`py` segun la maquina):
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/skills/browser-control/references/cdp_helpers.py"
+python <ruta-resuelta-de-cdp_helpers.py>
 ```
 
 3. Si falla, seguir la guia de troubleshooting en `references/connection-guide.md`.
@@ -33,7 +33,7 @@ python "${CLAUDE_PLUGIN_ROOT}/skills/browser-control/references/cdp_helpers.py"
 Ejecutar scripts Python inline via heredoc (ejecutar desde la raiz del repo). La ruta de los helpers se pasa como argumento y se lee con `sys.argv[1]`:
 
 ```bash
-python - "${CLAUDE_PLUGIN_ROOT}/skills/browser-control/references" <<'PY'
+python - <ruta-resuelta-del-directorio-references> <<'PY'
 import sys; sys.path.insert(0, sys.argv[1])
 from cdp_helpers import *
 
@@ -140,6 +140,9 @@ Usar `python` (o `python3`/`py` segun la maquina). Siempre usar el heredoc `<<'P
 - `references/cdp_helpers.py` — modulo Python con todos los helpers
 - `references/connection-guide.md` — setup y troubleshooting de conexion al browser
 - `references/interaction-patterns.md` — patrones para mecanicas web complejas (dialogs, iframes, dropdowns, uploads)
+
+Resolver [cdp_helpers.py](references/cdp_helpers.py) y el resto de referencias desde el directorio
+de esta skill antes de ejecutar los ejemplos.
 
 ## Variables de entorno
 

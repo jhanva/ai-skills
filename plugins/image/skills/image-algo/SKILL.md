@@ -1,13 +1,8 @@
 ---
 name: image-algo
 description: >
-  Diseño de algoritmos de procesamiento de imagen con validacion formal.
-  Cubre hashing, similarity, clustering, quality scoring, y deteccion.
-  Incluye edge cases especificos de imagen, metricas de accuracy,
-  y analisis de complejidad on-device.
-  Usar cuando: se quiere disenar un algoritmo de imagen nuevo (similarity,
-  hashing, clustering, quality scoring, deteccion) o el usuario pregunta
-  como comparar imagenes, detectar duplicados o medir calidad.
+  Disena y valida algoritmos de imagen: hashing, similitud, clustering, calidad y deteccion.
+  Usar para comparar imagenes, detectar duplicados o definir metricas y complejidad on-device.
 argument-hint: "[descripcion del problema]"
 disable-model-invocation: true
 allowed-tools:
@@ -27,7 +22,7 @@ allowed-tools:
 
 Disenar un algoritmo de procesamiento de imagen con fundamento matematico,
 edge cases identificados, metricas de validacion, y analisis de feasibility on-device.
-El output es una spec tecnica lista para `/plan` o `/tdd`.
+El output es una spec tecnica lista para las skills `plan` o `tdd`.
 
 ---
 
@@ -211,15 +206,15 @@ Producir documento con:
 6. **Complejidad:** time O(?), space O(?), feasibility on-device
 7. **Test plan:** test set, golden images, automation
 
-Esta spec es el input para `/plan` o directamente para `/tdd`.
+Esta spec es el input para la skill `plan` o directamente para la skill `tdd`.
 
 ---
 
 ## Transicion
 
 Cuando el usuario aprueba la spec:
-- Si requiere ML: "Usa `/ml-ondevice` para disenar la integracion del modelo"
-- Si requiere pipeline multi-paso: "Usa `/image-pipeline` para disenar la arquitectura del pipeline"
-- Si esta listo para implementar: "Usa `/plan` para convertir esto en tareas"
+- Si requiere ML: "Usa la skill `ml-ondevice` para disenar la integracion del modelo"
+- Si requiere pipeline multi-paso: "Usa la skill `image-pipeline` para disenar la arquitectura del pipeline"
+- Si esta listo para implementar: "Usa la skill `plan` para convertir esto en tareas"
 
-Argumento recibido: $ARGUMENTS
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.

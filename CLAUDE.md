@@ -13,22 +13,22 @@ El repo es un marketplace de plugins. Cada skill vive una sola vez en `plugins/<
 .claude-plugin/marketplace.json    — Catalogo para Claude Code
 .agents/plugins/marketplace.json   — Catalogo para Codex
 plugins/core/                      — Flujo de desarrollo (12 skills, 3 agentes, hooks, evals)
-  skills/optimize                  — Optimizacion de tokens (siempre activa)
+  skills/optimize                  — Auditoria explicita de eficiencia
   skills/brainstorm                — Diseno antes de implementar
   skills/plan                      — Spec -> plan de implementacion
   skills/tdd                       — Test-driven development estricto (+ testing-anti-patterns.md)
   skills/debug                     — Debugging sistematico en 4 fases (+ root-cause-tracing.md)
   skills/verify                    — Verificacion antes de completar
-  skills/execute                   — Ejecucion con subagentes + review (+ model-selection.md)
+  skills/execute                   — Ejecucion con especialistas opcionales + fallback
   skills/review                    — Code review estructurado
   skills/parallel                  — Agentes paralelos independientes
   skills/secure                    — Analisis de seguridad (references/, scripts/scan-secrets.py)
   skills/codegraph                 — Knowledge graph consultable (references/, scripts/)
   skills/humanize                  — Humanizar texto generado por IA (references/)
   agents/prompt-artist.md          — Agent: prompts para generacion de imagen
-  agents/reviewer.md               — Agent: code review de solo lectura (lo despacha /review)
-  agents/security-auditor.md       — Agent: auditoria de seguridad de solo lectura (lo despacha /secure full)
-  evals/                           — Casos de eval para tdd, debug, verify, codegraph y un negativo
+  agents/reviewer.md               — Agent opcional: code review de solo lectura
+  agents/security-auditor.md       — Agent opcional: auditoria de seguridad de solo lectura
+  evals/                           — Casos positivos, negativos y de fallback
   references/prompt-artist/        — domains, techniques, platforms, text-safety
   hooks/hooks.json                 — SessionStart (session-context.sh) y PreToolUse (block-env-access.sh)
 plugins/android/                   — android-arch, bitmap-safety, room-audit, ml-ondevice
@@ -49,13 +49,13 @@ Instaladas desde el marketplace, las skills se invocan con prefijo de plugin: `/
 
 | Skill | Invocacion | Proposito |
 |---|---|---|
-| `optimize` | Siempre activa | Filtrado de output, delegacion con umbral, seleccion de modelo |
+| `/optimize` | Solo usuario | Auditoria de contexto, latencia, costo y delegacion |
 | `/brainstorm` | Solo usuario | Diseno antes de implementar |
 | `/plan` | Solo usuario | Spec -> plan con tareas de 2-5 min |
-| `/tdd` | Auto + usuario | TDD estricto RED-GREEN-REFACTOR |
+| `/tdd` | Auto + usuario | RED-GREEN-REFACTOR para comportamiento comprobable |
 | `/debug` | Auto + usuario | Debugging sistematico con causa raiz |
 | `/verify` | Auto + usuario | Verificacion con evidencia antes de completar |
-| `/execute` | Solo usuario | Ejecucion de plan con subagentes |
+| `/execute` | Solo usuario | Ejecucion de plan con especialistas opcionales y fallback local |
 | `/review` | Solo usuario | Code review con severidades |
 | `/parallel` | Solo usuario | Despachar agentes para problemas independientes |
 | `/secure` | Solo usuario | Analisis de seguridad (quick: diff only, full: proyecto completo) |
@@ -73,8 +73,6 @@ Instaladas desde el marketplace, las skills se invocan con prefijo de plugin: `/
 | `/browser-control` | Solo usuario | Control de browser via CDP (navegacion, screenshots, clicks, tabs) |
 | `/codegraph` | Auto + usuario | Knowledge graph consultable del proyecto (build, query, path, explain) |
 | `/git-identity` | Solo usuario | Identidades Git separadas: audit y setup de 4 capas |
-
-"Siempre activa" = `user-invocable: false` (Claude la carga automaticamente, no aparece en menu `/`)
 
 Instalacion: `/plugin marketplace add jhanva/ai-skills` y `/plugin install core@ai-skills` (idem `android`, `image`, `design`, `repo-ops`). Desarrollo local: `claude --plugin-dir ./plugins/core`.
 "Solo usuario" = `disable-model-invocation: true` (se invoca manualmente con `/nombre`)
@@ -166,8 +164,8 @@ Para debugging: `/debug` (aplica `/tdd` para el fix y `/verify` para confirmar)
 
 ## Principios
 
-1. **No codear sin disenar** — `/brainstorm` antes de todo
-2. **No implementar sin test** — `/tdd` siempre activo
+1. **Disenar donde hay decisiones** — `/brainstorm` para alcance ambiguo o tradeoffs reales
+2. **Probar comportamiento** — `/tdd` cuando existe un cambio comprobable y un harness viable
 3. **No adivinar fixes** — `/debug` con causa raiz primero
 4. **No decir "listo" sin evidencia** — `/verify` antes de reportar
 5. **No confiar en reportes de subagentes** — verificar independientemente
@@ -175,10 +173,11 @@ Para debugging: `/debug` (aplica `/tdd` para el fix y `/verify` para confirmar)
 
 ## Ahorro de tokens
 
-La skill `optimize` se carga automaticamente y aplica estas reglas en toda interaccion:
+Las reglas base de `AGENTS.md` mantienen el contexto acotado. La skill `/optimize` permite una
+auditoria explicita cuando el flujo consume demasiado:
 
 - Filtrar output de comandos con pipes antes de que entre al contexto
 - Delegar a subagentes solo cuando output esperado > 50 lineas
-- Seleccion de modelo para subagentes (haiku/sonnet/opus)
+- Elegir capacidades entre los modelos realmente disponibles
 
 Al anadir o mover una skill: actualizar el `marketplace.json` de ambos runtimes, el `plugin.json` del plugin (subir `version`) y correr `claude plugin validate .`. Si la skill es contextual, anadir un caso en `plugins/core/evals/` y medir con `claude plugin eval .` desde `plugins/core`.

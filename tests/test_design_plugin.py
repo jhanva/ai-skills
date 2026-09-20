@@ -209,9 +209,10 @@ class DesignPluginLayoutTests(unittest.TestCase):
                 fields[key.strip()] = value.strip()
         return fields
 
-    def test_ui_review_dispatches_a_read_only_agent_with_codex_parity(self) -> None:
+    def test_ui_review_supports_optional_read_only_agent_with_codex_parity(self) -> None:
         skill = (PLUGIN / "skills" / "ui-review" / "SKILL.md").read_text(encoding="utf-8")
-        self.assertIn("design:ui-reviewer", skill)
+        self.assertIn("Si existe un especialista", skill)
+        self.assertIn("Si no hay especialista", skill)
         fm = self.frontmatter(PLUGIN / "agents" / "ui-reviewer.md")
         self.assertEqual("ui-reviewer", fm["name"])
         self.assertNotIn("Write", fm["tools"])

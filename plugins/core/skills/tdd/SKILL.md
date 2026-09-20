@@ -1,17 +1,19 @@
 ---
 name: tdd
 description: >
-  Impone ciclo RED-GREEN-REFACTOR estricto durante implementacion.
-  No se permite codigo de produccion sin test que falle primero.
-  Usar cuando: se esta escribiendo codigo nuevo, implementando features, arreglando bugs, o cualquier tarea que involucre escribir codigo de produccion.
+  Aplica RED-GREEN-REFACTOR a cambios de comportamiento comprobables.
+  Usar al implementar features o bugs con una suite viable; no para docs, exploracion o cambios puramente mecanicos.
 argument-hint: "[que se va a implementar]"
 ---
 
 # TDD — Test-Driven Development
 
-## Ley de hierro
+## Alcance
 
-**PROHIBIDO escribir codigo de produccion sin un test que falle primero.** Si se escribio codigo antes del test, se borra y se empieza de nuevo. Sin excepciones.
+Para comportamiento nuevo o corregido, escribir primero una prueba que demuestre el fallo. Si el
+entorno no permite una prueba automatizada razonable, acordar una verificacion reproducible y
+explicar la limitacion. No forzar TDD sobre documentacion, configuracion declarativa sin harness,
+prototipos descartables o cambios mecanicos sin comportamiento.
 
 ## Ciclo obligatorio
 
@@ -74,4 +76,4 @@ Consulta [testing-anti-patterns.md](testing-anti-patterns.md) para anti-patrones
 - [ ] Tests cubren happy path Y al menos un caso de error
 - [ ] No hay tests comentados o skipped
 
-Argumento recibido: $ARGUMENTS
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.
