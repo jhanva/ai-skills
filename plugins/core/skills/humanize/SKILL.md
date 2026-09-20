@@ -1,12 +1,8 @@
 ---
 name: humanize
 description: >
-  Humaniza texto generado por IA en español e inglés. Diagnostica patrones
-  detectables (vocabulario, estructura, ritmo, tono) y los transforma para
-  producir texto con voz natural. Dos modos: review (diagnóstico) y rewrite
-  (transformación). Soporte nativo de español con marcadores específicos.
-  Usar cuando: el usuario dice "humanizar", "suena a IA", "hazlo mas natural",
-  o pide revisar/mejorar texto que parece generado por IA.
+  Diagnostica y corrige patrones de texto artificial en espanol o ingles.
+  Usar para humanizar, revisar o reescribir contenido que suena generado por IA.
 argument-hint: "[review|rewrite] [archivo o texto]"
 disable-model-invocation: true
 allowed-tools:
@@ -99,5 +95,5 @@ Verificar:
 - registro consistente
 - hechos preservados
 
-Argumento recibido: $ARGUMENTS
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.
 

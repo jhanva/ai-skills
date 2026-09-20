@@ -1,12 +1,8 @@
 ---
 name: ui-review
 description: >
-  Auditoria de solo lectura de interfaces existentes contra criterios verificables:
-  accesibilidad (contraste, foco, nombres accesibles, orden de lectura), area tactil,
-  responsive, tipografia, color por tokens, motion, formularios, estados y navegacion.
-  Reporta con severidades y archivo:linea, igual que /review. Cubre Jetpack Compose y web.
-  Usar cuando: el usuario dice "revisa la UI", "auditoria de accesibilidad", "ui review",
-  "esta pantalla cumple", "revisa el diseno", o antes de dar por terminada una pantalla.
+  Audita interfaces Compose o web: accesibilidad, responsive, tokens, motion, formularios y estados.
+  Usar para revisar UI, diseno o accesibilidad antes de cerrar una pantalla.
 argument-hint: "[ruta o pantalla] [--stack compose|web]"
 disable-model-invocation: true
 allowed-tools:
@@ -23,7 +19,7 @@ allowed-tools:
 # UI Review — Auditoria de interfaz con evidencia
 
 Solo lectura. No se modifica ningun archivo: se leen composables, componentes, estilos y
-recursos, y se reporta. Los arreglos se hacen despues con `/tdd`.
+recursos, y se reporta. Los arreglos se hacen despues con la skill `tdd`.
 
 ## Resolver alcance
 
@@ -40,7 +36,7 @@ recursos, y se reporta. Los arreglos se hacen despues con `/tdd`.
 Antes de gastar un agente, correr las reglas mecanicas:
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/scripts/detect.py" <rutas> [--json]
+python <ruta-resuelta-de-detect.py> <rutas> [--json]
 ```
 
 Exit 1 = hallazgos (cada uno con `archivo:linea`, regla, severidad y la guia que incumple); 0 =
@@ -51,9 +47,7 @@ igual se corre aqui para tener la foto completa.
 
 ## Despachar el auditor
 
-Despachar el agente `ui-reviewer` del plugin con Agent tool (`subagent_type: "design:ui-reviewer"`;
-`ui-reviewer` si el plugin se carga con `--plugin-dir`). Es de solo lectura y conoce el formato.
-El prompt aporta:
+Si existe un especialista de UI de solo lectura, entregarle este contexto:
 
 ```
 Audita la UI en: [rutas]
@@ -76,8 +70,8 @@ Verifica en este orden y detente en cada categoria hasta agotarla:
    tarjetas iguales, bento (guias comp-*)
 
 Para cada categoria consulta el criterio exacto con:
-python "${CLAUDE_PLUGIN_ROOT}/scripts/search.py" "<tema>" --domain ux -n 3
-python "${CLAUDE_PLUGIN_ROOT}/scripts/search.py" "<tema>" --stack [stack] -n 3
+python <ruta-resuelta-de-search.py> "<tema>" --domain ux -n 3
+python <ruta-resuelta-de-search.py> "<tema>" --stack [stack] -n 3
 ```
 
 ## Verificar el reporte
@@ -89,7 +83,7 @@ no se sostiene, se elimina del reporte final y se anota que se descarto.
 Para contraste, calcular en vez de estimar:
 
 ```bash
-python -c "import sys; sys.path.insert(0, r'${CLAUDE_PLUGIN_ROOT}/scripts'); import catalog; print(catalog.contrast_ratio('#RRGGBB', '#RRGGBB'))"
+python -c "import sys; sys.path.insert(0, r'<ruta-resuelta-del-directorio-scripts>'); import catalog; print(catalog.contrast_ratio('#RRGGBB', '#RRGGBB'))"
 ```
 
 ## Formato del reporte
@@ -120,4 +114,8 @@ Cada hallazgo cita el `id` de la guia del catalogo para que el arreglo sea traza
 hallazgos en una severidad, omitir la seccion. Sin sycophancy: si la pantalla falla
 accesibilidad, es CAMBIOS_REQUERIDOS aunque se vea bien.
 
-Argumento recibido: $ARGUMENTS
+Si no hay especialista, el agente principal ejecuta la misma lista de comprobacion y conserva el
+modo de solo lectura. Resolver [detect.py](../../scripts/detect.py),
+[search.py](../../scripts/search.py) y [catalog.py](../../scripts/catalog.py) desde esta skill.
+
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.

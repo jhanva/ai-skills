@@ -17,7 +17,7 @@ allowed-tools:
 
 ## Uso
 
-- Invocacion explicita con `/git-identity`.
+- Invocacion explicita con la skill `git-identity`.
 - Usa lecturas puntuales para revisar config: `git config`, `git remote -v`, y lectura directa de archivos concretos.
 - Modo por defecto: `audit`.
 - Si el prompt menciona `setup`, ejecutar el flujo de configuracion.

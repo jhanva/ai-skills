@@ -63,9 +63,9 @@ Cada skill existe **una sola vez** y sirve a ambos runtimes:
 
 - Claude Code lee el frontmatter de `SKILL.md` (`description`, `disable-model-invocation`, `argument-hint`, `allowed-tools`).
 - Codex lee el mismo `SKILL.md` y toma la politica de invocacion de `agents/openai.yaml` (`allow_implicit_invocation`).
-- Las rutas a archivos del propio plugin se escriben como `${CLAUDE_PLUGIN_ROOT}/...`. Claude Code la sustituye al cargar; en Codex equivale a `plugins/<plugin>/`.
+- Los `SKILL.md` usan enlaces relativos para sus recursos, de modo que la misma instruccion sea portable entre runtimes.
 
-Al instalar un plugin, sus skills quedan **namespaced** con el nombre del plugin para evitar colisiones con otros plugins: la skill `tdd` del plugin `core` se invoca como `/core:tdd`. Las skills marcadas como contextuales (`tdd`, `debug`, `verify`, `codegraph`, `optimize`) se activan solas cuando la tarea lo amerita, sin necesidad de escribir el comando.
+Al instalar un plugin, sus skills quedan **namespaced** con el nombre del plugin para evitar colisiones con otros plugins: la skill `tdd` del plugin `core` se invoca como `/core:tdd`. Las skills contextuales (`tdd`, `debug`, `verify`, `codegraph`) pueden activarse solas; `optimize` es una auditoria explicita para no cargar contexto permanente.
 
 Cada plugin declara una `version`. Solo recibes cambios cuando esa version sube en `main`, asi que una actualizacion nunca te cambia el comportamiento sin que lo pidas con `/plugin update`.
 
@@ -158,7 +158,31 @@ codex
 
 Busca `ai-skills`, instala el plugin que necesites y abre una sesion nueva. Las skills se invocan con `$skill` (por ejemplo `$tdd`, `$brainstorm`).
 
-Alternativa manual, sin marketplace: copia `plugins/<plugin>/skills/` a `.agents/skills/` del proyecto destino y lleva `.codex/` y `AGENTS.md` si quieres tambien los agentes custom y hooks nativos.
+#### Desarrollo vivo desde este clon
+
+El marketplace instala una version cacheada: es estable, pero no refleja cada edicion local. Para
+usar la unica copia viva de este repo desde cualquier proyecto, crea enlaces por skill en el
+directorio global del usuario:
+
+```bash
+python scripts/link-user-skills.py --plugin core --dry-run
+python scripts/link-user-skills.py --plugin core
+```
+
+Usa `--all` para todos los plugins, `--status` para auditar y `--remove` para retirar solo los
+enlaces que apuntan a este clon. El script preserva skills ajenas y detecta colisiones. En Windows
+puede requerir Developer Mode o una terminal elevada para crear symlinks.
+
+Si no puedes cambiar esa politica, `--junction` crea junctions de directorio en Windows. Siguen
+apuntando a la fuente viva y no requieren copiar las skills:
+
+```bash
+python scripts/link-user-skills.py --plugin core --junction
+```
+
+Esto resuelve el caso de trabajo diario: editar `plugins/core/skills/...` aqui y abrir una sesion
+nueva de Codex en cualquier proyecto. `.codex/` y `AGENTS.md` siguen siendo adaptadores de este
+repo; las skills no dependen de ellos y funcionan con fallback si no hay agentes custom.
 
 ### Otros agentes
 
@@ -206,13 +230,13 @@ Los nombres de las tablas son los cortos; con el plugin instalado se invocan com
 
 | Skill | Activacion | Proposito |
 |---|---|---|
-| [`optimize`](./plugins/core/skills/optimize/SKILL.md) | Siempre activa | Filtrado de output de comandos, umbral para delegar a subagentes y seleccion de modelo (haiku/sonnet/opus) |
+| [`optimize`](./plugins/core/skills/optimize/SKILL.md) | Explicita | Auditoria de contexto, latencia, costo y delegacion innecesaria |
 | [`brainstorm`](./plugins/core/skills/brainstorm/SKILL.md) | Explicita | Diseno antes de implementar: preguntas una a una, 2-3 enfoques con tradeoffs, spec escrita y auto-revisada |
 | [`plan`](./plugins/core/skills/plan/SKILL.md) | Explicita | Convierte una spec aprobada en tareas de 2-5 minutos con codigo real, comandos y output esperado. Cero placeholders |
-| [`tdd`](./plugins/core/skills/tdd/SKILL.md) | Contextual + explicita | RED-GREEN-REFACTOR estricto: prohibido codigo de produccion sin un test que falle primero |
+| [`tdd`](./plugins/core/skills/tdd/SKILL.md) | Contextual + explicita | RED-GREEN-REFACTOR para cambios de comportamiento comprobables; fallback verificable cuando no hay harness viable |
 | [`debug`](./plugins/core/skills/debug/SKILL.md) | Contextual + explicita | Debugging en 4 fases con rastreo de causa raiz; regla de los 3 intentos |
 | [`verify`](./plugins/core/skills/verify/SKILL.md) | Contextual + explicita | Ninguna afirmacion de exito sin ejecutar la verificacion y leer el output |
-| [`execute`](./plugins/core/skills/execute/SKILL.md) | Explicita | Ejecuta un plan tarea por tarea con subagente fresco y revision de 2 etapas (spec y calidad) |
+| [`execute`](./plugins/core/skills/execute/SKILL.md) | Explicita | Ejecuta un plan por dependencias, con especialistas opcionales, fallback local y revision de spec/calidad |
 | [`review`](./plugins/core/skills/review/SKILL.md) | Explicita | Code review con severidades (critico / importante / menor) y manejo de feedback sin sycophancy |
 | [`parallel`](./plugins/core/skills/parallel/SKILL.md) | Explicita | Despacha agentes en paralelo para problemas independientes entre si |
 | [`secure`](./plugins/core/skills/secure/SKILL.md) | Explicita | Analisis de seguridad: secrets, injection, auth, crypto, infra. Modo `quick` (solo diff) o `full` (proyecto). Incluye `scan-secrets.py` sin dependencias |
@@ -256,14 +280,14 @@ Los nombres de las tablas son los cortos; con el plugin instalado se invocan com
 | Agente | Runtime | Proposito |
 |---|---|---|
 | [`prompt-artist`](./plugins/core/agents/prompt-artist.md) | Claude Code (plugin `core`) | Transforma ideas en prompts narrativos para generacion de imagenes (Gemini, DALL-E, Midjourney, Stable Diffusion). Formula de 7 componentes con pesos por dominio; anexos en [`references/prompt-artist/`](./plugins/core/references/prompt-artist/) |
-| [`reviewer`](./plugins/core/agents/reviewer.md) | Claude Code (plugin `core`) | Revisor de solo lectura (correccion, regresiones, tests, seguridad). `/core:review` lo despacha como `core:reviewer` |
-| [`security-auditor`](./plugins/core/agents/security-auditor.md) | Claude Code (plugin `core`) | Auditor de seguridad de solo lectura por area (code, infra, deps). `/core:secure full` lo despacha en paralelo |
-| [`ui-reviewer`](./plugins/design/agents/ui-reviewer.md) | Claude Code (plugin `design`) | Auditor de UI de solo lectura (accesibilidad, interaccion, layout, tokens, motion) para Compose y web. `/design:ui-review` lo despacha como `design:ui-reviewer` |
+| [`reviewer`](./plugins/core/agents/reviewer.md) | Claude Code (plugin `core`) | Revisor opcional de solo lectura para correccion, regresiones, tests y seguridad |
+| [`security-auditor`](./plugins/core/agents/security-auditor.md) | Claude Code (plugin `core`) | Auditor opcional de seguridad de solo lectura por area (code, infra, deps) |
+| [`ui-reviewer`](./plugins/design/agents/ui-reviewer.md) | Claude Code (plugin `design`) | Auditor opcional de UI de solo lectura para Compose y web |
 | [`prompt_artist`](./.codex/agents/prompt-artist.toml) | Codex | Equivalente de `prompt-artist` como agente custom de Codex |
 | [`reviewer`](./.codex/agents/reviewer.toml) | Codex | Equivalente de `reviewer`; backend de `$review` |
 | [`security_auditor`](./.codex/agents/security-auditor.toml) | Codex | Equivalente de `security-auditor`; backend de `$secure` |
 | [`ui_reviewer`](./.codex/agents/ui-reviewer.toml) | Codex | Equivalente de `ui-reviewer`; backend de `$ui-review` |
-| [`task_implementer`](./.codex/agents/task-implementer.toml) | Codex | Backend de `$execute`: implementa una tarea del plan con TDD. En Claude Code, `execute` despacha el subagente con prompt inline |
+| [`task_implementer`](./.codex/agents/task-implementer.toml) | Codex | Especialista opcional para una tarea acotada; `execute` tambien funciona sin el |
 
 Los agentes de Claude Code son de solo lectura por definicion (`tools` sin `Write`/`Edit`), asi que un review o una auditoria nunca modifica el codigo.
 
@@ -352,7 +376,7 @@ En Codex, sustituye `/<plugin>:` por `$`.
 
 ```
 .claude-plugin/marketplace.json     catalogo para Claude Code
-.agents/plugins/marketplace.json    catalogo para Codex (mismos plugins, mismas versiones)
+.agents/plugins/marketplace.json    catalogo para Codex (mismos plugins y fuentes)
 plugins/
   core/
     .claude-plugin/plugin.json      manifest para Claude Code (name, version, description)
@@ -380,8 +404,11 @@ plugins/
   hooks/codex_hooks.py              handlers multiplataforma
 .claude/settings.json               dogfooding: este repo instala sus propios plugins
 tests/                              validacion de manifests, layout de skills, hooks y scanner
-docs/codex-adaptation.md            por que la capa Codex es como es
-AGENTS.md                           reglas de trabajo del repo (git, autorizaciones, convenciones)
+docs/architecture.md                fuente unica, desarrollo vivo y presupuesto de contexto
+docs/codex-adaptation.md            contrato portable y adaptadores Codex
+docs/model-selection.md             criterio y pins de agentes Codex
+docs/repo-workflow.md               gitflow, versiones y checklist de PR
+AGENTS.md                           reglas concisas de trabajo del repo
 CLAUDE.md                           catalogo y flujo para Claude Code
 ```
 
@@ -396,8 +423,8 @@ Las reglas completas estan en [`AGENTS.md`](./AGENTS.md). Resumen operativo:
    - `disable-model-invocation: true` si solo se invoca a mano; `user-invocable: false` si es siempre activa.
 2. Crear `agents/openai.yaml` en la skill con `allow_implicit_invocation` coherente con el frontmatter (`false` para las de invocacion manual).
 3. Mantener `SKILL.md` por debajo de 500 lineas; anexos a `references/`, scripts a `scripts/`.
-4. Referenciar archivos propios como `${CLAUDE_PLUGIN_ROOT}/skills/<nombre>/...`, nunca con rutas `.claude/` o `.agents/`.
-5. Subir `version` en `plugins/<plugin>/.claude-plugin/plugin.json`, `plugins/<plugin>/plugin.json` y en la entrada del plugin en **ambos** `marketplace.json`.
+4. Referenciar archivos propios con enlaces relativos al directorio de la skill, nunca con rutas de una instalacion concreta.
+5. Subir `version` en `plugins/<plugin>/.claude-plugin/plugin.json`, `plugins/<plugin>/plugin.json` y en la entrada del marketplace de Claude Code. El catalogo Codex toma la version del manifest portable.
 6. Actualizar las tablas de este README y de `CLAUDE.md`.
 
 ### Verificar antes de abrir PR
@@ -416,7 +443,7 @@ claude --plugin-dir ./plugins/<plugin>
 
 ### Evals: medir si las skills se activan
 
-`plugins/core/evals/` contiene una suite de casos para las skills contextuales (`tdd`, `debug`, `verify`, `codegraph`) y un caso negativo que no debe activar ninguna. Cada caso es un `prompt.md` escrito como lo escribiria un usuario (sin nombrar la skill) y uno o mas `graders/*.md`: un `tool_used` que comprueba que la skill se invoco y un `llm` o `regex` sobre la respuesta.
+`plugins/core/evals/` contiene casos positivos para skills contextuales y explicitas, casos negativos contra sobreactivacion y un caso de fallback sin subagentes. Cada caso usa `prompt.md` y uno o mas `graders/*.md` sobre invocacion o resultado.
 
 ```bash
 cd plugins/core
@@ -442,7 +469,7 @@ Gitflow con `main` (publicado) y `develop` (integracion). Ramas `feature/`, `fix
 | Instale el plugin pero no veo `/core:...` en `/help` | Los plugins se cargan al inicio de sesion | `/reload-plugins` o reiniciar Claude Code |
 | Hice `git pull` y no cambio nada | La version del plugin no subio, o no actualizaste | `/plugin update core@ai-skills`; si desarrollas, usa `--plugin-dir` |
 | `--plugin-dir ./plugins` carga cero plugins | Cargar una carpeta de plugins requiere 2.1.265+ | Una bandera por plugin: `--plugin-dir ./plugins/core` |
-| Una skill de Codex muestra `${CLAUDE_PLUGIN_ROOT}` literal | Codex no sustituye la variable | Interpretarla como `plugins/<plugin>/` |
+| Edite una skill local pero Codex sigue viendo la anterior | La instalacion del marketplace usa cache | Usar `scripts/link-user-skills.py` para desarrollo vivo y abrir una sesion nueva |
 | Un hook de `.env` bloquea un comando legitimo | El patron cubre `.env*` salvo `.example`/`.sample`/`.template` | Renombrar el archivo a uno de los sufijos permitidos o ejecutar el comando fuera del agente |
 | Tengo mi propio `prompt-artist` en `.claude/agents/` | Los agentes del proyecto tienen prioridad sobre los del plugin | Borrar la copia local para usar la del plugin |
 
@@ -456,8 +483,8 @@ claude --add-dir /ruta/a/gamedev-skills
 
 ## Principios
 
-1. **No codear sin disenar** — `brainstorm` antes de todo
-2. **No implementar sin test** — `tdd` siempre presente cuando cambia comportamiento
+1. **Disenar donde hay decisiones** — `brainstorm` para alcance ambiguo o tradeoffs reales
+2. **Probar comportamiento** — `tdd` cuando existe un harness viable
 3. **No adivinar fixes** — `debug` con causa raiz primero
 4. **No decir "listo" sin evidencia** — `verify` antes de reportar
 5. **No confiar en reportes de subagentes** — verificar independientemente
@@ -465,16 +492,17 @@ claude --add-dir /ruta/a/gamedev-skills
 
 ## Ahorro de tokens
 
-La skill `optimize` (siempre activa en `core`) y las reglas de `AGENTS.md` aplican estas tecnicas en toda interaccion:
+Las reglas de `AGENTS.md` mantienen el contexto acotado. La skill explicita `optimize` audita
+flujos que necesiten una reduccion adicional:
 
-| Tecnica | Tokens ahorrados por uso |
+| Tecnica | Efecto esperado |
 |---|---|
-| Filtrar output de comando con pipes | 500-3,000 |
-| Subagente para tests vs inline | 1,000-5,000 en contexto principal |
-| Modelo ligero vs pesado en tarea mecanica | ~60% menos costo |
-| Limpiar contexto entre tareas | todo el contexto acumulado |
+| Filtrar output de comando con pipes | Menos ruido en contexto |
+| Delegar solo tareas independientes | Menos coordinacion y duplicacion |
+| Elegir capacidades segun riesgo | Mejor relacion calidad/costo |
+| Cargar referencias bajo demanda | Menor contexto inicial |
 
-Ademas: subagentes frescos por tarea, texto completo de la tarea en el prompt (el subagente no lee el plan), skills y `references/` cargados solo cuando hacen falta, y review de 2 etapas para evitar re-trabajo.
+Los beneficios se miden cuando haya telemetria; el repo no publica cifras de ahorro sin una prueba reproducible.
 
 ## Licencia
 

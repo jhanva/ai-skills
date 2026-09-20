@@ -64,18 +64,18 @@ Reporta: causa raiz, fix aplicado, tests que pasan, archivos modificados
 
 ### 3. Despachar en paralelo
 
-Usar multiples Agent tool calls en UN SOLO mensaje:
+Despachar todos los especialistas disponibles en una sola operacion cuando el entorno lo permita:
 
 ```
-Agent(dominio_A, prompt_A)
-Agent(dominio_B, prompt_B)
-Agent(dominio_C, prompt_C)
+especialista(dominio_A, prompt_A)
+especialista(dominio_B, prompt_B)
+especialista(dominio_C, prompt_C)
 ```
 
 ### 4. Integrar resultados
 
 - Leer cada reporte
-- **NO confiar ciegamente** — verificar con `/verify`
+- **NO confiar ciegamente** - verificar con la skill `verify`
 - Ejecutar suite COMPLETA desde sesion principal
 - Si hay conflictos (dos agentes tocaron mismo archivo), resolver manualmente
 - Reportar resultado consolidado
@@ -90,4 +90,4 @@ Agent(dominio_C, prompt_C)
 | Output vago | Pedir estructura: causa, fix, evidencia |
 | Confiar en reportes | SIEMPRE verificar con suite completa |
 
-Argumento recibido: $ARGUMENTS
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.

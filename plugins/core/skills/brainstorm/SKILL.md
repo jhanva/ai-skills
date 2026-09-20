@@ -10,9 +10,11 @@ disable-model-invocation: true
 
 # Brainstorm — Diseno antes de implementar
 
-## Regla absoluta
+## Cuando usarlo
 
-**PROHIBIDO implementar sin diseno aprobado.** Todo proyecto pasa por este proceso sin importar que tan "simple" parezca. La complejidad oculta se descubre aqui, no en produccion.
+Usar este proceso para features no triviales, arquitectura nueva, requisitos ambiguos o decisiones
+con tradeoffs reales. Un fix pequeno, cambio mecanico o tarea con spec completa puede ir directo a
+planificacion o implementacion tras una comprobacion breve del alcance.
 
 ## Proceso
 
@@ -89,15 +91,15 @@ Antes de presentar al usuario, verifica:
 
 ### Fase 6: Transicion
 
-Cuando el usuario aprueba la spec: "Spec aprobada. Usa `/plan` para convertirla en un plan de implementacion paso a paso."
+Cuando el usuario aprueba la spec: "Spec aprobada. Usa la skill `plan` para convertirla en un plan de implementacion paso a paso."
 
 ## Anti-patrones
 
 | Excusa | Por que es invalida |
 |---|---|
-| "Es muy simple para disenar" | Los bugs mas caros nacen de suposiciones no examinadas |
+| "No necesito aclarar el alcance" | Las suposiciones no examinadas crean retrabajo |
 | "Ya se que quiero" | Saber que quieres no es lo mismo que saber como construirlo |
 | "Solo es un CRUD" | Validaciones, permisos, edge cases, migraciones — nunca es "solo" un CRUD |
 | "Ya empece a codear" | Codigo sin diseno es deuda tecnica desde el dia 1 |
 
-Argumento recibido: $ARGUMENTS
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.

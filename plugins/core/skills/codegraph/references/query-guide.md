@@ -15,7 +15,7 @@ Flujo:
 1. Volcar el vocabulario real del grafo:
 
 ```bash
-python ${CLAUDE_SKILL_DIR}/scripts/codegraph.py vocab RUTA > codegraph-out/vocab.txt
+python <ruta-resuelta-de-codegraph.py> vocab RUTA > codegraph-out/vocab.txt
 ```
 
 2. Leer `codegraph-out/vocab.txt` y elegir hasta 12 tokens **presentes en
@@ -36,7 +36,7 @@ Query expandida (del vocab del grafo, N tokens): [token1, token2, ...]
 4. Consultar usando los tokens unidos por espacios como pregunta:
 
 ```bash
-python ${CLAUDE_SKILL_DIR}/scripts/codegraph.py query RUTA "token1 token2 token3"
+python <ruta-resuelta-de-codegraph.py> query RUTA "token1 token2 token3"
 ```
 
 ## Interpretar el output
@@ -61,7 +61,7 @@ Al redactar la respuesta:
 Despues de responder, persistir el resultado:
 
 ```bash
-python ${CLAUDE_SKILL_DIR}/scripts/codegraph.py save-answer RUTA \
+python <ruta-resuelta-de-codegraph.py> save-answer RUTA \
   --question "pregunta original del usuario" \
   --answer "resumen de la respuesta (1-3 frases)" \
   --nodes "LabelNodo1" "LabelNodo2" \

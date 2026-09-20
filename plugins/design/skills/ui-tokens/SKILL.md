@@ -1,11 +1,8 @@
 ---
 name: ui-tokens
 description: >
-  Materializa el sistema de diseno persistido (design-system/<proyecto>/MASTER.md) en
-  tokens de codigo del stack: Color/Type/Shape/Spacing y Theme para Jetpack Compose, o
-  custom properties CSS y tema Tailwind para web. Genera tambien la prueba de contraste
-  que fija los pares texto/fondo. Usar cuando: el usuario dice "genera los tokens",
-  "crea el theme", "pasa el design system a codigo", "tokens css", "MaterialTheme".
+  Convierte un MASTER.md aprobado en tokens y tema Compose, CSS o Tailwind con pruebas de contraste.
+  Usar para generar tokens, themes o materializar un design system.
 argument-hint: "[ruta a MASTER.md o nombre de proyecto] [--stack compose|web]"
 disable-model-invocation: true
 ---
@@ -14,24 +11,24 @@ disable-model-invocation: true
 
 `MASTER.md` es la fuente de verdad; este skill lo traduce a archivos de tokens que los
 componentes consumen por nombre. Nunca al reves: si hace falta un color nuevo, primero se
-anade a `MASTER.md` (con `/design-system`) y despues se regenera.
+anade a `MASTER.md` (con la skill `design-system`) y despues se regenera.
 
 ## Precondiciones
 
 1. Localizar el sistema: argumento, o `Glob design-system/**/MASTER.md`. Si no existe,
-   detenerse y proponer `/design-system`; no inventar tokens.
+   detenerse y proponer la skill `design-system`; no inventar tokens.
 2. Leer `MASTER.md` completo: secciones Color, Tipografia, Espaciado, Motion y Stack.
-3. Detectar el stack como en `/design-system`. Localizar donde viven los tokens actuales, si
+3. Detectar el stack como en la skill `design-system`. Localizar donde viven los tokens actuales, si
    los hay (`ui/theme/` en Compose; `tokens.css`, `theme.css` o `tailwind.config.*` en web).
    Si existen, se **actualizan**, no se duplican.
 
-## Proceso (bajo /tdd)
+## Proceso (bajo la skill `tdd` cuando cambia comportamiento)
 
 Los tokens son codigo de produccion y se escriben con test primero:
 
 1. **RED**: prueba de contraste que lee los pares del sistema (texto/fondo claro, texto/fondo
    oscuro, on-primary/primary) y falla porque el archivo de tokens no existe. Plantilla en
-   `${CLAUDE_PLUGIN_ROOT}/skills/ui-tokens/references/compose-tokens.md` o `web-tokens.md`.
+   [compose-tokens.md](references/compose-tokens.md) o [web-tokens.md](references/web-tokens.md).
 2. **GREEN**: generar los archivos de tokens con los valores exactos de `MASTER.md`.
 3. **REFACTOR**: reemplazar literales existentes en componentes por los tokens, uno por uno,
    con `Grep` de `Color(0x` / `#[0-9A-Fa-f]{6}` / `\.sp\b` fuera del directorio de tema.
@@ -54,7 +51,7 @@ ensamblada frente a una disenada. Estructura y ejemplos en `references/web-token
 ## Verificacion antes de cerrar
 
 - El test de contraste pasa (leer el output, no asumirlo).
-- `python "${CLAUDE_PLUGIN_ROOT}/scripts/detect.py" <directorio de tema y componentes tocados>` sale
+- `python <ruta-resuelta-de-detect.py> <directorio de tema y componentes tocados>` sale
   con 0 (los archivos de tema estan exentos de la regla de literales; los componentes no).
 - `Grep` de literales de color y tamano fuera del directorio de tema devuelve cero o una lista
   justificada (imagenes de marca, casos documentados).
@@ -63,4 +60,6 @@ ensamblada frente a una disenada. Estructura y ejemplos en `references/web-token
 
 Reportar archivos creados o modificados, resultado del test y literales que quedaron pendientes.
 
-Argumento recibido: $ARGUMENTS
+El script [detect.py](../../scripts/detect.py) se resuelve desde esta skill antes de ejecutarlo.
+
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.

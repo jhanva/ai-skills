@@ -12,16 +12,15 @@ referencias a simbolos de Markdown sin costo.
    una parte del corpus.
 2. Partir en chunks de 15-20 archivos, agrupando por directorio.
 3. Crear la carpeta `codegraph-out/fragments/`.
-4. Despachar TODOS los subagentes en un solo mensaje (Agent tool,
-   `subagent_type="general-purpose"` — necesitan Write). Un agente por
+4. Despachar todos los especialistas disponibles en una sola operacion. Un especialista por
    chunk, con el prompt de abajo.
 5. Verificar que cada `codegraph-out/fragments/chunk_NN.json` existe en
    disco. Si falta mas de la mitad, reportar y no continuar.
 6. Fusionar y reconstruir:
 
 ```bash
-python ${CLAUDE_SKILL_DIR}/scripts/codegraph.py merge-fragments RUTA
-python ${CLAUDE_SKILL_DIR}/scripts/codegraph.py build RUTA
+python <ruta-resuelta-de-codegraph.py> merge-fragments RUTA
+python <ruta-resuelta-de-codegraph.py> build RUTA
 ```
 
 ## Prompt para cada subagente
@@ -32,7 +31,7 @@ a escribir):
 ```
 Eres un subagente de extraccion de knowledge graph. Lee los archivos
 listados y extrae un fragmento de grafo. Escribe SOLO JSON valido con el
-schema de abajo en la ruta CHUNK_PATH usando el Write tool.
+schema de abajo en la ruta CHUNK_PATH usando la capacidad de escritura disponible.
 
 Archivos (chunk CHUNK_NUM):
 FILE_LIST

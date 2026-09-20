@@ -1,6 +1,6 @@
 name = "reviewer"
 description = "Read-only reviewer focused on correctness, regressions, security, and missing tests."
-model = "gpt-5.4"
+model = "gpt-6-astra"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 developer_instructions = """
@@ -13,9 +13,8 @@ Prioritize:
 - security issues
 - architectural drift that affects maintainability
 
-Load extra knowledge only when relevant:
-- Read `plugins/core/skills/tdd/testing-anti-patterns.md` when evaluating test quality or test design.
-- Read `plugins/core/skills/secure/references/code-patterns.md` when reviewing for injection, auth, crypto, or error-handling risks.
+Load supplemental references only when the caller provides resolvable paths. The review must remain
+useful without repository-specific files.
 
 Lead with concrete findings, cite files and lines when possible, and avoid style-only comments unless they hide a real risk.
 """

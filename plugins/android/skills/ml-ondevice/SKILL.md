@@ -1,10 +1,8 @@
 ---
 name: ml-ondevice
 description: >
-  Guia la integracion de modelos ML on-device en Android. Cubre seleccion
-  de framework (MediaPipe/MLKit/TFLite/ONNX), preprocessing, postprocessing,
-  GPU/CPU fallback, lifecycle del modelo, thread safety, y testing.
-  Usar cuando: se quiere integrar un modelo ML on-device en Android (MediaPipe, TFLite, ML Kit, ONNX, inferencia, embedding).
+  Disena integraciones ML on-device en Android: runtime, preprocesamiento,
+  fallback CPU/GPU, lifecycle y pruebas. Usar para MediaPipe, ML Kit, TFLite, ONNX, inferencia o embeddings.
 argument-hint: "[descripcion del modelo o tarea ML]"
 disable-model-invocation: true
 allowed-tools:
@@ -24,7 +22,7 @@ allowed-tools:
 
 Disenar la integracion completa de un modelo ML on-device: seleccion de framework,
 preprocessing, inference, postprocessing, fallback, lifecycle, threading, y testing.
-El output es una spec de integracion lista para `/plan`.
+El output es una spec de integracion lista para la skill `plan`.
 
 ---
 
@@ -302,6 +300,6 @@ Producir documento con:
 7. **Testing:** golden images, tests por capa, performance benchmark
 8. **Dependencies:** libraries exactas con versiones para build.gradle
 
-Transicion: "Usa `/image-pipeline` si el modelo es parte de un pipeline multi-paso, o `/plan` para implementar directamente."
+Transicion: "Usa la skill `image-pipeline` si el modelo es parte de un pipeline multi-paso, o la skill `plan` para implementar directamente."
 
-Argumento recibido: $ARGUMENTS
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.

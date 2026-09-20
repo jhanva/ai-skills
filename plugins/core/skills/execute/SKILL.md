@@ -1,97 +1,48 @@
 ---
 name: execute
 description: >
-  Ejecuta un plan de implementacion despachando un subagente fresco por tarea
-  con revision de 2 etapas: cumplimiento de spec y calidad de codigo.
-  Usar cuando: existe un plan creado con /plan y el usuario pide ejecutarlo o implementarlo.
+  Ejecuta un plan aprobado por tareas, con verificacion de cumplimiento y calidad.
+  Usar cuando existe un plan y el usuario pide implementarlo.
 argument-hint: "[ruta al plan]"
 disable-model-invocation: true
 ---
 
-# Execute — Ejecucion con subagentes
+# Execute - Ejecucion de planes
 
-## Proceso
+## Preparar
 
-### Paso 1: Cargar plan
+1. Leer el plan completo y comprobar que sus rutas y dependencias siguen vigentes.
+2. Reportar antes de editar cualquier ambiguedad que cambie alcance o arquitectura.
+3. Extraer cada tarea con sus criterios, archivos, pruebas y dependencias.
+4. Confirmar una rama de trabajo segura segun las reglas del proyecto.
 
-- Leer el documento de plan completo
-- Revisar criticamente: tiene sentido? Pasos claros? Gaps?
-- Si hay problemas, reportar ANTES de ejecutar
-- Si no hay plan: "Primero usa `/plan` para crear un plan"
+Si no existe un plan util, detenerse y proponer la skill `plan`.
 
-### Paso 2: Extraer tareas
+## Ejecutar
 
-Extraer el texto completo de cada tarea. Cada subagente recibe el texto literal — nunca la ruta al archivo del plan. Esto ahorra tokens de lectura de archivos.
+Procesar primero las dependencias. Las tareas independientes pueden correr en paralelo solo si
+no comparten archivos ni estado. Para cada tarea:
 
-### Paso 3: Ejecutar tarea por tarea
+1. Entregar al implementador el texto de la tarea y el contexto minimo necesario.
+2. Aplicar RED-GREEN-REFACTOR cuando cambia comportamiento y es viable probarlo.
+3. Leer el diff; no confiar solo en el resumen del implementador.
+4. Revisar cumplimiento de la spec, calidad, seguridad y pruebas.
+5. Corregir bloqueantes antes de avanzar a una tarea dependiente.
 
-Para cada tarea, en orden secuencial (NUNCA en paralelo):
+Un especialista de implementacion disponible puede encargarse de una tarea acotada. El agente
+coordinador conserva la responsabilidad de integrar y verificar el resultado.
 
-#### 3a. Despachar implementador
+### Fallback sin subagente
 
-Crear subagente con Agent tool:
+Si el entorno no ofrece especialistas, el agente principal ejecuta cada tarea directamente con
+el mismo orden, limites de archivos y revisiones. La ausencia de subagentes nunca bloquea el plan.
 
-```
-Eres un implementador enfocado. Tu unica tarea:
+## Verificar y cerrar
 
-[TEXTO COMPLETO DE LA TAREA]
+- Ejecutar las pruebas especificas y luego la suite completa relevante.
+- Ejecutar lint, build o validadores del repo cuando existan.
+- Comparar el resultado final contra todos los criterios del plan.
+- Reportar comandos, resultados, archivos cambiados y limites pendientes.
+- Usar la skill `verify` antes de afirmar que el trabajo esta listo.
 
-Reglas:
-- Sigue los pasos EXACTAMENTE
-- Primero test (RED), verifica que falla
-- Implementa lo minimo (GREEN)
-- Ejecuta TODOS los tests
-- Haz commit con el mensaje indicado
-- Si algo no esta claro, REPORTA en vez de adivinar
-
-Reporta resultado:
-- DONE: todo segun el plan
-- DONE_CON_NOTAS: funciona pero hay observaciones
-- NECESITO_CONTEXTO: falta informacion
-- BLOQUEADO: no puedo completar, [razon]
-```
-
-Consulta [model-selection.md](model-selection.md) para elegir el modelo correcto.
-
-#### 3b. Manejar resultado
-
-- **DONE**: Proceder a revision
-- **DONE_CON_NOTAS**: Leer notas, decidir si requieren accion
-- **NECESITO_CONTEXTO**: Proporcionar contexto y re-despachar
-- **BLOQUEADO**: Evaluar, reportar al usuario si no se resuelve
-
-### Paso 4: Revision de 2 etapas (despues de cada tarea)
-
-#### Etapa 1 — Spec
-
-- Cada requerimiento esta implementado?
-- Comportamiento coincide con lo especificado?
-- No se agrego nada extra? (over-building)
-- No falto nada? (under-building)
-
-**No confiar en el reporte del implementador. Leer el codigo.**
-
-#### Etapa 2 — Calidad
-
-- Tests cubren happy path y error cases
-- Sin codigo duplicado innecesario
-- Nombres descriptivos
-- Sin vulnerabilidades (injection, XSS, secrets hardcodeados)
-- Sigue patrones del proyecto
-
-Si hay problemas criticos, crear tarea de correccion ANTES de continuar.
-
-### Paso 5: Completar
-
-- Ejecutar suite de tests completa desde sesion principal
-- Ejecutar linter si existe
-- Reportar con evidencia (usa `/verify`)
-
-## Reglas de seguridad
-
-- **NUNCA** ejecutar en main/master — crear branch de feature primero
-- **NUNCA** despachar subagentes en paralelo — las tareas tienen dependencias
-- **NUNCA** saltar revisiones para "ir mas rapido"
-- **NUNCA** dejar que el subagente lea el plan completo (desperdicia tokens)
-
-Argumento recibido: $ARGUMENTS
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.

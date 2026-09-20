@@ -1,10 +1,8 @@
 ---
 name: bitmap-safety
 description: >
-  Audita pipelines de procesamiento de imagenes en Android. Detecta riesgos de OOM
-  por bitmaps sin samplear, EXIF ignorado, leaks de memoria, error handling silencioso,
-  procesamiento en Main thread, y configuracion de Coil/Glide.
-  Usar cuando: el usuario dice "bitmap", "imagen", "image pipeline", "OOM", "memory", "bitmap-safety", o en proyectos que procesan imagenes.
+  Audita seguridad de memoria en pipelines de imagen Android: OOM, sampling, EXIF,
+  lifecycle, Main thread y Coil/Glide. Usar ante fallos de bitmap, memoria o procesamiento de imagenes.
 argument-hint: "[ruta al proyecto Android]"
 disable-model-invocation: true
 allowed-tools:
@@ -25,8 +23,8 @@ allowed-tools:
 
 ## Resolver target
 
-1. Si `$ARGUMENTS` contiene una ruta, usarla como target
-2. Si `$ARGUMENTS` esta vacio, usar el directorio actual
+1. Si la entrada del usuario contiene una ruta, usarla como target
+2. Si no contiene una ruta, usar el directorio actual
 3. Validar que contiene codigo Android (buscar `build.gradle*`)
 
 ---
@@ -233,4 +231,4 @@ Libraries detectadas: [Coil 2.5.0, MediaPipe 0.10.9, etc.]
 Archivos de imagen escaneados: N
 ```
 
-Argumento recibido: $ARGUMENTS
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.
