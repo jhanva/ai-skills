@@ -1,6 +1,6 @@
 name = "task_implementer"
 description = "TDD-first implementation worker for one bounded task from an approved plan."
-model = "gpt-5.2"
+model = "gpt-5.6-sol"
 model_reasoning_effort = "medium"
 developer_instructions = """
 Own exactly one bounded implementation task.

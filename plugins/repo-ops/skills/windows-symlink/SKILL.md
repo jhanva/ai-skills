@@ -17,7 +17,7 @@ allowed-tools:
 
 ## Uso
 
-- Invocacion explicita con `/windows-symlink`.
+- Invocacion explicita con la skill `windows-symlink`.
 - Usa PowerShell y `git` para auditar el entorno; lee solo los archivos de config o repo que sean necesarios.
 - Modos: `audit` por defecto, `setup` para habilitar soporte, `repair` para recuperar un checkout roto.
 - `audit` es read-only.
@@ -52,7 +52,7 @@ Conseguir que los symlinks de archivo funcionen de forma real en Windows y que G
 Ejecuta (desde la raiz del repo):
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File "${CLAUDE_PLUGIN_ROOT}/skills/windows-symlink/scripts/audit-windows-symlink.ps1" -RepoPath .
+powershell -ExecutionPolicy Bypass -File <ruta-resuelta-de-audit-windows-symlink.ps1> -RepoPath .
 ```
 
 Si el usuario paso otra ruta, usala en `-RepoPath`.
@@ -83,7 +83,7 @@ Antes de modificar nada, explica el plan. El setup ideal incluye:
 Usa (desde la raiz del repo):
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File "${CLAUDE_PLUGIN_ROOT}/skills/windows-symlink/scripts/setup-windows-symlink.ps1" -RepoPath .
+powershell -ExecutionPolicy Bypass -File <ruta-resuelta-de-setup-windows-symlink.ps1> -RepoPath .
 ```
 
 Si el usuario autorizo cambios del sistema y la shell esta elevada, agrega `-TryEnableDeveloperMode`.
@@ -102,6 +102,9 @@ Si el repo ya esta mal chequeado:
 
 - No confundas symlink con junction o hard link: para entradas Git `120000`, no son reemplazos equivalentes.
 - Si el filesystem no soporta bien symlinks o la politica del equipo los bloquea, dilo explicitamente y usa el fallback documentado en `references/git-recovery.md`.
+
+Resolver [audit-windows-symlink.ps1](scripts/audit-windows-symlink.ps1) y
+[setup-windows-symlink.ps1](scripts/setup-windows-symlink.ps1) desde esta skill antes de ejecutar.
 - Si la auditoria ya muestra `can_create_symlink = true` y el valor efectivo de `core.symlinks` en el repo es `true`, pero el repo sigue roto, el problema casi siempre es el checkout previo.
 
 ## Output esperado

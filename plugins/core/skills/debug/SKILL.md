@@ -83,4 +83,4 @@ Consulta [root-cause-tracing.md](root-cause-tracing.md) para tecnica detallada.
 | "Voy a reescribir el modulo" | Encuentra el bug, arregla el bug. Despues refactoriza |
 | "Es un bug del framework" | Verifica primero que no sea tu codigo |
 
-Argumento recibido: $ARGUMENTS
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.

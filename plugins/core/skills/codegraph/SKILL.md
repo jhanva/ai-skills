@@ -1,17 +1,8 @@
 ---
 name: codegraph
 description: >
-  Convierte un proyecto (codigo, SQL, docs, configs) en un knowledge graph
-  persistente y consultable. Extrae clases, funciones, imports, calls,
-  herencia y referencias con tags de confianza (EXTRACTED/INFERRED/AMBIGUOUS),
-  detecta comunidades, y responde preguntas de arquitectura desde el grafo
-  en vez de releer archivos. Outputs: graph.json, GRAPH_REPORT.md y
-  visualizacion HTML interactiva. Si codegraph-out/graph.json ya existe,
-  las preguntas sobre el codebase se responden consultando el grafo.
-  Usar cuando: el usuario dice "codegraph", "knowledge graph", "mapea el proyecto",
-  "grafo del codigo", o hace preguntas de arquitectura sobre un proyecto que
-  ya tiene codegraph-out/ (como funciona X, que llama a Y, traza el flujo
-  de Z, que depende de W).
+  Construye y consulta un grafo persistente de codigo, SQL, docs y configuracion.
+  Usar para mapear arquitectura, dependencias, flujos o proyectos que ya tienen codegraph-out.
 argument-hint: "[build|query|path|explain|label] [ruta] [pregunta]"
 allowed-tools:
   - Read
@@ -31,7 +22,7 @@ Python 3.10+, sin pip install). El grafo es persistente: se construye una
 vez y las consultas posteriores leen `codegraph-out/graph.json` en vez de
 re-escanear el proyecto.
 
-Script principal: `${CLAUDE_SKILL_DIR}/scripts/codegraph.py`
+Script principal: [codegraph.py](scripts/codegraph.py). Resolver su ruta absoluta antes de usarlo
 (en Windows usar `python`, en macOS/Linux `python3`).
 
 ## Fast path — el grafo ya existe
@@ -44,7 +35,7 @@ re-detectar archivos, no reconstruir.
 ## Build — construir el grafo
 
 ```bash
-python ${CLAUDE_SKILL_DIR}/scripts/codegraph.py build RUTA
+python <ruta-resuelta-de-codegraph.py> build RUTA
 ```
 
 - Sin ruta: usar `.` (directorio actual). No preguntar al usuario.
@@ -71,9 +62,9 @@ El build deja las comunidades sin nombre. Nombrarlas es tarea del agente:
 3. Guardar los labels y regenerar:
 
 ```bash
-# Escribir con Write el archivo codegraph-out/labels.tmp.json:
+# Escribir el archivo codegraph-out/labels.tmp.json:
 # {"0": "Nombre comunidad 0", "3": "Nombre comunidad 3", ...}
-python ${CLAUDE_SKILL_DIR}/scripts/codegraph.py label RUTA --file codegraph-out/labels.tmp.json
+python <ruta-resuelta-de-codegraph.py> label RUTA --file codegraph-out/labels.tmp.json
 ```
 
 ### Reportar al usuario
@@ -105,9 +96,9 @@ Tres comandos. Elegir segun la forma de la pregunta:
 | "Explica X" / "que es X" | `explain "X"` |
 
 ```bash
-python ${CLAUDE_SKILL_DIR}/scripts/codegraph.py query RUTA "pregunta" [--dfs] [--budget 2000]
-python ${CLAUDE_SKILL_DIR}/scripts/codegraph.py path RUTA "ConceptoA" "ConceptoB"
-python ${CLAUDE_SKILL_DIR}/scripts/codegraph.py explain RUTA "Concepto"
+python <ruta-resuelta-de-codegraph.py> query RUTA "pregunta" [--dfs] [--budget 2000]
+python <ruta-resuelta-de-codegraph.py> path RUTA "ConceptoA" "ConceptoB"
+python <ruta-resuelta-de-codegraph.py> explain RUTA "Concepto"
 ```
 
 Reglas para responder (detalles en `references/query-guide.md`):
@@ -141,4 +132,4 @@ No hacerlo por defecto.
 - Si el build reporta advertencias de salud del grafo, decirselo al
   usuario en el resumen final.
 
-## Argumento: $ARGUMENTS
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.

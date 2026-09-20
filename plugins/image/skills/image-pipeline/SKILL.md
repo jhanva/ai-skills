@@ -1,10 +1,8 @@
 ---
 name: image-pipeline
 description: >
-  Diseña pipelines de procesamiento de imagen multi-paso para Android.
-  Cubre stages, memory budget, concurrency model, progress/cancellation,
-  error strategy, y caching. Para batch processing y flujos complejos.
-  Usar cuando: se quiere construir un pipeline de imagen multi-paso (scan, load, process, store, display) o batch processing.
+  Disena pipelines de imagen multi-paso en Android: memoria, concurrencia, progreso, errores y cache.
+  Usar para batch processing o flujos scan-load-process-store-display.
 argument-hint: "[descripcion del pipeline]"
 disable-model-invocation: true
 allowed-tools:
@@ -22,7 +20,7 @@ allowed-tools:
 
 Disenar un pipeline de procesamiento de imagen multi-paso con arquitectura correcta:
 stages bien definidos, memory budget, concurrency, progress, cancellation, errores,
-y caching. El output es una spec de arquitectura lista para `/plan`.
+y caching. El output es una spec de arquitectura lista para la skill `plan`.
 
 ---
 
@@ -340,6 +338,6 @@ Producir documento con:
    - Que vive en presentation (ViewModel, progress UI)
 8. **Performance targets:** tiempo total para N items, memoria max
 
-Transicion: "Usa `/plan` para convertir este diseño en tareas de implementacion."
+Transicion: "Usa la skill `plan` para convertir este diseno en tareas de implementacion."
 
-Argumento recibido: $ARGUMENTS
+Entrada: interpreta el resto del prompt del usuario como argumento de la skill.

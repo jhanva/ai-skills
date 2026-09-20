@@ -1,7 +1,7 @@
 {
   "name": "design",
   "description": "Sistema de diseno con modos por superficie, auditoria de UI, tokens de codigo y detector determinista con hook para Jetpack Compose y web",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": {
     "name": "jhanva"
   },
