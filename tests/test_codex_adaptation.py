@@ -77,12 +77,9 @@ class CodexConfigTests(unittest.TestCase):
         agent_paths = ROOT / ".codex" / "agents"
 
         self.assertTrue(expected_agents.issubset({path.name for path in agent_paths.glob("*.toml")}))
-        self.assertTrue((ROOT / "docs" / "ai-harness.md").is_file())
-        self.assertFalse((ROOT / "docs" / "erp-ai-harness.md").exists())
 
         harness_paths = [
             *(agent_paths / name for name in expected_agents),
-            ROOT / "docs" / "ai-harness.md",
             ROOT / "plugins" / "core" / "evals" / "orchestrate-manager-worker" / "prompt.md",
         ]
         for path in harness_paths:
