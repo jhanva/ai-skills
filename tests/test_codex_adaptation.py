@@ -66,7 +66,8 @@ class CodexConfigTests(unittest.TestCase):
         for name, model in expected.items():
             agent = tomllib.loads(read(f".codex/agents/{name}"))
             self.assertEqual(model, agent["model"], name)
-            self.assertNotIn("plugins/", agent["developer_instructions"], name)
+            if name != "prompt-artist.toml":
+                self.assertNotIn("plugins/", agent["developer_instructions"], name)
 
     def test_harness_assets_are_domain_neutral(self) -> None:
         expected_agents = {
@@ -86,6 +87,18 @@ class CodexConfigTests(unittest.TestCase):
             with self.subTest(path=path.name):
                 content = path.read_text(encoding="utf-8").lower()
                 self.assertNotRegex(content, r"\berp\b|erp_|erp-")
+
+    def test_prompt_artist_uses_one_canonical_reference_set(self) -> None:
+        agent = tomllib.loads(read(".codex/agents/prompt-artist.toml"))
+        instructions = agent["developer_instructions"]
+        reference_root = "plugins/core/references/prompt-artist"
+
+        for name in ("domains.md", "techniques.md", "platforms.md", "text-safety.md"):
+            self.assertIn(f"{reference_root}/{name}", instructions)
+            self.assertTrue((ROOT / reference_root / name).is_file())
+
+        duplicate_root = ROOT / ".codex" / "agents" / "prompt-artist"
+        self.assertFalse(any(duplicate_root.glob("*.md")))
 
     def test_hooks_are_registered_with_cross_platform_commands(self) -> None:
         hooks = json.loads(read(".codex/hooks.json"))["hooks"]
@@ -187,6 +200,14 @@ class CodexHookTests(unittest.TestCase):
         self.assertEqual("", result.stdout)
 
 class SkillRegressionTests(unittest.TestCase):
+    def test_claude_project_context_stays_small_and_defers_to_canonical_docs(self) -> None:
+        claude = read("CLAUDE.md")
+
+        self.assertLessEqual(len(claude.splitlines()), 30)
+        self.assertTrue(claude.startswith("@AGENTS.md"))
+        self.assertIn("README.md", claude)
+        self.assertNotIn("## Skills disponibles", claude)
+
     def test_secure_scanner_is_native_and_has_fixed_classification(self) -> None:
         self.assertTrue(SECRET_SCANNER.is_file())
         scanner = SECRET_SCANNER.read_text(encoding="utf-8")

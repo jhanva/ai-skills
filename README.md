@@ -420,14 +420,13 @@ plugins/
     agents/ui-reviewer.md           auditor de UI de solo lectura
   android/  image/  repo-ops/       misma estructura, sin agentes ni hooks
 .codex/
-  agents/*.toml                     agentes custom de Codex (+ playbooks en subcarpetas)
+  agents/*.toml                     agentes custom de Codex
   config.toml                       settings de subagentes
   hooks.json                        registro de hooks nativos
   hooks/codex_hooks.py              handlers multiplataforma
 .claude/settings.json               dogfooding: este repo instala sus propios plugins
 tests/                              validacion de manifests, layout de skills, hooks y scanner
 docs/architecture.md                fuente unica, desarrollo vivo y presupuesto de contexto
-docs/codex-adaptation.md            contrato portable y adaptadores Codex
 docs/model-selection.md             criterio y pins de agentes Codex
 docs/repo-workflow.md               gitflow, versiones y checklist de PR
 AGENTS.md                           reglas concisas de trabajo del repo
