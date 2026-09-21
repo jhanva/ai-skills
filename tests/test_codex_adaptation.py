@@ -54,9 +54,9 @@ class CodexConfigTests(unittest.TestCase):
 
     def test_custom_agents_use_supported_role_pins_without_repo_dependencies(self) -> None:
         expected = {
-            "erp-explorer.toml": "gpt-5.6-luna",
-            "erp-implementer.toml": "gpt-5.6-terra",
-            "erp-reviewer.toml": "gpt-5.6-terra",
+            "harness-explorer.toml": "gpt-5.6-luna",
+            "harness-implementer.toml": "gpt-5.6-terra",
+            "harness-reviewer.toml": "gpt-5.6-terra",
             "prompt-artist.toml": "gpt-6-astra",
             "reviewer.toml": "gpt-6-astra",
             "security-auditor.toml": "gpt-6-astra",
@@ -67,6 +67,28 @@ class CodexConfigTests(unittest.TestCase):
             agent = tomllib.loads(read(f".codex/agents/{name}"))
             self.assertEqual(model, agent["model"], name)
             self.assertNotIn("plugins/", agent["developer_instructions"], name)
+
+    def test_harness_assets_are_domain_neutral(self) -> None:
+        expected_agents = {
+            "harness-explorer.toml",
+            "harness-implementer.toml",
+            "harness-reviewer.toml",
+        }
+        agent_paths = ROOT / ".codex" / "agents"
+
+        self.assertTrue(expected_agents.issubset({path.name for path in agent_paths.glob("*.toml")}))
+        self.assertTrue((ROOT / "docs" / "ai-harness.md").is_file())
+        self.assertFalse((ROOT / "docs" / "erp-ai-harness.md").exists())
+
+        harness_paths = [
+            *(agent_paths / name for name in expected_agents),
+            ROOT / "docs" / "ai-harness.md",
+            ROOT / "plugins" / "core" / "evals" / "orchestrate-manager-worker" / "prompt.md",
+        ]
+        for path in harness_paths:
+            with self.subTest(path=path.name):
+                content = path.read_text(encoding="utf-8").lower()
+                self.assertNotRegex(content, r"\berp\b|erp_|erp-")
 
     def test_hooks_are_registered_with_cross_platform_commands(self) -> None:
         hooks = json.loads(read(".codex/hooks.json"))["hooks"]
@@ -119,7 +141,7 @@ class CodexHookTests(unittest.TestCase):
         result = run_hook(
             "subagent-stop",
             {
-                "agent_type": "erp_implementer",
+                "agent_type": "harness_implementer",
                 "last_assistant_message": "Termine la implementacion.",
             },
         )
@@ -133,7 +155,7 @@ class CodexHookTests(unittest.TestCase):
         result = run_hook(
             "subagent-stop",
             {
-                "agent_type": "erp_implementer",
+                "agent_type": "harness_implementer",
                 "cwd": str(ROOT),
                 "last_assistant_message": 'RESULT_ENVELOPE: {"status":"passed"}',
             },
@@ -158,7 +180,7 @@ class CodexHookTests(unittest.TestCase):
         result = run_hook(
             "subagent-stop",
             {
-                "agent_type": "erp_implementer",
+                "agent_type": "harness_implementer",
                 "cwd": str(ROOT / "tests"),
                 "last_assistant_message": "RESULT_ENVELOPE: " + json.dumps(envelope),
             },

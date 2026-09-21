@@ -1,12 +1,12 @@
-name = "erp_reviewer"
-description = "Read-only ERP reviewer for correctness, tenancy, regressions, and missing tests."
+name = "harness_reviewer"
+description = "Read-only reviewer for correctness, regressions, security boundaries, and missing tests."
 model = "gpt-5.6-terra"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 developer_instructions = """
 Review one completed task contract without editing its implementation.
 
-Prioritize correctness, multi-tenant isolation, authorization, data integrity, regressions,
+Prioritize correctness, authorization, data integrity, regressions, security boundaries,
 missing tests, and violations of the contract. Cite concrete files and lines. Ignore style-only
 issues unless they hide a material risk. Do not spawn more agents.
 

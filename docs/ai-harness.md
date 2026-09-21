@@ -1,15 +1,14 @@
-# AI harness para desarrollo de un ERP con Codex
+# AI harness para desarrollo de software con Codex
 
-Estado: implementacion inicial en `feature/erp-ai-harness`
+Estado: implementacion inicial
 
 Fecha: 2026-09-20
 
 ## 1. Problema y contexto
 
-Se quiere desarrollar un ERP modular, multiempresa y escalable con Next.js, TypeScript,
-PostgreSQL y Supabase. Codex sera la interfaz principal de desarrollo. El objetivo del harness
-es conservar un modelo de alta capacidad como coordinador y delegar trabajo acotado a modelos
-mas economicos sin perder control arquitectonico, trazabilidad ni seguridad.
+Se quiere desarrollar software modular y escalable con Codex como interfaz principal. El objetivo
+del harness es conservar un modelo de alta capacidad como coordinador y delegar trabajo acotado
+a modelos mas economicos sin perder control arquitectonico, trazabilidad ni seguridad.
 
 El sistema no intentara garantizar que un modelo siempre resuelva una tarea. Su garantia sera
 mas precisa: ningun resultado se acepta silenciosamente si no satisface contratos y
@@ -32,7 +31,7 @@ La implementacion sera nativa primero:
    capacidades nativas son insuficientes.
 
 Esta decision favorece una topologia centralizada porque contiene mejor la propagacion de
-errores que una red de agentes independientes y porque el desarrollo de un ERP contiene muchas
+errores que una red de agentes independientes y porque el desarrollo de software contiene muchas
 decisiones secuenciales y acopladas.
 
 ## 3. Objetivos
@@ -68,7 +67,7 @@ decisiones secuenciales y acopladas.
 7. El costo se mide por resultado aceptado, no por llamada ni por precio nominal del modelo.
 8. Un fallo debe terminar en rechazo, reintento limitado o escalamiento; nunca en exito aparente.
 9. Contexto durable vive en archivos versionados, no solo en la memoria de un chat.
-10. Seguridad, contabilidad y aislamiento multiempresa siempre tienen gates reforzados.
+10. Seguridad, datos sensibles y cambios irreversibles siempre tienen gates reforzados.
 
 ## 6. Vista de arquitectura
 
@@ -255,7 +254,7 @@ El repositorio es la memoria compartida. Debe contener:
 - `AGENTS.md`: reglas breves, comandos, restricciones y definicion de terminado.
 - Specs: comportamiento esperado de cada iniciativa.
 - ADR: decisiones arquitectonicas, alternativas y consecuencias.
-- Documentacion de dominio: invariantes y vocabulario del ERP.
+- Documentacion de dominio: invariantes y vocabulario del producto.
 - Skills: procedimientos repetibles de planificacion, TDD, depuracion, revision y verificacion.
 - Codigo y pruebas: fuente de verdad ejecutable.
 
@@ -266,7 +265,7 @@ Reglas de presupuesto de contexto:
 - resumir resultados de worker en el sobre, no copiar su transcript
 - cargar referencias de una skill bajo demanda
 - abrir un chat nuevo por epica o cambio importante
-- evitar usar un unico chat para toda la vida del ERP
+- evitar usar un unico chat para toda la vida del producto
 
 ### 7.7 Hooks
 
@@ -292,7 +291,7 @@ Las skills contienen procedimientos, no politicas duras. El conjunto inicial rec
 - `debug`: investigar causa raiz antes de corregir.
 - `verify`: exigir evidencia fresca antes de declarar exito.
 - `delegate-task`: construir el contrato y seleccionar el perfil de worker.
-- `review-erp-change`: aplicar gates especificos de seguridad y dominio.
+- `review-high-risk-change`: aplicar gates especificos de seguridad y dominio.
 
 Las dos ultimas solo se crean despues de validar manualmente el flujo que encapsularan.
 
@@ -410,16 +409,16 @@ delegated | validating | review
 Solo `integrated` significa terminado. `accepted` significa que el resultado local es apto para
 pasar a integracion, no que ya esta en la rama protegida.
 
-## 10. Gates por riesgo del ERP
+## 10. Gates por riesgo del cambio
 
 | Dominio | Modelo minimo | Validacion adicional | Aprobacion humana |
 |---|---|---|---|
 | Docs, fixtures, UI menor | Luna o Terra | lint y pruebas afectadas | opcional |
-| CRUD interno reversible | Terra | unit, integration, tenant isolation | segun impacto |
+| Cambio interno reversible | Terra | unit e integration | segun impacto |
 | Contratos entre modulos | Sol | contract tests y revision independiente | recomendada |
-| RLS, auth y permisos | Sol | pruebas negativas y security review | obligatoria |
+| Auth, permisos y datos sensibles | Sol | pruebas negativas y security review | obligatoria |
 | Migraciones destructivas | Sol | restore rehearsal y backup plan | obligatoria |
-| Pagos, impuestos y contabilidad | Sol | invariantes de dominio y conciliacion | obligatoria |
+| Reglas criticas de negocio | Sol | invariantes de dominio y pruebas de reconciliacion | obligatoria |
 | Produccion e infraestructura | Sol | plan de rollback y entorno controlado | obligatoria |
 
 ## 11. Estrategia de pruebas del harness
@@ -439,7 +438,7 @@ pasar a integracion, no que ya esta en la rama protegida.
 Crear un corpus versionado de tareas representativas:
 
 - exploracion de repositorio
-- CRUD multiempresa de bajo riesgo
+- cambio modular de bajo riesgo
 - cambio de contrato entre modulos
 - politica RLS defectuosa
 - migracion compatible y migracion destructiva
@@ -599,7 +598,7 @@ del modelo fuerte en tareas mecanicas.
 ### Subagentes nativos sin contratos
 
 Reduce configuracion inicial, pero dificulta medir costo, detectar ampliaciones de alcance y
-comparar calidad. No ofrece suficiente disciplina para un ERP.
+comparar calidad. No ofrece suficiente disciplina para un proyecto de software sostenido.
 
 ### Orquestador propio desde el inicio
 
@@ -635,7 +634,7 @@ Investigacion y sistemas de referencia:
 - SWE-agent: https://github.com/SWE-agent/SWE-agent
 
 Estas referencias muestran patrones y tradeoffs, no prueban que una topologia sea optima para
-este ERP. La decision final se validara con las metricas y evals definidos en esta spec.
+este proyecto. La decision final se validara con las metricas y evals definidos en esta spec.
 
 ## 20. Estado de implementacion
 
@@ -645,18 +644,18 @@ Implementado en esta primera version:
 - router determinista por seis dimensiones de riesgo
 - validacion de contratos y sobres de resultado mediante JSON
 - rechazo de rutas absolutas, traversal y archivos fuera de alcance
-- perfiles Codex `erp_explorer`, `erp_implementer` y `erp_reviewer`
+- perfiles Codex `harness_explorer`, `harness_implementer` y `harness_reviewer`
 - pins Luna/Terra y esfuerzo por rol
 - hook `SubagentStop` con validacion de `RESULT_ENVELOPE`
 - comandos multiplataforma para el hook
 - eval de activacion manager-worker
 - pruebas unitarias integradas en la suite del repositorio
 
-Pendiente de validar con un ERP real:
+Pendiente de validar con proyectos reales:
 
 - calibracion del router con al menos 30 tareas representativas
 - linea base comparativa Sol-only
-- gates de dominio para RLS, contabilidad, pagos y migraciones
+- gates de dominio para autorizacion, datos sensibles y migraciones
 - politicas de branch protection del repositorio consumidor
 - automatizacion selectiva con `codex exec`
 

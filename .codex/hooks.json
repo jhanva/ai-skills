@@ -31,7 +31,7 @@
     ],
     "SubagentStop": [
       {
-        "matcher": "^(erp_explorer|erp_implementer|erp_reviewer)$",
+        "matcher": "^(harness_explorer|harness_implementer|harness_reviewer)$",
         "hooks": [
           {
             "type": "command",

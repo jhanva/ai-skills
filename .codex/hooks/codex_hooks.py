@@ -154,7 +154,7 @@ def session_context(payload: dict[str, Any]) -> None:
 
 
 UI_EXTENSIONS = {".kt", ".tsx", ".jsx", ".vue", ".svelte", ".astro", ".html", ".css", ".scss"}
-HARNESS_AGENT_TYPES = {"erp_explorer", "erp_implementer", "erp_reviewer"}
+HARNESS_AGENT_TYPES = {"harness_explorer", "harness_implementer", "harness_reviewer"}
 HARNESS_SCRIPT = Path("plugins/core/skills/orchestrate/scripts/harness.py")
 
 

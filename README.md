@@ -289,9 +289,9 @@ Los nombres de las tablas son los cortos; con el plugin instalado se invocan com
 | [`security_auditor`](./.codex/agents/security-auditor.toml) | Codex | Equivalente de `security-auditor`; backend de `$secure` |
 | [`ui_reviewer`](./.codex/agents/ui-reviewer.toml) | Codex | Equivalente de `ui-reviewer`; backend de `$ui-review` |
 | [`task_implementer`](./.codex/agents/task-implementer.toml) | Codex | Especialista opcional para una tarea acotada; `execute` tambien funciona sin el |
-| [`erp_explorer`](./.codex/agents/erp-explorer.toml) | Codex | Explorer Luna de solo lectura para contratos de bajo riesgo |
-| [`erp_implementer`](./.codex/agents/erp-implementer.toml) | Codex | Worker Terra para una implementacion acotada y verificable |
-| [`erp_reviewer`](./.codex/agents/erp-reviewer.toml) | Codex | Reviewer Terra de solo lectura para correccion, tenancy y regresiones |
+| [`harness_explorer`](./.codex/agents/harness-explorer.toml) | Codex | Explorer Luna de solo lectura para contratos de bajo riesgo |
+| [`harness_implementer`](./.codex/agents/harness-implementer.toml) | Codex | Worker Terra para una implementacion acotada y verificable |
+| [`harness_reviewer`](./.codex/agents/harness-reviewer.toml) | Codex | Reviewer Terra de solo lectura para correccion, seguridad y regresiones |
 
 Los agentes de Claude Code son de solo lectura por definicion (`tools` sin `Write`/`Edit`), asi que un review o una auditoria nunca modifica el codigo.
 
@@ -303,14 +303,14 @@ Los hooks corren automaticamente en eventos del runtime. El plugin `core` los tr
 |---|---|---|---|
 | SessionStart | [`session-context.sh`](./plugins/core/hooks/session-context.sh) | `session-context` | Muestra branch, ultimos commits y archivos sin commit al iniciar |
 | PreToolUse | [`block-env-access.sh`](./plugins/core/hooks/block-env-access.sh) | `pre-tool-policy` | Bloquea leer, escribir, redirigir, `source`, `cp`/`mv` sobre `.env*`. Permite `.env.example`, `.env.sample`, `.env.template`. En Codex ademas bloquea comandos destructivos de git |
-| SubagentStop | No aplica | `subagent-stop` | Exige `RESULT_ENVELOPE` JSON valido a los perfiles `erp_*` antes de permitir que terminen |
+| SubagentStop | No aplica | `subagent-stop` | Exige `RESULT_ENVELOPE` JSON valido a los perfiles `harness_*` antes de permitir que terminen |
 | PostToolUse | [`detect-ui.sh`](./plugins/design/hooks/detect-ui.sh) (plugin `design`) | `ui-detect` | Tras `Edit`/`Write` (o `apply_patch`) sobre `.kt`, `.tsx`, `.vue`, `.html`, `.css`..., corre [`detect.py`](./plugins/design/scripts/detect.py): 24 reglas deterministas (color literal, `contentDescription = null`, `outline: none` sin `:focus-visible`, `<img>` sin `alt`, eyebrows de mas, easing con rebote...) y devuelve los hallazgos como contexto adicional. Nunca bloquea; se suprime en linea con `design-detect: ignore <regla>` |
 
 Los hooks de Claude Code se registran en el `hooks/hooks.json` de cada plugin ([`core`](./plugins/core/hooks/hooks.json), [`design`](./plugins/design/hooks/hooks.json)) y se suman a los que el proyecto ya tenga en su `settings.json`. Los de Codex se registran en [`.codex/hooks.json`](./.codex/hooks.json) con `command` y `commandWindows` separados para no asumir un binario fijo de Python.
 
 ### Harness manager-worker
 
-La skill `orchestrate` define contratos portables y los perfiles `erp_*` aplican el routing de
+La skill `orchestrate` define contratos portables y los perfiles `harness_*` aplican el routing de
 Codex. El manager puede validar un contrato, obtener la ruta y comprobar el resultado con:
 
 ```bash
@@ -319,7 +319,7 @@ python plugins/core/skills/orchestrate/scripts/harness.py route <task.json>
 python plugins/core/skills/orchestrate/scripts/harness.py validate-result <task.json> <result.json>
 ```
 
-El router devuelve `explorer`, `implementer` u `orchestrator`. Los workers `erp_*` deben terminar
+El router devuelve `explorer`, `implementer` u `orchestrator`. Los workers `harness_*` deben terminar
 con `RESULT_ENVELOPE:` y JSON valido; `SubagentStop` pide otra pasada si el sobre falta o es
 invalido. El hook valida solo la estructura del sobre; el manager ejecuta `validate-result` para
 comprobar el alcance contra el contrato. El diff, las pruebas y la aceptacion final siguen bajo

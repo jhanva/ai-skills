@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Actualiza los agentes generales de Codex y conserva los tiers del harness ERP.
+# Actualiza los agentes generales de Codex y conserva los tiers del harness.
 #
 # Uso:
 #   scripts/bump-codex-model.sh <default-model> [implementer-model]
@@ -15,7 +15,7 @@
 #   - .codex/agents/ui-reviewer.toml
 #   - .codex/agents/task-implementer.toml  (usa implementer-model si se pasa)
 #
-# Los perfiles erp-explorer, erp-implementer y erp-reviewer se actualizan
+# Los perfiles harness-explorer, harness-implementer y harness-reviewer se actualizan
 # separadamente despues de ejecutar sus evals de routing, calidad y costo.
 
 set -euo pipefail

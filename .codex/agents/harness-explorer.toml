@@ -1,5 +1,5 @@
-name = "erp_explorer"
-description = "Low-cost read-only explorer for bounded ERP codebase and dependency mapping tasks."
+name = "harness_explorer"
+description = "Low-cost read-only explorer for bounded codebase and dependency mapping tasks."
 model = "gpt-5.6-luna"
 model_reasoning_effort = "medium"
 sandbox_mode = "read-only"
