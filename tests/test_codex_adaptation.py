@@ -31,7 +31,17 @@ class CodexConfigTests(unittest.TestCase):
     def test_project_config_contains_only_real_agent_settings(self) -> None:
         config = tomllib.loads(read(".codex/config.toml"))
 
-        self.assertEqual({"max_threads", "max_depth"}, set(config["agents"]))
+        self.assertEqual(
+            {
+                "enabled",
+                "max_concurrent_threads_per_session",
+                "default_subagent_model",
+                "default_subagent_reasoning_effort",
+                "interrupt_message",
+            },
+            set(config["agents"]),
+        )
+        self.assertEqual("gpt-5.6-terra", config["agents"]["default_subagent_model"])
         self.assertTrue(config["features"]["hooks"])
 
     def test_custom_agents_have_required_codex_fields(self) -> None:
@@ -44,6 +54,9 @@ class CodexConfigTests(unittest.TestCase):
 
     def test_custom_agents_use_supported_role_pins_without_repo_dependencies(self) -> None:
         expected = {
+            "erp-explorer.toml": "gpt-5.6-luna",
+            "erp-implementer.toml": "gpt-5.6-terra",
+            "erp-reviewer.toml": "gpt-5.6-terra",
             "prompt-artist.toml": "gpt-6-astra",
             "reviewer.toml": "gpt-6-astra",
             "security-auditor.toml": "gpt-6-astra",
@@ -60,6 +73,7 @@ class CodexConfigTests(unittest.TestCase):
 
         self.assertIn("SessionStart", hooks)
         self.assertIn("PreToolUse", hooks)
+        self.assertIn("SubagentStop", hooks)
         handlers = [
             handler
             for groups in hooks.values()
@@ -100,6 +114,58 @@ class CodexHookTests(unittest.TestCase):
         )
 
         self.assertEqual("deny", json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"])
+
+    def test_subagent_stop_requires_result_envelope_for_harness_agents(self) -> None:
+        result = run_hook(
+            "subagent-stop",
+            {
+                "agent_type": "erp_implementer",
+                "last_assistant_message": "Termine la implementacion.",
+            },
+        )
+
+        self.assertEqual(0, result.returncode, result.stderr)
+        response = json.loads(result.stdout)
+        self.assertEqual("block", response["decision"])
+        self.assertIn("RESULT_ENVELOPE", response["reason"])
+
+    def test_subagent_stop_rejects_invalid_result_envelope(self) -> None:
+        result = run_hook(
+            "subagent-stop",
+            {
+                "agent_type": "erp_implementer",
+                "cwd": str(ROOT),
+                "last_assistant_message": 'RESULT_ENVELOPE: {"status":"passed"}',
+            },
+        )
+
+        self.assertEqual(0, result.returncode, result.stderr)
+        response = json.loads(result.stdout)
+        self.assertEqual("block", response["decision"])
+        self.assertIn("task_id", response["reason"])
+
+    def test_subagent_stop_accepts_valid_result_envelope(self) -> None:
+        envelope = {
+            "task_id": "billing-create-invoice",
+            "status": "passed",
+            "summary": "Implementado y verificado.",
+            "changed_files": ["src/billing/create-invoice.ts"],
+            "checks": [{"command": "pnpm test --filter billing", "result": "passed"}],
+            "assumptions": [],
+            "risks": [],
+            "out_of_scope": [],
+        }
+        result = run_hook(
+            "subagent-stop",
+            {
+                "agent_type": "erp_implementer",
+                "cwd": str(ROOT / "tests"),
+                "last_assistant_message": "RESULT_ENVELOPE: " + json.dumps(envelope),
+            },
+        )
+
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual("", result.stdout)
 
 class SkillRegressionTests(unittest.TestCase):
     def test_secure_scanner_is_native_and_has_fixed_classification(self) -> None:

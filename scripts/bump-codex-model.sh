@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Actualiza el pin de modelo de Codex en todos los agentes a la vez.
+# Actualiza los agentes generales de Codex y conserva los tiers del harness ERP.
 #
 # Uso:
 #   scripts/bump-codex-model.sh <default-model> [implementer-model]
@@ -14,6 +14,9 @@
 #   - .codex/agents/security-auditor.toml
 #   - .codex/agents/ui-reviewer.toml
 #   - .codex/agents/task-implementer.toml  (usa implementer-model si se pasa)
+#
+# Los perfiles erp-explorer, erp-implementer y erp-reviewer se actualizan
+# separadamente despues de ejecutar sus evals de routing, calidad y costo.
 
 set -euo pipefail
 

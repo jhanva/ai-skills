@@ -2,12 +2,16 @@
 #
 # NOTE: Codex TOML agent files (.codex/agents/*.toml) do not support variable
 # interpolation. Each agent pins its own `model = "..."`. When bumping to a
-# new Codex model, update the pins in all files listed under `pinned_in`
-# atomically, or use the helper script: `scripts/bump-codex-model.sh`.
+# new Codex model, update the generic agent pins with
+# `scripts/bump-codex-model.sh`. Update the `erp-*` tiers separately after
+# evaluating cost, risk and task quality for each role.
 
 [agents]
-max_threads = 6
-max_depth = 1
+enabled = true
+max_concurrent_threads_per_session = 3
+default_subagent_model = "gpt-5.6-terra"
+default_subagent_reasoning_effort = "medium"
+interrupt_message = true
 
 [features]
 hooks = true

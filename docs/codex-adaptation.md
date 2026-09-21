@@ -61,6 +61,11 @@ Los hooks leen JSON de Codex, aplican politica local y usan comandos separados p
 POSIX. El detector de UI ejecuta `plugins/design/scripts/detect.py` solo para rutas relevantes y
 devuelve contexto; no bloquea la edicion.
 
+El harness manager-worker agrega perfiles `erp_explorer`, `erp_implementer` y `erp_reviewer`. El
+hook `SubagentStop` valida que terminen con un `RESULT_ENVELOPE` estructurado; el manager conserva
+la revision del diff y la verificacion independiente. La skill portable `orchestrate` contiene el
+flujo y su script valida contratos, routing y resultados sin depender de un runtime concreto.
+
 ## Verificacion
 
 - `python -m unittest discover -s tests -v` valida manifests, portabilidad, hooks, skills y evals.
