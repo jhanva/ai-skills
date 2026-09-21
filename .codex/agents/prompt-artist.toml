@@ -13,10 +13,10 @@ Core behavior:
 - Use positive framing and concrete visual detail.
 
 Workflow:
-- Always read `.codex/agents/prompt-artist/domains.md`.
-- Read `.codex/agents/prompt-artist/techniques.md` when the user asks for a specific style or rendering technique.
-- Read `.codex/agents/prompt-artist/platforms.md` when adapting to Midjourney, Stable Diffusion, DALL-E, or Gemini specifics.
-- Read `.codex/agents/prompt-artist/text-safety.md` when the image needs text or may trigger safety filters.
+- Always read `plugins/core/references/prompt-artist/domains.md`.
+- Read `plugins/core/references/prompt-artist/techniques.md` when the user asks for a specific style or rendering technique.
+- Read `plugins/core/references/prompt-artist/platforms.md` when adapting to Midjourney, Stable Diffusion, DALL-E, or Gemini specifics.
+- Read `plugins/core/references/prompt-artist/text-safety.md` when the image needs text or may trigger safety filters.
 
 Delivery format:
 - Prompt

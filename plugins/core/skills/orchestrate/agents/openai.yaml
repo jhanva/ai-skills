@@ -1,0 +1,7 @@
+interface:
+  display_name: "Orchestrate"
+  short_description: "Coordina manager y workers por riesgo"
+  default_prompt: "Usa $orchestrate para delegar tareas acotadas con contratos y verificacion."
+
+policy:
+  allow_implicit_invocation: true

@@ -7,6 +7,7 @@ los hooks de Claude sin depender de bash, jq ni campos que Codex no emite.
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import re
 import subprocess
@@ -153,6 +154,8 @@ def session_context(payload: dict[str, Any]) -> None:
 
 
 UI_EXTENSIONS = {".kt", ".tsx", ".jsx", ".vue", ".svelte", ".astro", ".html", ".css", ".scss"}
+HARNESS_AGENT_TYPES = {"harness_explorer", "harness_implementer", "harness_reviewer"}
+HARNESS_SCRIPT = Path("plugins/core/skills/orchestrate/scripts/harness.py")
 
 
 def edited_paths(payload: dict[str, Any]) -> list[str]:
@@ -191,9 +194,51 @@ def ui_detect(payload: dict[str, Any]) -> None:
         )
 
 
+def subagent_stop(payload: dict[str, Any]) -> None:
+    """Exige un sobre de resultado a los perfiles del harness."""
+    if payload.get("agent_type") not in HARNESS_AGENT_TYPES:
+        return
+    message = payload.get("last_assistant_message")
+    if not isinstance(message, str) or "RESULT_ENVELOPE:" not in message:
+        emit(
+            {
+                "decision": "block",
+                "reason": (
+                    "Return one final line beginning with RESULT_ENVELOPE: followed by the "
+                    "required JSON result object."
+                ),
+            }
+        )
+        return
+    raw_result = message.rsplit("RESULT_ENVELOPE:", 1)[1].strip()
+    try:
+        result = json.loads(raw_result)
+        if not isinstance(result, dict):
+            raise ValueError("result must be a JSON object")
+        cwd = Path(str(payload.get("cwd") or ".")).resolve()
+        root = run_git(cwd, "rev-parse", "--show-toplevel")
+        harness_path = (Path(root) if root else cwd) / HARNESS_SCRIPT
+        spec = importlib.util.spec_from_file_location("orchestrate_harness", harness_path)
+        if spec is None or spec.loader is None:
+            raise ValueError("harness validator is unavailable")
+        harness = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(harness)
+        errors = harness.validate_result_envelope(result)
+    except (json.JSONDecodeError, OSError, ValueError) as exc:
+        errors = [str(exc)]
+    if errors:
+        emit(
+            {
+                "decision": "block",
+                "reason": "Invalid RESULT_ENVELOPE: " + "; ".join(errors),
+            }
+        )
+
+
 ACTIONS = {
     "pre-tool-policy": pre_tool_policy,
     "session-context": session_context,
+    "subagent-stop": subagent_stop,
     "ui-detect": ui_detect,
 }
 

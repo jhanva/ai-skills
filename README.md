@@ -237,6 +237,7 @@ Los nombres de las tablas son los cortos; con el plugin instalado se invocan com
 | [`debug`](./plugins/core/skills/debug/SKILL.md) | Contextual + explicita | Debugging en 4 fases con rastreo de causa raiz; regla de los 3 intentos |
 | [`verify`](./plugins/core/skills/verify/SKILL.md) | Contextual + explicita | Ninguna afirmacion de exito sin ejecutar la verificacion y leer el output |
 | [`execute`](./plugins/core/skills/execute/SKILL.md) | Explicita | Ejecuta un plan por dependencias, con especialistas opcionales, fallback local y revision de spec/calidad |
+| [`orchestrate`](./plugins/core/skills/orchestrate/SKILL.md) | Contextual + explicita | Coordina manager y workers con routing por riesgo, contratos acotados, resultados estructurados y escalamiento limitado |
 | [`review`](./plugins/core/skills/review/SKILL.md) | Explicita | Code review con severidades (critico / importante / menor) y manejo de feedback sin sycophancy |
 | [`parallel`](./plugins/core/skills/parallel/SKILL.md) | Explicita | Despacha agentes en paralelo para problemas independientes entre si |
 | [`secure`](./plugins/core/skills/secure/SKILL.md) | Explicita | Analisis de seguridad: secrets, injection, auth, crypto, infra. Modo `quick` (solo diff) o `full` (proyecto). Incluye `scan-secrets.py` sin dependencias |
@@ -288,6 +289,9 @@ Los nombres de las tablas son los cortos; con el plugin instalado se invocan com
 | [`security_auditor`](./.codex/agents/security-auditor.toml) | Codex | Equivalente de `security-auditor`; backend de `$secure` |
 | [`ui_reviewer`](./.codex/agents/ui-reviewer.toml) | Codex | Equivalente de `ui-reviewer`; backend de `$ui-review` |
 | [`task_implementer`](./.codex/agents/task-implementer.toml) | Codex | Especialista opcional para una tarea acotada; `execute` tambien funciona sin el |
+| [`harness_explorer`](./.codex/agents/harness-explorer.toml) | Codex | Explorer Luna de solo lectura para contratos de bajo riesgo |
+| [`harness_implementer`](./.codex/agents/harness-implementer.toml) | Codex | Worker Terra para una implementacion acotada y verificable |
+| [`harness_reviewer`](./.codex/agents/harness-reviewer.toml) | Codex | Reviewer Terra de solo lectura para correccion, seguridad y regresiones |
 
 Los agentes de Claude Code son de solo lectura por definicion (`tools` sin `Write`/`Edit`), asi que un review o una auditoria nunca modifica el codigo.
 
@@ -299,9 +303,27 @@ Los hooks corren automaticamente en eventos del runtime. El plugin `core` los tr
 |---|---|---|---|
 | SessionStart | [`session-context.sh`](./plugins/core/hooks/session-context.sh) | `session-context` | Muestra branch, ultimos commits y archivos sin commit al iniciar |
 | PreToolUse | [`block-env-access.sh`](./plugins/core/hooks/block-env-access.sh) | `pre-tool-policy` | Bloquea leer, escribir, redirigir, `source`, `cp`/`mv` sobre `.env*`. Permite `.env.example`, `.env.sample`, `.env.template`. En Codex ademas bloquea comandos destructivos de git |
+| SubagentStop | No aplica | `subagent-stop` | Exige `RESULT_ENVELOPE` JSON valido a los perfiles `harness_*` antes de permitir que terminen |
 | PostToolUse | [`detect-ui.sh`](./plugins/design/hooks/detect-ui.sh) (plugin `design`) | `ui-detect` | Tras `Edit`/`Write` (o `apply_patch`) sobre `.kt`, `.tsx`, `.vue`, `.html`, `.css`..., corre [`detect.py`](./plugins/design/scripts/detect.py): 24 reglas deterministas (color literal, `contentDescription = null`, `outline: none` sin `:focus-visible`, `<img>` sin `alt`, eyebrows de mas, easing con rebote...) y devuelve los hallazgos como contexto adicional. Nunca bloquea; se suprime en linea con `design-detect: ignore <regla>` |
 
 Los hooks de Claude Code se registran en el `hooks/hooks.json` de cada plugin ([`core`](./plugins/core/hooks/hooks.json), [`design`](./plugins/design/hooks/hooks.json)) y se suman a los que el proyecto ya tenga en su `settings.json`. Los de Codex se registran en [`.codex/hooks.json`](./.codex/hooks.json) con `command` y `commandWindows` separados para no asumir un binario fijo de Python.
+
+### Harness manager-worker
+
+La skill `orchestrate` define contratos portables y los perfiles `harness_*` aplican el routing de
+Codex. El manager puede validar un contrato, obtener la ruta y comprobar el resultado con:
+
+```bash
+python plugins/core/skills/orchestrate/scripts/harness.py validate-task <task.json>
+python plugins/core/skills/orchestrate/scripts/harness.py route <task.json>
+python plugins/core/skills/orchestrate/scripts/harness.py validate-result <task.json> <result.json>
+```
+
+El router devuelve `explorer`, `implementer` u `orchestrator`. Los workers `harness_*` deben terminar
+con `RESULT_ENVELOPE:` y JSON valido; `SubagentStop` pide otra pasada si el sobre falta o es
+invalido. El hook valida solo la estructura del sobre; el manager ejecuta `validate-result` para
+comprobar el alcance contra el contrato. El diff, las pruebas y la aceptacion final siguen bajo
+responsabilidad del manager.
 
 ## Flujos de trabajo
 
@@ -398,14 +420,13 @@ plugins/
     agents/ui-reviewer.md           auditor de UI de solo lectura
   android/  image/  repo-ops/       misma estructura, sin agentes ni hooks
 .codex/
-  agents/*.toml                     agentes custom de Codex (+ playbooks en subcarpetas)
+  agents/*.toml                     agentes custom de Codex
   config.toml                       settings de subagentes
   hooks.json                        registro de hooks nativos
   hooks/codex_hooks.py              handlers multiplataforma
 .claude/settings.json               dogfooding: este repo instala sus propios plugins
 tests/                              validacion de manifests, layout de skills, hooks y scanner
 docs/architecture.md                fuente unica, desarrollo vivo y presupuesto de contexto
-docs/codex-adaptation.md            contrato portable y adaptadores Codex
 docs/model-selection.md             criterio y pins de agentes Codex
 docs/repo-workflow.md               gitflow, versiones y checklist de PR
 AGENTS.md                           reglas concisas de trabajo del repo
