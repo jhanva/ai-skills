@@ -1,7 +1,7 @@
 {
   "name": "core",
-  "description": "Flujo de desarrollo disciplinado: brainstorm, plan, tdd, debug, verify, execute, review, parallel, secure, codegraph, humanize y el agente prompt-artist",
-  "version": "1.2.0",
+  "description": "Flujo de desarrollo disciplinado: brainstorm, plan, tdd, debug, verify, execute, orchestrate, review, parallel, secure, codegraph, humanize y el agente prompt-artist",
+  "version": "1.3.0",
   "author": {
     "name": "jhanva"
   },
@@ -12,6 +12,7 @@
     "debug",
     "review",
     "security",
-    "codegraph"
+    "codegraph",
+    "orchestration"
   ]
 }

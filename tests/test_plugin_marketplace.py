@@ -200,7 +200,10 @@ class EvalSuiteTests(unittest.TestCase):
                 match = re.search(r"\)\?([\w-]+)\"", fm.get("input_match", ""))
                 if match:
                     fired.add(match.group(1))
-        self.assertTrue({"tdd", "debug", "verify", "codegraph", "execute"} <= fired, fired)
+        self.assertTrue(
+            {"tdd", "debug", "verify", "codegraph", "execute", "orchestrate"} <= fired,
+            fired,
+        )
         self.assertTrue(negative)
 
     def test_eval_results_are_ignored_by_git(self) -> None:
