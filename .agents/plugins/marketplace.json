@@ -58,6 +58,17 @@
         "installation": "AVAILABLE"
       },
       "category": "Developer Tools"
+    },
+    {
+      "name": "clone",
+      "source": {
+        "source": "local",
+        "path": "./plugins/clone"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Developer Tools"
     }
   ]
 }

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Clone Recon"
+  short_description: "Desarma una app en pantallas y features"
+  default_prompt: "Usa $clone-recon para capturar las pantallas, flujos y features de una app Android o Windows instalada que quiero reconstruir."
+
+policy:
+  allow_implicit_invocation: false

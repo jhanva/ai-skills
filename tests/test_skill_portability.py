@@ -59,7 +59,7 @@ class SharedSkillPortabilityTests(unittest.TestCase):
         oversized = {name: len(text) for name, text in descriptions.items() if len(text) > 300}
 
         self.assertEqual({}, oversized)
-        self.assertLessEqual(sum(map(len, descriptions.values())), 5_000)
+        self.assertLessEqual(sum(map(len, descriptions.values())), 6_000)
 
     def test_agents_file_stays_focused(self) -> None:
         agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")

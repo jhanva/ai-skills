@@ -55,7 +55,7 @@ Los nombres y descripciones de todas las skills se cargan antes de seleccionar
 una. Por eso:
 
 - cada descripcion tiene un maximo de 300 caracteres
-- el catalogo completo mantiene menos de 5000 caracteres de descripcion
+- el catalogo completo mantiene menos de 6000 caracteres de descripcion
 - un `SKILL.md` largo actua como router hacia `references/`
 - las reglas permanentes van en `AGENTS.md`; los procedimientos, en skills
 

@@ -4,10 +4,10 @@
 
 Marketplace de plugins para desarrollo asistido por IA: skills, agentes y hooks que imponen flujos disciplinados (diseno antes de codear, TDD, debugging con causa raiz, verificacion con evidencia).
 
-**24 skills en 5 plugins. Un catalogo, dos runtimes: Claude Code y Codex.**
+**28 skills en 6 plugins. Un catalogo, dos runtimes: Claude Code y Codex.**
 
-[![Plugins](https://img.shields.io/badge/plugins-5-0ea5e9?style=for-the-badge)](#plugins)
-[![Skills](https://img.shields.io/badge/skills-24-84cc16?style=for-the-badge)](#skills)
+[![Plugins](https://img.shields.io/badge/plugins-6-0ea5e9?style=for-the-badge)](#plugins)
+[![Skills](https://img.shields.io/badge/skills-28-84cc16?style=for-the-badge)](#skills)
 [![Codex Agents](https://img.shields.io/badge/codex%20agents-5-8b5cf6?style=for-the-badge)](#agentes)
 [![Hooks](https://img.shields.io/badge/hooks-codex%20%2B%20claude-f97316?style=for-the-badge)](#hooks)
 
@@ -78,6 +78,7 @@ Cada plugin declara una `version`. Solo recibes cambios cuando esa version sube 
 | **`image`** | Features de procesamiento de imagen (hashing, similitud, pipelines) | `image-algo`, `image-pipeline` | — |
 | **`design`** | Interfaces con criterio: sistema de diseno por modo de superficie, auditoria de UI y tokens para Jetpack Compose y web | `design-system`, `ui-review`, `ui-tokens` | Agente `ui-reviewer`; catalogo CSV (estilos, paletas con contraste validado, tipografia, guias UX con criterio WCAG y de composicion, motion, reglas por stack), buscador `search.py` y detector determinista `detect.py` con hook PostToolUse, todo sin dependencias |
 | **`repo-ops`** | Operaciones de entorno y repositorio | `git-identity`, `windows-symlink`, `browser-control` | — |
+| **`clone`** | Reconstruir apps Android o Windows para uso propio | `clone-recon`, `clone-arch`, `clone-build`, `clone-diff` | Scripts sin dependencias: captura via adb y UI Automation, diff de arbol de UI y reporte de paridad |
 
 Instala `core` siempre; el resto segun el proyecto. Los plugins son independientes entre si: `android` no requiere `image`, aunque `ml-ondevice` suele encadenarse con `image-pipeline`.
 
@@ -111,6 +112,10 @@ Instala `core` siempre; el resto segun el proyecto. Los plugins son independient
 
 ```bash
 /plugin install repo-ops@ai-skills
+```
+
+```bash
+/plugin install clone@ai-skills
 ```
 
 **3. Comprobar:** `/help` muestra las skills bajo su namespace (`core:tdd`, `android:room-audit`...). Tambien puedes abrir `/plugin` para ver el estado de cada plugin y sus errores de carga, si los hubiera.
@@ -275,6 +280,15 @@ Los nombres de las tablas son los cortos; con el plugin instalado se invocan com
 | [`git-identity`](./plugins/repo-ops/skills/git-identity/SKILL.md) | Explicita | Auditoria y setup de identidades git separadas (4 capas: `includeIf`, shell guards, pre-commit, SSH). Soporta mismo host con aliases SSH |
 | [`windows-symlink`](./plugins/repo-ops/skills/windows-symlink/SKILL.md) | Explicita | Audita, habilita y repara soporte de symlinks en Windows (Developer Mode, `core.symlinks`, recuperacion de checkouts) |
 | [`browser-control`](./plugins/repo-ops/skills/browser-control/SKILL.md) | Explicita | Control del Chrome real del usuario via CDP: navegacion, screenshots, clicks, teclado, JS, tabs. Un WebSocket, sin frameworks; helpers Python autocontenidos |
+
+### `clone`
+
+| Skill | Activacion | Proposito |
+|---|---|---|
+| [`clone-recon`](./plugins/clone/skills/clone-recon/SKILL.md) | Explicita | Desarma una app Android o Windows instalada: captura screenshot y arbol de UI por pantalla y arma flujos, modelo de datos y matriz de features |
+| [`clone-arch`](./plugins/clone/skills/clone-arch/SKILL.md) | Explicita | Elige el stack con una matriz ponderada, define el esquema y el orden de construccion |
+| [`clone-build`](./plugins/clone/skills/clone-build/SKILL.md) | Explicita | Construye pantalla por pantalla y compara cada una contra el original como definicion de terminado |
+| [`clone-diff`](./plugins/clone/skills/clone-diff/SKILL.md) | Explicita | Feature score, score de arbol de UI por pantalla, pasos por flujo y veredicto (incompleto, usable, completo) |
 
 ## Agentes
 

@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "clone",
+  "version": "1.0.0",
+  "description": "Reconstruccion de apps Android y Windows para uso propio: recon con captura de arbol de UI, stack, construccion pantalla por pantalla y paridad"
+}
