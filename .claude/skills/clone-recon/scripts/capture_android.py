@@ -118,3 +118,91 @@ def encode_png(width, height, pixels):
     ihdr = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
     return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", ihdr)
             + chunk(b"IDAT", zlib.compress(raw, 6)) + chunk(b"IEND", b""))
+
+
+def dump_ui(adb, serial, run, retries=3, sleep=time.sleep):
+    """Devuelve el XML de uiautomator, o None si fallo todas las veces."""
+    for attempt in range(retries):
+        code, out, err = run([adb, "-s", serial, "shell", "uiautomator", "dump", DUMP_PATH])
+        if code == 0 and b"ERROR" not in out + err:
+            code, out, _ = run([adb, "-s", serial, "exec-out", "cat", DUMP_PATH])
+            if code == 0 and b"<hierarchy" in out:
+                return out.decode("utf-8", "replace")
+        if attempt < retries - 1:
+            sleep(1)
+    return None
+
+
+def screencap(adb, serial, run):
+    """Devuelve (png_bytes, width, height, uniform)."""
+    code, out, err = run([adb, "-s", serial, "exec-out", "screencap"])
+    if code != 0:
+        raise CaptureError("screencap fallo: %s" % err.decode("utf-8", "replace").strip())
+    width, height, pixels = parse_raw_screencap(out)
+    return encode_png(width, height, pixels), width, height, is_uniform(pixels)
+
+
+def current_activity(adb, serial, run):
+    code, out, _ = run([adb, "-s", serial, "shell", "dumpsys", "activity", "activities"])
+    if code != 0:
+        return ""
+    match = _ACTIVITY.search(out.decode("utf-8", "replace"))
+    return match.group(1) if match else ""
+
+
+def capture(args, run=default_run, sleep=time.sleep):
+    adb = find_adb(args.adb)
+    if not adb:
+        raise CaptureError("no encuentro adb. Instala Android SDK Platform-Tools o pasa --adb RUTA.")
+    serial = pick_serial(list_devices(adb, run), args.serial)
+    os.makedirs(args.out, exist_ok=True)
+    base = os.path.join(args.out, args.id)
+
+    xml_text = dump_ui(adb, serial, run, args.retries, sleep)
+    png, width, height, uniform = screencap(adb, serial, run)
+    source = current_activity(adb, serial, run)
+    with open(base + ".png", "wb") as fh:
+        fh.write(png)
+
+    partial = False
+    if xml_text is not None:
+        with open(base + ".raw.xml", "w", encoding="utf-8") as fh:
+            fh.write(xml_text)
+        tree = uitree.normalize_android(xml_text, args.id, source, args.max_depth,
+                                        not args.no_redact)
+    else:
+        print("aviso: uiautomator dump fallo %d veces; solo screenshot." % args.retries,
+              file=sys.stderr)
+        tree = uitree.empty_tree("android", args.id, source, width, height)
+        partial = True
+    if uniform:
+        print("aviso: el screenshot es de un solo color (FLAG_SECURE o pantalla apagada).",
+              file=sys.stderr)
+        partial = True
+
+    with open(base + ".tree.json", "w", encoding="utf-8") as fh:
+        json.dump(tree, fh, ensure_ascii=False, indent=1)
+    print(uitree.summarize(tree))
+    return 1 if partial else 0
+
+
+def main(argv=None, run=default_run, sleep=time.sleep):
+    uitree.safe_stdout()
+    ap = argparse.ArgumentParser(description="Captura de pantalla Android para el clone pack")
+    ap.add_argument("--id", required=True, help="id de pantalla, ej. S03@vacio")
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--serial")
+    ap.add_argument("--adb")
+    ap.add_argument("--max-depth", type=int, default=25)
+    ap.add_argument("--no-redact", action="store_true")
+    ap.add_argument("--retries", type=int, default=3)
+    args = ap.parse_args(argv)
+    try:
+        return capture(args, run, sleep)
+    except (CaptureError, uitree.TreeError) as exc:
+        print("capture_android: %s" % exc, file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())

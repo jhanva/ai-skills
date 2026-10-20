@@ -120,3 +120,64 @@ class ScreencapTest(unittest.TestCase):
         idat_len = struct.unpack(">I", png[33:37])[0]
         raw = zlib.decompress(png[41:41 + idat_len])
         self.assertEqual(raw, b"\x00" + pixels[:16] + b"\x00" + pixels[16:])
+
+
+class SerialTest(unittest.TestCase):
+    def test_two_devices_without_serial_exits_two(self):
+        fake = FakeAdb(devices=("aaa", "bbb"))
+        with tempfile.TemporaryDirectory() as tmp:
+            code, _, err = run_main(fake, tmp)
+        self.assertEqual(code, 2)
+        self.assertIn("aaa, bbb", err)
+
+    def test_serial_selects_device(self):
+        fake = FakeAdb(devices=("aaa", "bbb"))
+        with tempfile.TemporaryDirectory() as tmp:
+            code, _, _ = run_main(fake, tmp, "--serial", "bbb")
+        self.assertEqual(code, 0)
+        self.assertIn(["adb", "-s", "bbb", "exec-out", "screencap"], fake.calls)
+
+    def test_no_devices_exits_two(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            code, _, err = run_main(FakeAdb(devices=()), tmp)
+        self.assertEqual(code, 2)
+        self.assertIn("no hay dispositivos", err)
+
+
+class CaptureTest(unittest.TestCase):
+    def test_happy_path_writes_three_files_and_exits_zero(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            code, out, _ = run_main(FakeAdb(), tmp)
+            self.assertEqual(code, 0)
+            self.assertEqual(sorted(os.listdir(tmp)), ["S01.png", "S01.raw.xml", "S01.tree.json"])
+            with open(os.path.join(tmp, "S01.tree.json"), encoding="utf-8") as fh:
+                tree = json.load(fh)
+        self.assertEqual(tree["source"], "com.example.notes/.MainActivity")
+        self.assertEqual(tree["tree_quality"], "full")
+        self.assertTrue(out.startswith("S01 android full com.example.notes/.MainActivity"))
+
+    def test_dump_failing_every_retry_gives_quality_none_and_exit_one(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            code, _, err = run_main(FakeAdb(dump_failures=3), tmp)
+            with open(os.path.join(tmp, "S01.tree.json"), encoding="utf-8") as fh:
+                tree = json.load(fh)
+            self.assertFalse(os.path.exists(os.path.join(tmp, "S01.raw.xml")))
+        self.assertEqual(code, 1)
+        self.assertEqual(tree["tree_quality"], "none")
+        self.assertIn("uiautomator dump fallo 3 veces", err)
+
+    def test_dump_recovers_on_second_try(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            code, _, _ = run_main(FakeAdb(dump_failures=1), tmp)
+        self.assertEqual(code, 0)
+
+    def test_uniform_screenshot_warns_and_exits_one(self):
+        fake = FakeAdb(screen=raw_screencap(4, 2, b"\x00\x00\x00\xff", varied=False))
+        with tempfile.TemporaryDirectory() as tmp:
+            code, _, err = run_main(fake, tmp)
+        self.assertEqual(code, 1)
+        self.assertIn("un solo color", err)
+
+
+if __name__ == "__main__":
+    unittest.main()
