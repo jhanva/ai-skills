@@ -9,14 +9,18 @@ Uso:
   powershell -NoProfile -ExecutionPolicy Bypass -File capture_windows.ps1 -Id S03 -Out clone\captures\original -Process notepad
   powershell -NoProfile -ExecutionPolicy Bypass -File capture_windows.ps1 -Id S03 -Out clone\captures\original -Title "Calculadora"
 
-Exit: 0 ok, 2 ventana no encontrada o acceso denegado.
+Si la ventana no muestra controles visibles (recien abierta, minimizada, en
+otro escritorio) reintenta -Retries veces con 500 ms de espera.
+
+Exit: 0 ok, 1 captura parcial (sin controles visibles), 2 ventana no encontrada o acceso denegado.
 #>
 param(
     [Parameter(Mandatory = $true)][string]$Id,
     [Parameter(Mandatory = $true)][string]$Out,
     [string]$Process = "",
     [string]$Title = "",
-    [int]$MaxDepth = 25
+    [int]$MaxDepth = 25,
+    [int]$Retries = 3
 )
 
 $ErrorActionPreference = "Stop"
@@ -113,16 +117,37 @@ function Convert-Node($element, [int]$depth) {
     return $node
 }
 
-$window = Find-Window
-try {
-    $tree = Convert-Node $window 0
-} catch [System.UnauthorizedAccessException] {
-    Fail "acceso denegado. La app corre como administrador: ejecuta la terminal como administrador o captura solo screenshot."
-} catch [System.Windows.Automation.ElementNotAvailableException] {
-    Fail "la ventana se cerro durante la captura."
+function Test-VisibleChild($node) {
+    foreach ($child in $node.children) {
+        if (-not $child.offscreen -and $child.rect[2] -gt 0 -and $child.rect[3] -gt 0) { return $true }
+    }
+    return $false
 }
 
+$window = Find-Window
+for ($attempt = 1; $attempt -le $Retries; $attempt++) {
+    $script:Truncated = $false
+    try {
+        $tree = Convert-Node $window 0
+    } catch [System.UnauthorizedAccessException] {
+        Fail "acceso denegado. La app corre como administrador: ejecuta la terminal como administrador o captura solo screenshot."
+    } catch [System.Windows.Automation.ElementNotAvailableException] {
+        Fail "la ventana se cerro durante la captura."
+    }
+    if (Test-VisibleChild $tree) { break }
+    if ($attempt -lt $Retries) {
+        [Console]::Error.WriteLine("capture_windows: la ventana no muestra controles visibles; reintento $attempt/$($Retries - 1) en 500 ms.")
+        Start-Sleep -Milliseconds 500
+    }
+}
+$partial = -not (Test-VisibleChild $tree)
+
 $rect = Get-Rect $window
+if ($partial) {
+    $why = "ventana oculta, en otro escritorio o aun cargando"
+    if ($rect[0] -le -32000) { $why = "la ventana esta minimizada: restaurala y repite" }
+    [Console]::Error.WriteLine("capture_windows: sin controles visibles tras $Retries intentos ($why). Se guarda igual; la pantalla queda como solo features.")
+}
 $procName = (Get-Process -Id $window.Current.ProcessId).ProcessName
 $raw = [ordered]@{
     window    = [ordered]@{ title = $window.Current.Name; process = $procName; rect = $rect }
@@ -145,4 +170,5 @@ if ($rect[2] -gt 0 -and $rect[3] -gt 0) {
 }
 
 Write-Output "ok: $base.raw.json ($procName, '$($window.Current.Name)', truncated=$($script:Truncated))"
+if ($partial) { exit 1 }
 exit 0

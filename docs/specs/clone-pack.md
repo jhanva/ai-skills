@@ -287,7 +287,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File capture_windows.ps1
   `uitree.py normalize --from uia` (paso separado que la skill ejecuta).
 - Acceso denegado (app elevada): exit 2 con el mensaje "ejecuta la terminal
   como administrador o captura solo screenshot".
-- Exit: 0 ok, 2 ventana no encontrada o acceso denegado.
+- Sin controles visibles (todos los hijos de la ventana fuera de pantalla o de
+  area 0: ventana recien abierta, minimizada u oculta): reintenta `-Retries`
+  veces (3 por defecto) con 500 ms de espera. Si sigue igual, guarda la
+  captura, avisa por stderr (con mensaje especifico si esta minimizada) y sale
+  con exit 1. Agregado tras observar una captura vacia intermitente del Bloc
+  de notas en la verificacion final.
+- Exit: 0 ok, 1 captura parcial (sin controles visibles), 2 ventana no
+  encontrada o acceso denegado.
 
 #### uitree.py
 
