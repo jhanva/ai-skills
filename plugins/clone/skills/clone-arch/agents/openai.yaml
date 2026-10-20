@@ -1,0 +1,7 @@
+interface:
+  display_name: "Clone Arch"
+  short_description: "Stack, esquema y orden de construccion del clon"
+  default_prompt: "Usa $clone-arch para elegir el stack, el esquema de datos y el orden de construccion a partir de clone/recon.md."
+
+policy:
+  allow_implicit_invocation: false

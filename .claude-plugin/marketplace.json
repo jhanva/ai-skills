@@ -34,6 +34,12 @@
       "source": "./plugins/repo-ops",
       "description": "Operaciones de repositorio y entorno: identidades git, symlinks en Windows y control de browser via CDP",
       "version": "1.1.0"
+    },
+    {
+      "name": "clone",
+      "source": "./plugins/clone",
+      "description": "Reconstruccion de apps Android y Windows para uso propio: recon con captura de arbol de UI, stack, construccion pantalla por pantalla y paridad",
+      "version": "1.0.0"
     }
   ]
 }

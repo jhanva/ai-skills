@@ -1,0 +1,44 @@
+{
+  "window": {"title": "Notas - Editor", "process": "notepad", "rect": [100, 50, 800, 600]},
+  "truncated": false,
+  "root": {
+    "type": "Window", "name": "Notas - Editor", "automationId": "", "className": "Notepad",
+    "rect": [100, 50, 800, 600], "enabled": true, "offscreen": false, "value": null, "toggle": null,
+    "children": [
+      {"type": "TitleBar", "name": "Notas - Editor", "automationId": "TitleBar", "className": "", "rect": [100, 50, 800, 30],
+       "enabled": true, "offscreen": false, "value": null, "toggle": null, "children": [
+        {"type": "Button", "name": "Cerrar", "automationId": "Close", "className": "", "rect": [850, 50, 50, 30],
+         "enabled": true, "offscreen": false, "value": null, "toggle": null, "children": []}
+      ]},
+      {"type": "Pane", "name": "", "automationId": "", "className": "", "rect": [100, 80, 800, 30],
+       "enabled": true, "offscreen": false, "value": null, "toggle": null, "children": [
+        {"type": "MenuBar", "name": "Aplicacion", "automationId": "MenuBar", "className": "", "rect": [100, 80, 800, 30],
+         "enabled": true, "offscreen": false, "value": null, "toggle": null, "children": [
+          {"type": "MenuItem", "name": "Archivo", "automationId": "", "className": "", "rect": [100, 80, 60, 30],
+           "enabled": true, "offscreen": false, "value": null, "toggle": null, "children": []},
+          {"type": "MenuItem", "name": "Editar", "automationId": "", "className": "", "rect": [160, 80, 60, 30],
+           "enabled": true, "offscreen": false, "value": null, "toggle": null, "children": []}
+        ]}
+      ]},
+      {"type": "Edit", "name": "Editor de texto", "automationId": "15", "className": "Edit", "rect": [100, 110, 780, 400],
+       "enabled": true, "offscreen": false, "value": "hola juan@correo.com", "toggle": null, "children": []},
+      {"type": "ScrollBar", "name": "Vertical", "automationId": "", "className": "", "rect": [880, 110, 20, 400],
+       "enabled": true, "offscreen": false, "value": null, "toggle": null, "children": []},
+      {"type": "List", "name": "Recientes", "automationId": "recent", "className": "", "rect": [100, 510, 800, 100],
+       "enabled": true, "offscreen": false, "value": null, "toggle": null, "children": [
+        {"type": "ListItem", "name": "a.txt", "automationId": "", "className": "", "rect": [100, 510, 800, 50],
+         "enabled": true, "offscreen": false, "value": null, "toggle": null, "children": []},
+        {"type": "ListItem", "name": "b.txt", "automationId": "", "className": "", "rect": [100, 560, 800, 50],
+         "enabled": true, "offscreen": false, "value": null, "toggle": null, "children": []}
+      ]},
+      {"type": "Button", "name": "Guardar", "automationId": "save", "className": "Button", "rect": [700, 620, 90, 25],
+       "enabled": true, "offscreen": false, "value": null, "toggle": null, "children": []},
+      {"type": "Button", "name": "Oculto", "automationId": "", "className": "Button", "rect": [0, 0, 10, 10],
+       "enabled": true, "offscreen": true, "value": null, "toggle": null, "children": []},
+      {"type": "Button", "name": "Ajuste automatico", "automationId": "wrap", "className": "ToggleSwitch", "rect": [100, 620, 150, 25],
+       "enabled": true, "offscreen": false, "value": null, "toggle": "On", "children": []},
+      {"type": "Text", "name": "Listo", "automationId": "", "className": "", "rect": [100, 640, 100, 10],
+       "enabled": true, "offscreen": false, "value": null, "toggle": null, "children": []}
+    ]
+  }
+}
