@@ -147,3 +147,103 @@ def build_report(clone_dir):
         "flows": flows,
         "pending": pending,
     }
+
+
+def _score(value):
+    return "-" if value is None else str(value)
+
+
+def render_text(report):
+    lines = ["Veredicto: %s" % report["verdict"],
+             "Features: %s (must %d/%d)" % (_score(report["feature_score"]),
+                                            report["must_done"], report["must_total"])]
+    if report["areas"]:
+        lines.append("Areas: " + ", ".join("%s %s" % (a, _score(s)) for a, s in report["areas"]))
+    for s in report["screens"]:
+        lines.append("Pantalla %s: %d (%d faltantes)" % (s["screen"], s["score"], s["missing"]))
+    if report["screens_features_only"]:
+        lines.append("Solo features: " + ", ".join(report["screens_features_only"]))
+    for f in report["flows"]:
+        if f["clone"] is None:
+            lines.append("Flujo %s: original %d pasos, clon sin medir" % (f["id"], f["original"]))
+        else:
+            lines.append("Flujo %s: original %d, clon %d (%+d)" % (f["id"], f["original"],
+                                                                  f["clone"], f["delta"]))
+    if report["pending"]:
+        lines.append("Pendiente:")
+        lines.extend("  %s %s [%s, %s] %s" % (p["id"], p["prioridad"], p["area"], p["estado"],
+                                              p["feature"]) for p in report["pending"])
+    return "\n".join(lines)
+
+
+def render_markdown(report):
+    out = ["# Paridad", "",
+           "**Veredicto:** %s" % report["verdict"], "",
+           "| metrica | valor |", "| --- | --- |",
+           "| feature score | %s |" % _score(report["feature_score"]),
+           "| must hechos | %d/%d |" % (report["must_done"], report["must_total"]), ""]
+    if report["areas"]:
+        out += ["## Areas (mas debil primero)", "", "| area | score |", "| --- | --- |"]
+        out += ["| %s | %s |" % (a, _score(s)) for a, s in report["areas"]]
+        out.append("")
+    if report["screens"] or report["screens_features_only"]:
+        out += ["## Pantallas", "", "| pantalla | score interactivo | faltantes |",
+                "| --- | --- | --- |"]
+        out += ["| %s | %d | %d |" % (s["screen"], s["score"], s["missing"])
+                for s in report["screens"]]
+        out += ["| %s | solo features | - |" % s for s in report["screens_features_only"]]
+        out.append("")
+    if report["flows"]:
+        out += ["## Flujos", "", "| flujo | original | clon | delta |", "| --- | --- | --- | --- |"]
+        for f in report["flows"]:
+            clone = "-" if f["clone"] is None else str(f["clone"])
+            delta = "-" if f["delta"] is None else "%+d" % f["delta"]
+            out.append("| %s %s | %d | %s | %s |" % (f["id"], f["nombre"], f["original"],
+                                                     clone, delta))
+        out.append("")
+    if report["pending"]:
+        out += ["## Pendiente (orden de construccion)", ""]
+        out += ["- %s **%s** %s (%s, %s)" % (p["id"], p["prioridad"], p["feature"], p["area"],
+                                             p["estado"]) for p in report["pending"]]
+        out.append("")
+    return "\n".join(out)
+
+
+def safe_stdout():
+    """Evita UnicodeEncodeError en consolas cp1252: reemplaza lo no imprimible."""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(errors="replace")
+
+
+def main(argv=None):
+    safe_stdout()
+    ap = argparse.ArgumentParser(description="Reporte de paridad del clone pack")
+    ap.add_argument("clone_dir")
+    fmt = ap.add_mutually_exclusive_group()
+    fmt.add_argument("--json", action="store_true")
+    fmt.add_argument("--markdown", action="store_true")
+    ap.add_argument("--out", help="escribe el reporte en este archivo (UTF-8)")
+    args = ap.parse_args(argv)
+    try:
+        report = build_report(args.clone_dir)
+    except InputError as exc:
+        print("parity: %s" % exc, file=sys.stderr)
+        return 2
+    if args.json:
+        output = json.dumps(report, ensure_ascii=False, indent=1)
+    elif args.markdown:
+        output = render_markdown(report)
+    else:
+        output = render_text(report)
+    if args.out:
+        with open(args.out, "w", encoding="utf-8") as fh:
+            fh.write(output + "\n")
+        print("ok: %s (veredicto %s)" % (args.out, report["verdict"]))
+    else:
+        print(output)
+    return 1 if report["verdict"] == "incompleto" else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

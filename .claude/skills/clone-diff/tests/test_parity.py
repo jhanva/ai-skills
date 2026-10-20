@@ -145,3 +145,55 @@ class VerdictTest(unittest.TestCase):
         self.assertEqual(report["verdict"], "completo")
 
 
+class CliTest(unittest.TestCase):
+    def test_incompleto_exits_one_with_text_report(self):
+        with Workspace(MIXED) as ws:
+            code, out, _ = run([ws])
+        self.assertEqual(code, 1)
+        self.assertEqual(out.splitlines()[:2], ["Veredicto: incompleto", "Features: 64 (must 1/2)"])
+
+    def test_usable_exits_zero(self):
+        with Workspace(ALL_MUST_DONE % "si", [diff("S01", 70)]) as ws:
+            code, out, _ = run([ws])
+        self.assertEqual(code, 0)
+        self.assertTrue(out.startswith("Veredicto: usable"))
+
+    def test_invalid_input_exits_two_with_message(self):
+        with Workspace(HEADER + "K01,Crear,notas,urgente,S01,si,\n") as ws:
+            code, _, err = run([ws])
+        self.assertEqual(code, 2)
+        self.assertIn("fila 2: prioridad 'urgente' invalida", err)
+
+    def test_missing_features_file_exits_two(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            code, _, err = run([tmp])
+        self.assertEqual(code, 2)
+        self.assertIn("no existe", err)
+
+    def test_markdown_output_has_verdict_and_screens(self):
+        with Workspace(ALL_MUST_DONE % "si", [diff("S01", 90)]) as ws:
+            code, out, _ = run([ws, "--markdown"])
+        self.assertEqual(code, 0)
+        self.assertIn("**Veredicto:** completo", out)
+        self.assertIn("| S01 | 90 | 0 |", out)
+
+    def test_out_writes_report_to_utf8_file(self):
+        features = HEADER + "K01,Edición rápida,notas,must,S01,si,\n"
+        with Workspace(features) as ws:
+            target = os.path.join(ws, "parity.md")
+            code, out, _ = run([ws, "--markdown", "--out", target])
+            with open(target, encoding="utf-8") as fh:
+                text = fh.read()
+        self.assertEqual(code, 0)
+        self.assertIn("**Veredicto:** completo", text)
+        self.assertEqual(out.strip(), "ok: %s (veredicto completo)" % target)
+
+    def test_json_output_is_parseable(self):
+        with Workspace(ALL_MUST_DONE % "si") as ws:
+            code, out, _ = run([ws, "--json"])
+        self.assertEqual(code, 0)
+        self.assertEqual(json.loads(out)["verdict"], "completo")
+
+
+if __name__ == "__main__":
+    unittest.main()
