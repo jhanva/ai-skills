@@ -110,3 +110,97 @@ def flatten(tree):
 
     walk(tree["root"], "root")
     return out
+
+
+def _distance(a, b):
+    return math.hypot(a["center"][0] - b["center"][0], a["center"][1] - b["center"][1])
+
+
+def match(orig, clone, use_text=True):
+    """Devuelve {indice_original: (indice_clon, pasada)}."""
+
+    def same_item(o, c):
+        return o["item_sig"] is not None and o["item_sig"] == c["item_sig"]
+
+    def same_id(o, c):
+        return bool(o["id"]) and o["id"] == c["id"]
+
+    def same_label(o, c):
+        return use_text and bool(o["label"]) and o["label"] == c["label"]
+
+    def near(o, c):
+        return _distance(o, c) < POSITION_MATCH and o["parent_role"] == c["parent_role"]
+
+    pairs = {}
+    used = set()
+    for name, test in (("item", same_item), ("id", same_id), ("label", same_label),
+                       ("position", near)):
+        candidates = []
+        for i, o in enumerate(orig):
+            if i in pairs:
+                continue
+            for j, c in enumerate(clone):
+                if j in used or c["role"] != o["role"]:
+                    continue
+                if test(o, c):
+                    candidates.append((_distance(o, c), i, j))
+        candidates.sort()
+        for _, i, j in candidates:
+            if i not in pairs and j not in used:
+                pairs[i] = (j, name)
+                used.add(j)
+    return pairs
+
+
+def _score(nodes, matched_idx, roles):
+    total = sum(WEIGHTS[n["role"]] for n in nodes if n["role"] in roles)
+    if total == 0:
+        return None
+    got = sum(WEIGHTS[nodes[i]["role"]] for i in matched_idx if nodes[i]["role"] in roles)
+    return int(round(100 * got / total))
+
+
+def _describe(node):
+    return {"role": node["role"], "label": node["raw_label"], "id": node["id"],
+            "bounds": node["bounds"]}
+
+
+def compare(orig_tree, clone_tree, use_text=True):
+    screen = orig_tree.get("screen", "")
+    for which, tree in (("original", orig_tree), ("clon", clone_tree)):
+        if tree.get("tree_quality") == "none":
+            return {"screen": screen, "status": "skipped",
+                    "reason": "tree_quality none en %s" % which,
+                    "interactive_score": None, "structure_score": None,
+                    "counts": {}, "missing": [], "extra": [], "text_changed": [], "moved": []}
+    orig = flatten(orig_tree)
+    clone = flatten(clone_tree)
+    pairs = match(orig, clone, use_text)
+    matched_clone = {j for j, _ in pairs.values()}
+
+    missing = [_describe(n) for i, n in enumerate(orig) if i not in pairs]
+    missing.sort(key=lambda d: (d["role"] not in INTERACTIVE, d["bounds"][1], d["bounds"][0]))
+    extra = [_describe(n) for j, n in enumerate(clone) if j not in matched_clone]
+    text_changed = []
+    moved = []
+    for i, (j, how) in sorted(pairs.items()):
+        o, c = orig[i], clone[j]
+        if how in ("id", "position") and o["label"] != c["label"]:
+            text_changed.append({"role": o["role"], "original": o["raw_label"],
+                                 "clone": c["raw_label"]})
+        dist = _distance(o, c)
+        if dist > MOVED:
+            moved.append({"role": o["role"], "label": o["raw_label"],
+                          "distance": round(dist, 2)})
+
+    return {
+        "screen": screen,
+        "status": "ok",
+        "interactive_score": _score(orig, pairs, INTERACTIVE),
+        "structure_score": _score(orig, pairs, INTERACTIVE | CONTENT),
+        "counts": {"original": len(orig), "clone": len(clone), "matched": len(pairs)},
+        "missing": missing,
+        "extra": extra,
+        "text_changed": text_changed,
+        "moved": moved,
+    }

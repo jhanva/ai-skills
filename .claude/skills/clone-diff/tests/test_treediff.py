@@ -67,3 +67,74 @@ class FlattenTest(unittest.TestCase):
                 json.dump({"schema": 2}, fh)
             with self.assertRaises(treediff.DiffError):
                 treediff.load_tree(path)
+
+
+class CompareTest(unittest.TestCase):
+    def test_identical_trees_score_100(self):
+        result = treediff.compare(form_screen(), form_screen())
+        self.assertEqual((result["interactive_score"], result["structure_score"]), (100, 100))
+        self.assertEqual(result["missing"], [])
+
+    def test_missing_button_is_reported_and_lowers_score(self):
+        clone = form_screen()
+        del clone["root"]["children"][2]
+        result = treediff.compare(form_screen(), clone)
+        self.assertEqual([m["label"] for m in result["missing"]], ["Cancelar"])
+        self.assertEqual(result["interactive_score"], 75)
+        self.assertEqual(result["structure_score"], 77)
+
+    def test_reordered_siblings_still_match(self):
+        clone = form_screen()
+        kids = clone["root"]["children"]
+        kids[1]["bounds"], kids[2]["bounds"] = kids[2]["bounds"], kids[1]["bounds"]
+        kids[1], kids[2] = kids[2], kids[1]
+        result = treediff.compare(form_screen(), clone)
+        self.assertEqual(result["interactive_score"], 100)
+
+    def test_list_size_difference_is_not_missing(self):
+        result = treediff.compare(list_screen(3), list_screen(20))
+        self.assertEqual(result["missing"], [])
+        self.assertEqual(result["interactive_score"], 100)
+
+    def test_changed_label_with_same_id_is_text_changed(self):
+        clone = form_screen()
+        clone["root"]["children"][1]["name"] = "Aplicar"
+        result = treediff.compare(form_screen(), clone)
+        self.assertEqual(result["interactive_score"], 100)
+        self.assertEqual(result["text_changed"],
+                         [{"role": "button", "original": "Guardar", "clone": "Aplicar"}])
+
+    def test_label_match_ignores_case_and_accents(self):
+        orig = tree([node("button", "Edición", bounds=(0.1, 0.1, 0.1, 0.1))])
+        clone = tree([node("button", "edicion", bounds=(0.8, 0.8, 0.1, 0.1))])
+        self.assertEqual(treediff.compare(orig, clone)["interactive_score"], 100)
+
+    def test_ignore_text_disables_label_pass(self):
+        orig = tree([node("button", "Ayuda", bounds=(0.1, 0.1, 0.1, 0.1))])
+        clone = tree([node("button", "Ayuda", bounds=(0.8, 0.8, 0.1, 0.1))])
+        self.assertEqual(treediff.compare(orig, clone, use_text=False)["interactive_score"], 0)
+        self.assertEqual(treediff.compare(orig, clone, use_text=True)["interactive_score"], 100)
+
+    def test_far_match_is_reported_as_moved(self):
+        orig = tree([node("button", "Ayuda", bounds=(0.1, 0.1, 0.1, 0.1))])
+        clone = tree([node("button", "Ayuda", bounds=(0.8, 0.8, 0.1, 0.1))])
+        moved = treediff.compare(orig, clone)["moved"]
+        self.assertEqual(moved, [{"role": "button", "label": "Ayuda", "distance": 0.99}])
+
+    def test_quality_none_is_skipped(self):
+        result = treediff.compare(form_screen(), tree([], quality="none"))
+        self.assertEqual(result["status"], "skipped")
+        self.assertIsNone(result["interactive_score"])
+
+    def test_screen_without_interactive_has_null_interactive_score(self):
+        only_text = tree([node("text", "Hola")])
+        result = treediff.compare(only_text, copy.deepcopy(only_text))
+        self.assertIsNone(result["interactive_score"])
+        self.assertEqual(result["structure_score"], 100)
+
+    def test_extra_clone_nodes_do_not_penalize(self):
+        clone = form_screen()
+        clone["root"]["children"].append(node("button", "Nuevo", bounds=(0.4, 0.4, 0.1, 0.1)))
+        result = treediff.compare(form_screen(), clone)
+        self.assertEqual(result["interactive_score"], 100)
+        self.assertEqual([e["label"] for e in result["extra"]], ["Nuevo"])
