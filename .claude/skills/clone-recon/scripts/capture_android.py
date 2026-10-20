@@ -89,3 +89,32 @@ def pick_serial(devices, serial=None):
         raise CaptureError("hay %d dispositivos: %s. Usa --serial."
                            % (len(devices), ", ".join(devices)))
     return devices[0]
+
+
+def parse_raw_screencap(data):
+    """Header de screencap crudo (12 o 16 bytes) + RGBA. Devuelve (w, h, pixels)."""
+    if len(data) < 12:
+        raise CaptureError("screencap devolvio %d bytes" % len(data))
+    width, height, fmt = struct.unpack_from("<III", data, 0)
+    header = len(data) - width * height * 4
+    if fmt not in (1, 2) or header not in (12, 16):
+        raise CaptureError("formato de screencap no soportado (formato %d)" % fmt)
+    return width, height, data[header:]
+
+
+def is_uniform(pixels):
+    first = pixels[:4]
+    return pixels == first * (len(pixels) // 4)
+
+
+def encode_png(width, height, pixels):
+    stride = width * 4
+    raw = b"".join(b"\x00" + pixels[y * stride:(y + 1) * stride] for y in range(height))
+
+    def chunk(kind, body):
+        return (struct.pack(">I", len(body)) + kind + body
+                + struct.pack(">I", zlib.crc32(kind + body) & 0xFFFFFFFF))
+
+    ihdr = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
+    return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", ihdr)
+            + chunk(b"IDAT", zlib.compress(raw, 6)) + chunk(b"IEND", b""))

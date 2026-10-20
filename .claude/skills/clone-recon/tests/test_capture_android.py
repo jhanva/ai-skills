@@ -100,3 +100,23 @@ class DeviceTest(unittest.TestCase):
     def test_unknown_serial_raises(self):
         with self.assertRaisesRegex(capture_android.CaptureError, "no esta conectado"):
             capture_android.pick_serial(["aaa"], "zzz")
+
+
+class ScreencapTest(unittest.TestCase):
+    def test_parses_12_and_16_byte_headers(self):
+        for header in (12, 16):
+            w, h, pixels = capture_android.parse_raw_screencap(raw_screencap(4, 2, header=header))
+            self.assertEqual((w, h, len(pixels)), (4, 2, 32))
+
+    def test_unsupported_format_raises(self):
+        data = struct.pack("<III", 2, 1, 4) + b"\x00" * 4
+        with self.assertRaises(capture_android.CaptureError):
+            capture_android.parse_raw_screencap(data)
+
+    def test_encoded_png_roundtrips_pixels(self):
+        pixels = bytes(range(32))
+        png = capture_android.encode_png(4, 2, pixels)
+        self.assertTrue(png.startswith(b"\x89PNG\r\n\x1a\n"))
+        idat_len = struct.unpack(">I", png[33:37])[0]
+        raw = zlib.decompress(png[41:41 + idat_len])
+        self.assertEqual(raw, b"\x00" + pixels[:16] + b"\x00" + pixels[16:])
