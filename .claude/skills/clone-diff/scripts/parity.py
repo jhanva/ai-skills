@@ -81,3 +81,69 @@ def load_diffs(directory):
         except (OSError, ValueError) as exc:
             raise InputError("no puedo leer %s: %s" % (path, exc))
     return diffs
+
+
+def feature_score(rows):
+    scored = [r for r in rows if r["prioridad"] in PRIORITY_WEIGHTS]
+    total = sum(PRIORITY_WEIGHTS[r["prioridad"]] for r in scored)
+    if total == 0:
+        return None
+    got = sum(PRIORITY_WEIGHTS[r["prioridad"]] * STATE_VALUES[r["estado"]] for r in scored)
+    return int(round(100 * got / total))
+
+
+def area_scores(rows):
+    areas = {}
+    for row in rows:
+        if row["prioridad"] in PRIORITY_WEIGHTS:
+            areas.setdefault(row["area"], []).append(row)
+    return {area: feature_score(items) for area, items in areas.items()}
+
+
+def pending_features(rows):
+    by_area = area_scores(rows)
+    order = {"must": 0, "should": 1, "could": 2}
+    pending = [r for r in rows if r["prioridad"] in order and r["estado"] != "si"]
+    pending.sort(key=lambda r: (order[r["prioridad"]], by_area[r["area"]], r["area"], r["id"]))
+    return [{"id": r["id"], "feature": r["feature"], "area": r["area"],
+             "prioridad": r["prioridad"], "estado": r["estado"]} for r in pending]
+
+
+def verdict(must_missing, features, screen_scores):
+    if must_missing:
+        return "incompleto"
+    if any(score < USABLE_SCREEN for score in screen_scores):
+        return "incompleto"
+    if (features is not None and features >= COMPLETE_FEATURES
+            and all(score >= COMPLETE_SCREEN for score in screen_scores)):
+        return "completo"
+    return "usable"
+
+
+def build_report(clone_dir):
+    rows = load_features(os.path.join(clone_dir, "features.csv"))
+    flows = load_flows(os.path.join(clone_dir, "flows.csv"))
+    diffs = load_diffs(os.path.join(clone_dir, "diffs"))
+    screens = []
+    skipped = []
+    for d in diffs:
+        if d.get("status") == "skipped" or d.get("interactive_score") is None:
+            skipped.append(d.get("screen", "?"))
+        else:
+            screens.append({"screen": d.get("screen", "?"), "score": d["interactive_score"],
+                            "missing": len(d.get("missing", []))})
+    screens.sort(key=lambda s: (s["score"], s["screen"]))
+    pending = pending_features(rows)
+    must_missing = [p for p in pending if p["prioridad"] == "must"]
+    features = feature_score(rows)
+    return {
+        "verdict": verdict(must_missing, features, [s["score"] for s in screens]),
+        "feature_score": features,
+        "must_done": sum(1 for r in rows if r["prioridad"] == "must" and r["estado"] == "si"),
+        "must_total": sum(1 for r in rows if r["prioridad"] == "must"),
+        "areas": sorted(area_scores(rows).items(), key=lambda kv: (kv[1], kv[0])),
+        "screens": screens,
+        "screens_features_only": skipped,
+        "flows": flows,
+        "pending": pending,
+    }

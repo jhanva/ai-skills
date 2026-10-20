@@ -96,3 +96,52 @@ class LoadTest(unittest.TestCase):
         self.assertEqual([d["screen"] for d in loaded], ["S01", "S02"])
 
 
+class ScoreTest(unittest.TestCase):
+    def test_weighted_score_counts_partial_as_half_and_skips_skip_and_extra(self):
+        with Workspace(MIXED) as ws:
+            report = parity.build_report(ws)
+        self.assertEqual(report["feature_score"], 64)
+        self.assertEqual((report["must_done"], report["must_total"]), (1, 2))
+
+    def test_pending_is_ordered_must_should_could(self):
+        with Workspace(MIXED) as ws:
+            report = parity.build_report(ws)
+        self.assertEqual([p["id"] for p in report["pending"]], ["K02", "K04", "K05"])
+
+    def test_areas_weakest_first(self):
+        with Workspace(MIXED) as ws:
+            report = parity.build_report(ws)
+        self.assertEqual(report["areas"][0], ("datos", 0))
+
+
+class VerdictTest(unittest.TestCase):
+    def test_missing_must_is_incompleto(self):
+        with Workspace(MIXED) as ws:
+            self.assertEqual(parity.build_report(ws)["verdict"], "incompleto")
+
+    def test_screen_below_70_is_incompleto(self):
+        with Workspace(ALL_MUST_DONE % "si", [diff("S01", 69)]) as ws:
+            self.assertEqual(parity.build_report(ws)["verdict"], "incompleto")
+
+    def test_usable_at_threshold_70(self):
+        with Workspace(ALL_MUST_DONE % "si", [diff("S01", 70)]) as ws:
+            self.assertEqual(parity.build_report(ws)["verdict"], "usable")
+
+    def test_completo_needs_features_90_and_screens_85(self):
+        with Workspace(ALL_MUST_DONE % "si", [diff("S01", 85), diff("S02", 100)]) as ws:
+            self.assertEqual(parity.build_report(ws)["verdict"], "completo")
+
+    def test_features_below_90_is_only_usable(self):
+        with Workspace(ALL_MUST_DONE % "no", [diff("S01", 100)]) as ws:
+            report = parity.build_report(ws)
+        self.assertEqual(report["feature_score"], 75)
+        self.assertEqual(report["verdict"], "usable")
+
+    def test_skipped_screens_are_listed_as_features_only(self):
+        skipped = {"screen": "S09", "status": "skipped", "interactive_score": None}
+        with Workspace(ALL_MUST_DONE % "si", [skipped]) as ws:
+            report = parity.build_report(ws)
+        self.assertEqual(report["screens_features_only"], ["S09"])
+        self.assertEqual(report["verdict"], "completo")
+
+
