@@ -533,8 +533,8 @@ Excluye (v1):
 `unittest` de stdlib. Se corren con:
 
 ```
-python -m unittest discover -s .claude/skills/clone-recon/tests -v
-python -m unittest discover -s .claude/skills/clone-diff/tests -v
+python -m unittest discover -s tests -v
+python -m unittest discover -s tests -v
 ```
 
 Casos minimos:
