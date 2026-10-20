@@ -293,7 +293,6 @@ def normalize_android(xml_text, screen, source="", max_depth=25, redact=True,
 
 # --------------------------------------------------------------------- uia
 
-
 def uia_role(raw_node):
     if raw_node.get("toggle") is not None and "ToggleSwitch" in (raw_node.get("className") or ""):
         return "switch"
@@ -329,7 +328,6 @@ def normalize_uia(raw, screen, max_depth=25, redact=True, captured_at=None):
 
 
 # --------------------------------------------------------------- summarize
-
 
 def signature(node):
     """Rol del nodo y roles de sus descendientes en preorden."""
@@ -415,7 +413,6 @@ def count_nodes(node):
 
 # --------------------------------------------------------------------- cli
 
-
 def _cmd_normalize(args):
     try:
         if args.source_format == "android":
@@ -476,4 +473,3 @@ def main(argv=None):
 
 if __name__ == "__main__":
     sys.exit(main())
-
