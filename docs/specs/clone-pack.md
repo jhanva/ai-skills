@@ -24,7 +24,7 @@ propia, para uso personal o de mi equipo. Hoy el repo tiene el flujo general
 | stack del clon | depende de la app; `/clone-arch` lo elige con una matriz y lo justifica |
 | captura en recon | semi-automatica: el usuario navega, la skill captura screenshot + arbol de UI |
 | medicion de paridad | score de features + diff de arbol de UI por pantalla |
-| runtime | solo Claude Code (`.claude/skills/`). Port a Codex despues |
+| runtime | plugin `clone` (Claude Code y Codex leen `plugins/clone/skills/`) |
 | estructura | enfoque C: pack de cuatro skills con ciclo de construccion propio |
 
 ## 2. Enfoque elegido y justificacion
@@ -48,7 +48,7 @@ original Android con un clon de escritorio.
 ### 3.1 Archivos del pack
 
 ```
-.claude/skills/
+plugins/clone/skills/
   clone-recon/
     SKILL.md
     references/recon-template.md      plantilla de clone/recon.md
