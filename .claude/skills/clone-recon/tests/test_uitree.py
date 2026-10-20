@@ -201,3 +201,33 @@ class InputRedactionTest(unittest.TestCase):
         tree = uitree.normalize_uia(raw, "S02", redact=False)
         self.assertEqual(find(tree["root"], "input", "15")["text"], "hola juan@correo.com")
         self.assertFalse(tree["redacted"])
+
+
+class SummarizeTest(unittest.TestCase):
+    def list_tree(self, items):
+        rows = [uia_node("ListItem", "item %d" % i, rect=(0, i * 10, 100, 10),
+                         children=[uia_node("Text", "t", rect=(0, i * 10, 50, 10))])
+                for i in range(items)]
+        raw = uia_raw([uia_node("List", "Lista", rect=(0, 0, 1000, 500), children=rows)])
+        return uitree.normalize_uia(raw, "S05", captured_at=FIXED_TIME)
+
+    def test_repeated_list_items_collapse_to_one_line(self):
+        text = uitree.summarize(self.list_tree(12))
+        self.assertIn("listitem x12 (plantilla: text)", text)
+        self.assertEqual(text.count("listitem"), 1)
+
+    def test_header_and_lines_format(self):
+        raw = uia_raw([uia_node("Button", "Ok", rect=(0, 0, 100, 50), automationId="ok")])
+        tree = uitree.normalize_uia(raw, "S01")
+        self.assertEqual(uitree.summarize(tree).splitlines(),
+                         ["S01 windows full app.exe: T", 'button "Ok" #ok [0.05,0.05]'])
+
+    def test_max_lines_cuts_deepest_levels_first(self):
+        groups = [uia_node("Pane", "g%d" % i, children=[
+            uia_node("Button", "b%d" % i, rect=(i * 10, 0, 10, 10))]) for i in range(5)]
+        raw = uia_raw([uia_node("ToolBar", "Barra", rect=(0, 0, 1000, 50), children=groups)])
+        tree = uitree.normalize_uia(raw, "S01")
+        lines = uitree.summarize(tree, max_lines=3).splitlines()
+        self.assertEqual(lines[1], 'toolbar "Barra" [0.50,0.05]')
+        self.assertEqual(lines[-1], "... 5 nodos mas")
+        self.assertEqual(len(lines), 3)

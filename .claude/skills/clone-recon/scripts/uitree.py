@@ -330,3 +330,88 @@ def normalize_uia(raw, screen, max_depth=25, redact=True, captured_at=None):
 
 # --------------------------------------------------------------- summarize
 
+
+def signature(node):
+    """Rol del nodo y roles de sus descendientes en preorden."""
+    roles = []
+
+    def walk(n):
+        for c in n["children"]:
+            roles.append(c["role"])
+            walk(c)
+    walk(node)
+    return (node["role"], tuple(roles))
+
+
+def _label(node):
+    return node["name"] or node["text"]
+
+
+def _line(node):
+    parts = [node["role"]]
+    label = _label(node)
+    if label:
+        parts.append('"%s"' % label)
+    if node["id"]:
+        parts.append("#" + node["id"])
+    x, y, w, h = node["bounds"]
+    parts.append("[%.2f,%.2f]" % (x + w / 2, y + h / 2))
+    return " ".join(parts)
+
+
+def _summary_lines(node, depth, out):
+    if node["role"] == "list":
+        groups = {}
+        order = []
+        for child in node["children"]:
+            sig = signature(child)
+            if sig not in groups:
+                groups[sig] = []
+                order.append(sig)
+            groups[sig].append(child)
+        for sig in order:
+            members = groups[sig]
+            if len(members) > 1:
+                template = ", ".join(r for r in sig[1] if r not in CONTAINERS) or "-"
+                out.append((depth, "%s x%d (plantilla: %s)" % (sig[0], len(members), template)))
+            else:
+                _summary_node(members[0], depth, out)
+        return
+    for child in node["children"]:
+        _summary_node(child, depth, out)
+
+
+def _summary_node(node, depth, out):
+    if node["role"] in CONTAINERS:
+        _summary_lines(node, depth, out)
+        return
+    out.append((depth, _line(node)))
+    _summary_lines(node, depth + 1, out)
+
+
+def summarize(tree, max_lines=40):
+    header = "%s %s %s %s" % (tree["screen"], tree["platform"], tree["tree_quality"],
+                              tree["source"])
+    lines = []
+    _summary_lines(tree["root"], 0, lines)
+    kept = lines
+    if len(lines) > max_lines:
+        budget = max(max_lines - 1, 0)
+        kept = []
+        for depth_cap in range(max(d for d, _ in lines), -1, -1):
+            kept = [l for l in lines if l[0] <= depth_cap]
+            if len(kept) <= budget:
+                break
+        kept = kept[:budget]
+    body = ["  " * d + text for d, text in kept]
+    if len(kept) < len(lines):
+        body.append("... %d nodos mas" % (len(lines) - len(kept)))
+    return "\n".join([header] + body)
+
+
+def count_nodes(node):
+    return 1 + sum(count_nodes(c) for c in node["children"])
+
+
+# --------------------------------------------------------------------- cli
+
