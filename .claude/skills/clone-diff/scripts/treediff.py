@@ -204,3 +204,73 @@ def compare(orig_tree, clone_tree, use_text=True):
         "text_changed": text_changed,
         "moved": moved,
     }
+
+
+def _fmt_score(value):
+    return "-" if value is None else str(value)
+
+
+def render_text(result):
+    if result["status"] == "skipped":
+        return "%s: omitida (%s). Se evalua solo por features." % (result["screen"],
+                                                                   result["reason"])
+    c = result["counts"]
+    lines = ["%s: interactivo %s, estructura %s (original %d nodos, clon %d, emparejados %d)"
+             % (result["screen"], _fmt_score(result["interactive_score"]),
+                _fmt_score(result["structure_score"]), c["original"], c["clone"], c["matched"])]
+
+    def section(title, items, fmt):
+        if items:
+            lines.append("%s (%d):" % (title, len(items)))
+            lines.extend("  " + fmt(item) for item in items)
+
+    def node_fmt(d):
+        x, y, w, h = d["bounds"]
+        label = ' "%s"' % d["label"] if d["label"] else ""
+        ident = " #%s" % d["id"] if d["id"] else ""
+        return "%s%s%s [%.2f,%.2f]" % (d["role"], label, ident, x + w / 2, y + h / 2)
+
+    section("Faltan", result["missing"], node_fmt)
+    section("Extra en el clon", result["extra"], node_fmt)
+    section("Texto distinto", result["text_changed"],
+            lambda d: '%s "%s" -> "%s"' % (d["role"], d["original"], d["clone"]))
+    section("Movidos", result["moved"],
+            lambda d: '%s "%s" (%.2f)' % (d["role"], d["label"], d["distance"]))
+    return "\n".join(lines)
+
+
+def safe_stdout():
+    """Evita UnicodeEncodeError en consolas cp1252: reemplaza lo no imprimible."""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(errors="replace")
+
+
+def main(argv=None):
+    safe_stdout()
+    ap = argparse.ArgumentParser(description="Diff de arboles de UI normalizados")
+    ap.add_argument("original")
+    ap.add_argument("clone")
+    ap.add_argument("--json", action="store_true")
+    ap.add_argument("--ignore-text", action="store_true")
+    ap.add_argument("--out", help="escribe el resultado JSON en este archivo (UTF-8)")
+    args = ap.parse_args(argv)
+    try:
+        orig = load_tree(args.original)
+        clone = load_tree(args.clone)
+    except DiffError as exc:
+        print("treediff: %s" % exc, file=sys.stderr)
+        return 2
+    result = compare(orig, clone, use_text=not args.ignore_text)
+    if args.out:
+        with open(args.out, "w", encoding="utf-8") as fh:
+            json.dump(result, fh, ensure_ascii=False, indent=1)
+    if args.json:
+        print(json.dumps(result, ensure_ascii=False, indent=1))
+    else:
+        print(render_text(result))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

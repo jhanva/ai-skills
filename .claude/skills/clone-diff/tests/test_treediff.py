@@ -138,3 +138,63 @@ class CompareTest(unittest.TestCase):
         result = treediff.compare(form_screen(), clone)
         self.assertEqual(result["interactive_score"], 100)
         self.assertEqual([e["label"] for e in result["extra"]], ["Nuevo"])
+
+
+class CliTest(unittest.TestCase):
+    def write(self, tmp, name, data):
+        path = os.path.join(tmp, name)
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(data, fh)
+        return path
+
+    def test_json_output_has_scores(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            a = self.write(tmp, "a.json", form_screen())
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                code = treediff.main([a, a, "--json"])
+        self.assertEqual(code, 0)
+        self.assertEqual(json.loads(buf.getvalue())["interactive_score"], 100)
+
+    def test_text_output_first_line(self):
+        clone = form_screen()
+        del clone["root"]["children"][2]
+        with tempfile.TemporaryDirectory() as tmp:
+            a = self.write(tmp, "a.json", form_screen())
+            b = self.write(tmp, "b.json", clone)
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                treediff.main([a, b])
+        lines = buf.getvalue().splitlines()
+        self.assertEqual(lines[0], "S01: interactivo 75, estructura 77 "
+                                   "(original 5 nodos, clon 4, emparejados 4)")
+        self.assertEqual(lines[1:3], ["Faltan (1):", '  button "Cancelar" #cancel [0.75,0.93]'])
+
+    def test_out_writes_utf8_json_and_prints_text(self):
+        orig = tree([node("menuitem", "Edición", bounds=(0.1, 0.1, 0.1, 0.1))])
+        with tempfile.TemporaryDirectory() as tmp:
+            a = self.write(tmp, "a.json", orig)
+            out_path = os.path.join(tmp, "diff.json")
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                code = treediff.main([a, a, "--out", out_path])
+            with open(out_path, encoding="utf-8") as fh:
+                written = json.load(fh)
+        self.assertEqual(code, 0)
+        self.assertEqual(written["interactive_score"], 100)
+        self.assertTrue(buf.getvalue().startswith("S01: interactivo 100"))
+
+    def test_wrong_schema_exits_two(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            a = self.write(tmp, "a.json", form_screen())
+            b = self.write(tmp, "b.json", {"schema": 2})
+            with redirect_stderr(io.StringIO()):
+                self.assertEqual(treediff.main([a, b]), 2)
+
+    def test_missing_file_exits_two(self):
+        with redirect_stderr(io.StringIO()):
+            self.assertEqual(treediff.main(["no-existe.json", "tampoco.json"]), 2)
+
+
+if __name__ == "__main__":
+    unittest.main()
