@@ -1,0 +1,7 @@
+interface:
+  display_name: "Clone Diff"
+  short_description: "Paridad del clon contra el original"
+  default_prompt: "Usa $clone-diff para medir cuanto le falta al clon respecto al original y obtener el veredicto."
+
+policy:
+  allow_implicit_invocation: false

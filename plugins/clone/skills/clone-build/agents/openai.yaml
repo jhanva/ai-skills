@@ -1,0 +1,7 @@
+interface:
+  display_name: "Clone Build"
+  short_description: "Construye el clon pantalla por pantalla"
+  default_prompt: "Usa $clone-build para construir la siguiente pantalla del clon y compararla contra el original."
+
+policy:
+  allow_implicit_invocation: false

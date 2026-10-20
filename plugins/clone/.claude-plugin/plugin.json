@@ -1,0 +1,15 @@
+{
+  "name": "clone",
+  "description": "Reconstruccion de apps Android y Windows para uso propio: recon con captura de arbol de UI, stack, construccion pantalla por pantalla y paridad",
+  "version": "1.0.0",
+  "author": {
+    "name": "jhanva"
+  },
+  "repository": "https://github.com/jhanva/ai-skills",
+  "keywords": [
+    "android",
+    "windows",
+    "ui-automation",
+    "parity"
+  ]
+}
