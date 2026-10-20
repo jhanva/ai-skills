@@ -116,3 +116,88 @@ class EmptyTreeTest(unittest.TestCase):
         self.assertEqual(tree["tree_quality"], "none")
         self.assertEqual(tree["root"]["children"], [])
         self.assertEqual(tree["window"], {"w": 1080, "h": 2400})
+
+
+class UiaNormalizeTest(unittest.TestCase):
+    def setUp(self):
+        raw = json.loads(read_fixture("uia_basic.json"))
+        self.tree = uitree.normalize_uia(raw, "S02", captured_at=FIXED_TIME)
+
+    def test_roles_follow_control_type_table(self):
+        self.assertEqual(preorder(self.tree["root"]), [
+            ("window", "Notas - Editor"),
+            ("menu", "MenuBar"), ("menuitem", "Archivo"), ("menuitem", "Editar"),
+            ("input", "15"),
+            ("list", "recent"), ("listitem", "a.txt"), ("listitem", "b.txt"),
+            ("button", "save"),
+            ("switch", "wrap"),
+            ("text", "Listo"),
+        ])
+
+    def test_scrollbar_titlebar_and_offscreen_nodes_are_dropped(self):
+        self.assertIsNone(find(self.tree["root"], "slider", "Vertical"))
+        self.assertIsNone(find(self.tree["root"], "button", "Close"))
+        self.assertIsNone(find(self.tree["root"], "button", "Oculto"))
+
+    def test_bounds_are_relative_to_window_origin(self):
+        save = find(self.tree["root"], "button", "save")
+        self.assertEqual(save["bounds"], [0.75, 0.95, 0.113, 0.042])
+
+    def test_source_names_process_and_title(self):
+        self.assertEqual(self.tree["source"], "notepad.exe: Notas - Editor")
+        self.assertEqual(self.tree["platform"], "windows")
+
+    def test_missing_window_raises_tree_error(self):
+        with self.assertRaises(uitree.TreeError):
+            uitree.normalize_uia({"root": {}}, "S02")
+
+
+class PipelineTest(unittest.TestCase):
+    def test_unnamed_single_child_group_is_collapsed(self):
+        raw = uia_raw([uia_node("Pane", children=[uia_node("Button", "Ok")])])
+        tree = uitree.normalize_uia(raw, "S01")
+        self.assertEqual(preorder(tree["root"]), [("window", "T"), ("button", "Ok")])
+
+    def test_named_group_is_kept(self):
+        raw = uia_raw([uia_node("Pane", "Panel", children=[uia_node("Button", "Ok")])])
+        tree = uitree.normalize_uia(raw, "S01")
+        self.assertEqual(preorder(tree["root"]),
+                         [("window", "T"), ("group", "Panel"), ("button", "Ok")])
+
+    def test_depth_limit_marks_tree_partial(self):
+        leaf = uia_node("Button", "Ok")
+        for level in range(30):
+            leaf = uia_node("Pane", "p%d" % level, children=[leaf])
+        tree = uitree.normalize_uia(uia_raw([leaf]), "S01", max_depth=25)
+        self.assertEqual(tree["tree_quality"], "partial")
+        self.assertIsNone(find(tree["root"], "button", "Ok"))
+
+    def test_raw_truncated_flag_marks_tree_partial(self):
+        tree = uitree.normalize_uia(uia_raw([uia_node("Button", "Ok")], truncated=True), "S01")
+        self.assertEqual(tree["tree_quality"], "partial")
+
+    def test_tree_without_interactive_nodes_is_partial(self):
+        tree = uitree.normalize_uia(uia_raw([uia_node("Text", "Hola")]), "S01")
+        self.assertEqual(tree["tree_quality"], "partial")
+
+    def test_zero_area_and_outside_window_nodes_are_dropped(self):
+        raw = uia_raw([uia_node("Button", "Cero", rect=(10, 10, 0, 20)),
+                       uia_node("Button", "Fuera", rect=(2000, 10, 50, 20)),
+                       uia_node("Button", "Dentro", rect=(10, 10, 50, 20))])
+        tree = uitree.normalize_uia(raw, "S01")
+        self.assertEqual(preorder(tree["root"]), [("window", "T"), ("button", "Dentro")])
+
+
+class InputRedactionTest(unittest.TestCase):
+    def test_input_value_is_replaced_but_name_kept(self):
+        raw = json.loads(read_fixture("uia_basic.json"))
+        tree = uitree.normalize_uia(raw, "S02")
+        editor = find(tree["root"], "input", "15")
+        self.assertEqual(editor["text"], "<value>")
+        self.assertEqual(editor["name"], "Editor de texto")
+
+    def test_no_redact_keeps_values(self):
+        raw = json.loads(read_fixture("uia_basic.json"))
+        tree = uitree.normalize_uia(raw, "S02", redact=False)
+        self.assertEqual(find(tree["root"], "input", "15")["text"], "hola juan@correo.com")
+        self.assertFalse(tree["redacted"])

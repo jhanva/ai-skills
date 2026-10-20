@@ -292,3 +292,41 @@ def normalize_android(xml_text, screen, source="", max_depth=25, redact=True,
 
 
 # --------------------------------------------------------------------- uia
+
+
+def uia_role(raw_node):
+    if raw_node.get("toggle") is not None and "ToggleSwitch" in (raw_node.get("className") or ""):
+        return "switch"
+    ctype = raw_node.get("type", "")
+    return UIA_TYPE_ROLES.get(ctype, "group")
+
+
+def _uia_node(raw_node):
+    ctype = raw_node.get("type", "")
+    node = _raw(uia_role(raw_node), raw_node.get("name"), raw_node.get("value"),
+                raw_node.get("automationId"), raw_node.get("rect") or [0, 0, 0, 0],
+                raw_node.get("enabled", True), raw_node.get("offscreen", False),
+                drop=ctype in UIA_DROP_TYPES)
+    node["children"] = [_uia_node(c) for c in raw_node.get("children", [])]
+    return node
+
+
+def normalize_uia(raw, screen, max_depth=25, redact=True, captured_at=None):
+    try:
+        window = raw["window"]
+        raw_root = raw["root"]
+        win = [int(v) for v in window["rect"]]
+    except (KeyError, TypeError, ValueError) as exc:
+        raise TreeError("JSON de UIA invalido: falta %s" % exc)
+    if win[2] <= 0 or win[3] <= 0:
+        raise TreeError("la ventana tiene tamano 0")
+    root = _uia_node(raw_root)
+    root["role"] = "window"
+    root["rect"] = list(win)
+    source = "%s.exe: %s" % (window.get("process", ""), window.get("title", ""))
+    return _finish("windows", screen, source, root, win, max_depth, redact, captured_at,
+                   truncated=bool(raw.get("truncated")))
+
+
+# --------------------------------------------------------------- summarize
+
