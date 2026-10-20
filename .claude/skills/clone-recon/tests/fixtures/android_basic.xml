@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<hierarchy rotation="0">
+  <node index="0" text="" resource-id="" class="android.widget.FrameLayout" content-desc="" checkable="false" clickable="false" scrollable="false" enabled="true" bounds="[0,0][1080,2400]">
+    <node index="0" text="" resource-id="com.example.notes:id/content" class="android.widget.LinearLayout" content-desc="" checkable="false" clickable="false" scrollable="false" enabled="true" bounds="[0,0][1080,2400]">
+      <node index="0" text="Notas" resource-id="com.example.notes:id/title" class="android.widget.TextView" content-desc="" checkable="false" clickable="false" scrollable="false" enabled="true" bounds="[40,100][540,180]" />
+      <node index="1" text="" resource-id="com.example.notes:id/search" class="android.widget.EditText" content-desc="Buscar" checkable="false" clickable="true" scrollable="false" enabled="true" bounds="[40,200][1040,320]" />
+      <node index="2" text="Solo favoritas" resource-id="com.example.notes:id/fav" class="android.widget.CheckBox" content-desc="" checkable="true" clickable="true" scrollable="false" enabled="true" bounds="[40,340][600,440]" />
+      <node index="3" text="" resource-id="com.example.notes:id/list" class="androidx.recyclerview.widget.RecyclerView" content-desc="" checkable="false" clickable="false" scrollable="true" enabled="true" bounds="[0,460][1080,2000]">
+        <node index="0" text="" resource-id="com.example.notes:id/row" class="android.widget.LinearLayout" content-desc="" checkable="false" clickable="true" scrollable="false" enabled="true" bounds="[0,460][1080,660]">
+          <node index="0" text="Compras" resource-id="com.example.notes:id/row_title" class="android.widget.TextView" content-desc="" checkable="false" clickable="false" scrollable="false" enabled="true" bounds="[40,480][800,560]" />
+          <node index="1" text="2026-10-01" resource-id="com.example.notes:id/row_date" class="android.widget.TextView" content-desc="" checkable="false" clickable="false" scrollable="false" enabled="true" bounds="[40,570][800,640]" />
+        </node>
+        <node index="1" text="" resource-id="com.example.notes:id/row" class="android.widget.LinearLayout" content-desc="" checkable="false" clickable="true" scrollable="false" enabled="true" bounds="[0,660][1080,860]">
+          <node index="0" text="Ideas" resource-id="com.example.notes:id/row_title" class="android.widget.TextView" content-desc="" checkable="false" clickable="false" scrollable="false" enabled="true" bounds="[40,680][800,760]" />
+          <node index="1" text="2026-10-02" resource-id="com.example.notes:id/row_date" class="android.widget.TextView" content-desc="" checkable="false" clickable="false" scrollable="false" enabled="true" bounds="[40,770][800,840]" />
+        </node>
+        <node index="2" text="" resource-id="com.example.notes:id/row" class="android.widget.LinearLayout" content-desc="" checkable="false" clickable="true" scrollable="false" enabled="true" bounds="[0,860][1080,1060]">
+          <node index="0" text="Viaje" resource-id="com.example.notes:id/row_title" class="android.widget.TextView" content-desc="" checkable="false" clickable="false" scrollable="false" enabled="true" bounds="[40,880][800,960]" />
+          <node index="1" text="2026-10-03" resource-id="com.example.notes:id/row_date" class="android.widget.TextView" content-desc="" checkable="false" clickable="false" scrollable="false" enabled="true" bounds="[40,970][800,1040]" />
+        </node>
+      </node>
+      <node index="4" text="" resource-id="" class="android.view.View" content-desc="Nueva nota" checkable="false" clickable="true" scrollable="false" enabled="true" bounds="[880,2100][1040,2260]" />
+      <node index="5" text="Guardar" resource-id="com.example.notes:id/save" class="android.widget.Button" content-desc="" checkable="false" clickable="true" scrollable="false" enabled="false" bounds="[40,2280][520,2380]" />
+    </node>
+  </node>
+</hierarchy>

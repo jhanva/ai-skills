@@ -102,3 +102,193 @@ def redact_text(text):
     text = _EMAIL.sub("<email>", text)
     text = _PHONE_CANDIDATE.sub(_phone_sub, text)
     return _LONG_NUMBER.sub("<num>", text)
+
+
+def _redact_node(node):
+    node["name"] = redact_text(node["name"])
+    if node["role"] == "input" and node["text"]:
+        node["text"] = "<value>"
+    else:
+        node["text"] = redact_text(node["text"])
+    for child in node["children"]:
+        _redact_node(child)
+
+
+# ----------------------------------------------------- pipeline comun (raw)
+# Nodo intermedio: role, name, text, id, rect [x, y, w, h] absoluto,
+# enabled, offscreen, drop, children.
+
+def _raw(role, name="", text="", id_="", rect=(0, 0, 0, 0), enabled=True,
+         offscreen=False, drop=False, children=None):
+    return {"role": role, "name": name or "", "text": text or "", "id": id_ or "",
+            "rect": list(rect), "enabled": bool(enabled), "offscreen": bool(offscreen),
+            "drop": bool(drop), "children": children or []}
+
+
+def _visible(node, win):
+    x, y, w, h = node["rect"]
+    wx, wy, ww, wh = win
+    if w <= 0 or h <= 0:
+        return False
+    return x < wx + ww and y < wy + wh and x + w > wx and y + h > wy
+
+
+def _prune(node, win):
+    kept = []
+    for child in node["children"]:
+        if child["drop"] or child["offscreen"] or not _visible(child, win):
+            continue
+        kept.append(_prune(child, win))
+    node["children"] = kept
+    return node
+
+
+def _collapse(node):
+    node["children"] = [_collapse(c) for c in node["children"]]
+    collapsed = []
+    for child in node["children"]:
+        while (child["role"] == "group" and not child["name"] and not child["text"]
+               and not child["id"] and len(child["children"]) == 1):
+            child = child["children"][0]
+        collapsed.append(child)
+    node["children"] = collapsed
+    return node
+
+
+def _limit_depth(node, max_depth, depth=0):
+    """Devuelve True si se corto algun nodo."""
+    if depth >= max_depth:
+        cut = bool(node["children"])
+        node["children"] = []
+        return cut
+    cut = False
+    for child in node["children"]:
+        cut = _limit_depth(child, max_depth, depth + 1) or cut
+    return cut
+
+
+def _relative(node, win):
+    x, y, w, h = node["rect"]
+    wx, wy, ww, wh = win
+    out = {
+        "role": node["role"],
+        "name": node["name"],
+        "text": node["text"],
+        "id": node["id"],
+        "bounds": [round((x - wx) / ww, 3), round((y - wy) / wh, 3),
+                   round(w / ww, 3), round(h / wh, 3)],
+        "enabled": node["enabled"],
+        "children": [_relative(c, win) for c in node["children"]],
+    }
+    return out
+
+
+def _has_interactive(node):
+    if node["role"] in INTERACTIVE:
+        return True
+    return any(_has_interactive(c) for c in node["children"])
+
+
+def _finish(platform, screen, source, root, win, max_depth, redact, captured_at,
+            truncated=False):
+    root = _prune(root, win)
+    root = _collapse(root)
+    truncated = _limit_depth(root, max_depth) or truncated
+    rel = _relative(root, win)
+    if redact:
+        _redact_node(rel)
+    if truncated or not _has_interactive(rel):
+        quality = "partial"
+    else:
+        quality = "full"
+    return {
+        "schema": SCHEMA,
+        "platform": platform,
+        "screen": screen,
+        "source": source,
+        "captured_at": captured_at or _now(),
+        "window": {"w": win[2], "h": win[3]},
+        "tree_quality": quality,
+        "redacted": bool(redact),
+        "root": rel,
+    }
+
+
+def empty_tree(platform, screen, source, width, height, captured_at=None):
+    """Arbol sin nodos para pantallas donde no se pudo obtener el dump."""
+    return {
+        "schema": SCHEMA,
+        "platform": platform,
+        "screen": screen,
+        "source": source,
+        "captured_at": captured_at or _now(),
+        "window": {"w": width, "h": height},
+        "tree_quality": "none",
+        "redacted": True,
+        "root": {"role": "window", "name": "", "text": "", "id": "",
+                 "bounds": [0.0, 0.0, 1.0, 1.0], "enabled": True, "children": []},
+    }
+
+
+# ------------------------------------------------------------------ android
+
+def android_role(attrs, has_children, parent_role):
+    cls = attrs.get("class", "")
+    short = cls.rsplit(".", 1)[-1]
+    role = ANDROID_CLASS_ROLES.get(short) or ANDROID_CLASS_ROLES.get(short.split("$")[-1])
+    if role is None:
+        if attrs.get("checkable") == "true":
+            role = "checkbox"
+        elif attrs.get("clickable") == "true":
+            role = "button"
+        elif attrs.get("scrollable") == "true":
+            role = "list"
+        elif has_children:
+            role = "group"
+        elif attrs.get("text"):
+            role = "text"
+        else:
+            role = "unknown"
+    if parent_role == "list" and attrs.get("clickable") == "true":
+        role = "listitem"
+    return role
+
+
+def _android_rect(bounds):
+    m = _BOUNDS.fullmatch(bounds or "")
+    if not m:
+        return [0, 0, 0, 0]
+    x1, y1, x2, y2 = (int(v) for v in m.groups())
+    return [x1, y1, x2 - x1, y2 - y1]
+
+
+def _android_node(el, parent_role):
+    attrs = el.attrib
+    kids = [k for k in el if k.tag == "node"]
+    role = android_role(attrs, bool(kids), parent_role)
+    rid = attrs.get("resource-id", "")
+    if ":id/" in rid:
+        rid = rid.split(":id/", 1)[1]
+    node = _raw(role, attrs.get("content-desc", ""), attrs.get("text", ""), rid,
+                _android_rect(attrs.get("bounds")), attrs.get("enabled", "true") == "true")
+    node["children"] = [_android_node(k, role) for k in kids]
+    return node
+
+
+def normalize_android(xml_text, screen, source="", max_depth=25, redact=True,
+                      captured_at=None):
+    try:
+        hierarchy = ET.fromstring(xml_text)
+    except ET.ParseError as exc:
+        raise TreeError("XML de uiautomator invalido: %s" % exc)
+    tops = [_android_node(el, "window") for el in hierarchy if el.tag == "node"]
+    if not tops:
+        raise TreeError("el dump de uiautomator no tiene nodos")
+    width = max(n["rect"][0] + n["rect"][2] for n in tops)
+    height = max(n["rect"][1] + n["rect"][3] for n in tops)
+    win = [0, 0, width, height]
+    root = _raw("window", rect=win, children=tops)
+    return _finish("android", screen, source, root, win, max_depth, redact, captured_at)
+
+
+# --------------------------------------------------------------------- uia

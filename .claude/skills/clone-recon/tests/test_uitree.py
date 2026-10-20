@@ -65,3 +65,54 @@ class RedactTextTest(unittest.TestCase):
 
     def test_dates_and_short_numbers_are_kept(self):
         self.assertEqual(uitree.redact_text("2026-10-01, 3 notas"), "2026-10-01, 3 notas")
+
+
+class AndroidNormalizeTest(unittest.TestCase):
+    def setUp(self):
+        self.tree = uitree.normalize_android(read_fixture("android_basic.xml"), "S01",
+                                             captured_at=FIXED_TIME)
+
+    def test_roles_follow_class_table_and_fallbacks(self):
+        self.assertEqual(preorder(self.tree["root"]), [
+            ("window", ""),
+            ("group", "content"),
+            ("text", "title"),
+            ("input", "search"),
+            ("checkbox", "fav"),
+            ("list", "list"),
+            ("listitem", "row"), ("text", "row_title"), ("text", "row_date"),
+            ("listitem", "row"), ("text", "row_title"), ("text", "row_date"),
+            ("listitem", "row"), ("text", "row_title"), ("text", "row_date"),
+            ("button", "Nueva nota"),
+            ("button", "save"),
+        ])
+
+    def test_bounds_are_relative_to_window(self):
+        search = find(self.tree["root"], "input", "search")
+        self.assertEqual(search["bounds"], [0.037, 0.083, 0.926, 0.05])
+
+    def test_window_size_comes_from_top_nodes(self):
+        self.assertEqual(self.tree["window"], {"w": 1080, "h": 2400})
+
+    def test_enabled_flag_is_kept(self):
+        self.assertFalse(find(self.tree["root"], "button", "save")["enabled"])
+
+    def test_header_fields(self):
+        self.assertEqual(self.tree["schema"], 1)
+        self.assertEqual(self.tree["platform"], "android")
+        self.assertEqual(self.tree["screen"], "S01")
+        self.assertEqual(self.tree["captured_at"], FIXED_TIME)
+        self.assertEqual(self.tree["tree_quality"], "full")
+        self.assertTrue(self.tree["redacted"])
+
+    def test_invalid_xml_raises_tree_error(self):
+        with self.assertRaises(uitree.TreeError):
+            uitree.normalize_android("<hierarchy><node", "S01")
+
+
+class EmptyTreeTest(unittest.TestCase):
+    def test_empty_tree_has_quality_none(self):
+        tree = uitree.empty_tree("android", "S09", "com.x/.Main", 1080, 2400, FIXED_TIME)
+        self.assertEqual(tree["tree_quality"], "none")
+        self.assertEqual(tree["root"]["children"], [])
+        self.assertEqual(tree["window"], {"w": 1080, "h": 2400})
