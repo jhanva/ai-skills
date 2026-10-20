@@ -415,3 +415,65 @@ def count_nodes(node):
 
 # --------------------------------------------------------------------- cli
 
+
+def _cmd_normalize(args):
+    try:
+        if args.source_format == "android":
+            with open(args.raw, encoding="utf-8") as fh:
+                tree = normalize_android(fh.read(), args.screen, args.source,
+                                         args.max_depth, not args.no_redact)
+        else:
+            with open(args.raw, encoding="utf-8-sig") as fh:
+                raw = json.load(fh)
+            tree = normalize_uia(raw, args.screen, args.max_depth, not args.no_redact)
+    except (OSError, ValueError, TreeError) as exc:
+        print("uitree: %s" % exc, file=sys.stderr)
+        return 2
+    with open(args.out, "w", encoding="utf-8") as fh:
+        json.dump(tree, fh, ensure_ascii=False, indent=1)
+    print("ok: %s (%d nodos, %s)" % (args.out, count_nodes(tree["root"]), tree["tree_quality"]))
+    return 0
+
+
+def _cmd_summarize(args):
+    try:
+        with open(args.tree, encoding="utf-8") as fh:
+            tree = json.load(fh)
+    except (OSError, ValueError) as exc:
+        print("uitree: %s" % exc, file=sys.stderr)
+        return 2
+    print(summarize(tree, args.max_lines))
+    return 0
+
+
+def safe_stdout():
+    """Evita UnicodeEncodeError en consolas cp1252: reemplaza lo no imprimible."""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(errors="replace")
+
+
+def main(argv=None):
+    safe_stdout()
+    ap = argparse.ArgumentParser(description="Arbol de UI normalizado")
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    n = sub.add_parser("normalize")
+    n.add_argument("--from", dest="source_format", choices=("android", "uia"), required=True)
+    n.add_argument("raw")
+    n.add_argument("--out", required=True)
+    n.add_argument("--screen", required=True)
+    n.add_argument("--source", default="")
+    n.add_argument("--max-depth", type=int, default=25)
+    n.add_argument("--no-redact", action="store_true")
+    s = sub.add_parser("summarize")
+    s.add_argument("tree")
+    s.add_argument("--max-lines", type=int, default=40)
+    args = ap.parse_args(argv)
+    if args.cmd == "normalize":
+        return _cmd_normalize(args)
+    return _cmd_summarize(args)
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+

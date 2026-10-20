@@ -231,3 +231,44 @@ class SummarizeTest(unittest.TestCase):
         self.assertEqual(lines[1], 'toolbar "Barra" [0.50,0.05]')
         self.assertEqual(lines[-1], "... 5 nodos mas")
         self.assertEqual(len(lines), 3)
+
+
+class CliTest(unittest.TestCase):
+    def test_normalize_writes_tree_and_returns_zero(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = os.path.join(tmp, "S01.tree.json")
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                code = uitree.main(["normalize", "--from", "android",
+                                    os.path.join(FIXTURES, "android_basic.xml"),
+                                    "--out", out, "--screen", "S01"])
+            self.assertEqual(code, 0)
+            with open(out, encoding="utf-8") as fh:
+                self.assertEqual(json.load(fh)["screen"], "S01")
+            self.assertIn("ok: ", buf.getvalue())
+
+    def test_normalize_invalid_input_returns_two(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            bad = os.path.join(tmp, "bad.xml")
+            with open(bad, "w", encoding="utf-8") as fh:
+                fh.write("<hierarchy><node")
+            with redirect_stderr(io.StringIO()):
+                code = uitree.main(["normalize", "--from", "android", bad,
+                                    "--out", os.path.join(tmp, "o.json"), "--screen", "S01"])
+            self.assertEqual(code, 2)
+
+    def test_summarize_command_prints_summary(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "t.json")
+            tree = uitree.normalize_uia(uia_raw([uia_node("Button", "Ok")]), "S01")
+            with open(path, "w", encoding="utf-8") as fh:
+                json.dump(tree, fh)
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                code = uitree.main(["summarize", path])
+        self.assertEqual(code, 0)
+        self.assertTrue(buf.getvalue().startswith("S01 windows full"))
+
+
+if __name__ == "__main__":
+    unittest.main()
