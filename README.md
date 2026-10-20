@@ -114,6 +114,17 @@ Incluye libreria Python CDP (`cdp_helpers.py`, ~370 lineas) con auto-discovery d
 
 Disponible en ambos runtimes: `$codegraph` en Codex y `/codegraph` en Claude Code. Zero dependencias (solo stdlib de Python 3.10+, sin pip install), pipeline completo en un comando, builds incrementales por hash de contenido. Outputs: `graph.json` (node-link, compatible d3/GraphRAG), `GRAPH_REPORT.md` (god nodes, conexiones sorprendentes, preguntas sugeridas) y `graph.html` (visualizacion interactiva offline). El directorio `codegraph-out/` es committeable: el equipo comparte un solo grafo.
 
+### Clonar apps
+
+| Skill | Activacion | Proposito |
+|---|---|---|
+| [`clone-recon`](./.claude/skills/clone-recon/SKILL.md) | Explicita | Desarma una app Android o de escritorio Windows instalada: captura screenshot + arbol de UI de cada pantalla mientras el usuario navega, y arma pantallas, flujos, modelo de datos y matriz de features |
+| [`clone-arch`](./.claude/skills/clone-arch/SKILL.md) | Explicita | Elige el stack del clon con una matriz ponderada, convierte el modelo inferido en esquema real y fija el orden de construccion |
+| [`clone-build`](./.claude/skills/clone-build/SKILL.md) | Explicita | Construye pantalla por pantalla con `/tdd`, captura el clon con el mismo script y lo compara contra el original como definicion de terminado |
+| [`clone-diff`](./.claude/skills/clone-diff/SKILL.md) | Explicita | Feature score ponderado, score de arbol de UI por pantalla, pasos por flujo y veredicto (incompleto, usable, completo) |
+
+Solo en Claude Code por ahora. Para uso propio: reconstruye funcionalidad observando la UI, nunca descompila ni extrae recursos. Scripts zero-deps (stdlib de Python 3.10+ y Windows PowerShell 5.1): `capture_android.py` (adb), `capture_windows.ps1` (UI Automation), `uitree.py` (arbol normalizado neutral a la plataforma, con redaccion de datos personales), `treediff.py` y `parity.py`.
+
 ### Game development
 
 Stack orientado a juegos 2D pixel art (RPG, platformer, roguelike) con Godot 4, GDScript y C#. Incluye 20 skills y 9 agentes especializados.
@@ -333,6 +344,12 @@ codegraph build [ruta]           (construye/actualiza el grafo, incremental)
 codegraph query [ruta] "..."     (responde desde el grafo, BFS o --dfs)
 codegraph path [ruta] "A" "B"    (camino mas corto entre dos conceptos)
 codegraph explain [ruta] "X"     (un nodo y todas sus conexiones)
+```
+
+### Clonar apps
+
+```
+clone-recon  -->  clone-arch  -->  clone-build (usa tdd)  -->  clone-diff
 ```
 
 ### Multiples problemas independientes

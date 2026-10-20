@@ -76,6 +76,19 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
   codegraph/scripts/cg_html.py                 — Visualizacion HTML autocontenida
   git-identity/SKILL.md            — Identidades Git separadas (4 capas, audit/setup)
   git-identity/references/setup.md — Referencia para modo setup
+  clone-recon/SKILL.md             — Desarmar app Android/Windows (pantallas, flujos, features)
+  clone-recon/references/recon-template.md   — Plantilla de clone/recon.md
+  clone-recon/references/android-capture.md  — Setup y problemas de captura con adb
+  clone-recon/references/windows-capture.md  — Setup y problemas de captura con UI Automation
+  clone-recon/scripts/capture_android.py     — Captura via adb (screenshot + arbol de UI)
+  clone-recon/scripts/capture_windows.ps1    — Captura via UI Automation (PowerShell 5.1)
+  clone-recon/scripts/uitree.py              — Arbol de UI normalizado (normalize, summarize)
+  clone-arch/SKILL.md              — Stack, esquema y orden de construccion del clon
+  clone-arch/references/stack-matrix.md      — Matriz de decision de stack
+  clone-build/SKILL.md             — Construccion pantalla por pantalla contra el original
+  clone-diff/SKILL.md              — Paridad: features + arbol de UI + veredicto
+  clone-diff/scripts/treediff.py             — Diff de arboles de UI normalizados
+  clone-diff/scripts/parity.py               — Reporte de paridad y veredicto
 
 .claude/commands/
   git-identity.md                  — Auditoria y setup de cuentas git separadas
@@ -153,6 +166,10 @@ Skills de desarrollo y agentes especializados propios, escritos desde cero. Impo
 | `/browser-control` | Solo usuario | Control de browser via CDP (navegacion, screenshots, clicks, tabs) |
 | `/codegraph` | Auto + usuario | Knowledge graph consultable del proyecto (build, query, path, explain) |
 | `/git-identity` | Solo usuario | Identidades Git separadas: audit y setup de 4 capas |
+| `/clone-recon` | Solo usuario | Desarmar app Android/Windows: capturas, flujos, features |
+| `/clone-arch` | Solo usuario | Stack (matriz), esquema y orden de construccion del clon |
+| `/clone-build` | Solo usuario | Construir pantalla por pantalla con diff contra el original |
+| `/clone-diff` | Solo usuario | Paridad: feature score, score de UI por pantalla, veredicto |
 
 "Siempre activa" = `user-invocable: false` (Claude la carga automaticamente, no aparece en menu `/`)
 "Solo usuario" = `disable-model-invocation: true` (se invoca manualmente con `/nombre`)
@@ -248,6 +265,14 @@ Tier 1 — Directores (opus)
 /aseprite-workflows    Inspeccionar .aseprite, exportar sheets/frames, correr Lua
 /godot-workflows       Import headless, export builds, scripts de automatizacion
 /pixellab-workflows    Generar personajes, tilesets, props con PixelLab AI
+```
+
+### Clonar apps (uso propio)
+```
+/clone-recon  -->  /clone-arch  -->  /clone-build (usa /tdd)  -->  /clone-diff
+ capturas,         stack,            pantalla por pantalla,        veredicto:
+ flujos,           esquema,          diff de arbol de UI           incompleto,
+ features          hitos             contra el original            usable, completo
 ```
 
 ### Infraestructura
